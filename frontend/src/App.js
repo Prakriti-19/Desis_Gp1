@@ -1,28 +1,19 @@
-// import Component from the react module
 import React, { Component } from "react";
 import Modal from "./components/Modal";
 import axios from 'axios';
 
-// create a class that extends the component
-class App extends Component {
 
-// add a constructor to take props
+class App extends Component {
 constructor(props) {
 	super(props);
-	
-	// add the props here
 	this.state = {
-	
-	// the viewCompleted prop represents the status
-	// of the task. Set it to false by default
 	viewCompleted: false,
 	activeItem: {
 		title: "",
-		description: "",
-		completed: false
+		//description: "",
+		quantity: 10,
+
 	},
-	
-	// this list stores all the completed tasks
 	taskList: []
 	};
 }
@@ -140,7 +131,7 @@ handleDelete = (item) => {
 
 // Create item
 createItem = () => {
-	const item = { title: "", description: "", completed: false };
+	const item = { title: "", quantity:10};
 	this.setState({ activeItem: item, modal: !this.state.modal });
 };
 

@@ -46,14 +46,12 @@ class ngo(models.Model):
 class invent(models.Model):
     name = models.CharField(max_length=200)
     quantity = models.IntegerField(default=10)
-    # donor_id = models.ForeignKey(donor, on_delete=models.CASCADE, related_name='donor1', related_query_name='donor1')
+    # donor_id = models.ForeignKey(donor, on_delete=models.CASCADE, related_name='donor1', related_query_name='donor1',null=True)
     # category = models.ManyToManyField(Category, related_name='products')
-    # user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='comments', related_query_name='comment')
-    start_date = models.DateField(auto_now_add=True)
-    image = models.ManyToManyField('inventory.Image', related_name='products')
-    exp_date = models.DateField()
-    status = models.BooleanField(default=True)
-    desc = models.TextField(default="xyz")
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='donation', related_query_name='donation',null=True)
+    # image = models.ManyToManyField('inventory.Image', related_name='food')
+    # exp_date = models.DateField()
+    # desc = models.TextField(default="xyz")
 
     def __str__(self):
         return self.name
@@ -68,8 +66,8 @@ class chat(models.Model):
 
     
 class stats(models.Model):
-    plates_served_week = models.IntegerField()
     city = models.CharField(max_length=250)
+    plates_served_week = models.IntegerField()
     plates_served_month = models.IntegerField()
     plates_served_total = models.IntegerField()
 
