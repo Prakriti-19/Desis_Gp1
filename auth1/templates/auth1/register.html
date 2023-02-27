@@ -1,7 +1,7 @@
-{% extends 'base.html' %}
+{% extends 'auth1/base.html' %}
 {% block content %}
 <main class="container">
-    <h1 class="display-6 mt-4">User login</h1>
+    <h1 class="display-6 mt-4">New User Registration</h1>
     <form method="post" class="mt-4">
         {% csrf_token %}
         {% for error in form.non_field_errors %}
@@ -23,14 +23,14 @@
         </div>
         {% endfor %}
         <div class="mb-2">
-            <button type="submit" class="btn btn-primary btn-lg form-control">
-                Login
+            <button type="submit" class="btn btn-primary btn-lg form-control" value="OK">
+                Create account
             </button>
         </div>
         <div class="mt-2">
-            <p class="text-muted">
-                Don't have an account?
-                <a href="register.html" class="text-muted">Create now</a>
+            <p class="nav-link">
+                Already have an account?
+                <a href="{% url 'login' %}" class="nav-link">Login here</a>
             </p>
         </div>
     </form>

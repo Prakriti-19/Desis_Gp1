@@ -14,8 +14,8 @@ router.register(r'donations', donationsViewSet, basename='donations')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('auth/', include('auth1.urls')),
-    path('', include(router.urls)),
+    path('api/', include(router.urls)),
+    path('', include('auth1.urls')),
 ]
 
 if settings.DEBUG:

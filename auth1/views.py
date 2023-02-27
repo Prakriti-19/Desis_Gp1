@@ -6,15 +6,15 @@ from django.views import View
 from django.views.generic import TemplateView
 
 class HomeView(TemplateView):
-    template_name = "home.html"
+    template_name = "auth1/home.html"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["title"] = "tOdO | Home"
+        context["title"] = "HandsForHunger | Home"
         return context
     
 class RegisterView(TemplateView):
-    template_name = "register.html"
+    template_name = "auth1/register.html"
     form_class = UserRegisterForm
 
     def get_context_data(self, **kwargs):
@@ -33,14 +33,14 @@ class RegisterView(TemplateView):
         if form.is_valid():
             form.save()
             messages.success(request, "You have been registered! Login now!")
-            return redirect("home")
+            return redirect("/")
         context = self.get_context_data()
         context.update({"form": form})
         return render(request, self.template_name, context)
 
 
 class LoginView(TemplateView):
-    template_name = "login.html"
+    template_name = "auth1/login.html"
     form_class = UserLoginForm
 
     def get_context_data(self, **kwargs):
@@ -63,7 +63,7 @@ class LoginView(TemplateView):
             if user:
                 login(request, user)
                 messages.success(request, "Successfully logged in")
-                return redirect("home")
+                return redirect("/")
             else:
                 messages.error(request, "Invalid credentials")
         context = self.get_context_data()
@@ -74,3 +74,4 @@ class LoginView(TemplateView):
 class LogoutView(View):
     def get(self, request):
         logout(request)
+        return redirect("/")
