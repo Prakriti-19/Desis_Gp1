@@ -1,58 +1,50 @@
 from django.db import models
 from django.contrib.auth.models import User
-from versatileimagefield.fields import VersatileImageField, PPOIField
+# from versatileimagefield.fields import VersatileImageField, PPOIField
 
 
-class Image(models.Model):
-    name = models.CharField(max_length=255)
-    image = VersatileImageField(
-        'Image',
-        upload_to='images/',
-        ppoi_field='image_ppoi'
-    )
-    image_ppoi = PPOIField()
-
+class location(models.Model):
+    code = models.IntegerField(default=248001)
+    city = models.CharField(max_length=250,default="es")
+    state= models.CharField(max_length=250,default="qw")
     def __str__(self):
-        return self.name
-    
+        return self.city
+  
 class donor(models.Model):
-    d_name = models.CharField(max_length=255)
+    id = models.AutoField(primary_key=True)
+    donor_name = models.CharField(max_length=255)
     email = models.CharField(max_length=55)
-    # donations = models.OneToManyField(invent,related_name='donations')
     phone_no = models.IntegerField()
     points = models.PositiveBigIntegerField(default=0)
-    locality = models.TextField(default="hj")
-    city = models.CharField(max_length=200)
+    pincode = models.ForeignKey(location, on_delete=models.CASCADE,null=True)
     longitude = models.DecimalField(decimal_places=10,max_digits=15)
     latitude = models.DecimalField(decimal_places=10,max_digits=15)
 
     def __str__(self):
-        return self.d_name
-
+        return self.donor_name
 
 class ngo(models.Model):
-    name = models.CharField(max_length=255)
-    email = models.CharField(max_length=55)
-    phone_no = models.IntegerField()
-    rating = models.DecimalField(decimal_places=2,max_digits=4)
-    locality = models.TextField(default="ghjv")
-    city = models.CharField(max_length=200)
-    longitude = models.DecimalField(decimal_places=10,max_digits=15)
-    latitude = models.DecimalField(decimal_places=10,max_digits=15)
+    id = models.AutoField(primary_key=True)
+    ngo_name = models.CharField(max_length=255,default="a")
+    email = models.CharField(max_length=55,default="b")
+    phone_no = models.IntegerField(default=123456789)
+    pincode = models.ForeignKey(location, on_delete=models.CASCADE,null=True)
+    longitude = models.DecimalField(decimal_places=10,max_digits=15,default=2.313)
+    latitude = models.DecimalField(decimal_places=10,max_digits=15,default=13.131)
 
     def __str__(self):
-        return self.name
+        return self.ngo_name
 
-class invent(models.Model):
-    name = models.CharField(max_length=200)
+class donations(models.Model):
+    id = models.AutoField(primary_key=True)
+    donor_id = models.ForeignKey(donor, on_delete=models.CASCADE)
+    name = models.CharField(max_length=255)
+    ngo_id = models.ForeignKey(ngo, on_delete=models.CASCADE)
+    exp_date = models.DateField()
     quantity = models.IntegerField(default=10)
-    # donor_id = models.ForeignKey(donor, on_delete=models.CASCADE, related_name='donor1', related_query_name='donor1',null=True)
-    # category = models.ManyToManyField(Category, related_name='products')
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='donation', related_query_name='donation',null=True)
-    # image = models.ManyToManyField('inventory.Image', related_name='food')
-    # exp_date = models.DateField()
-    # desc = models.TextField(default="xyz")
-
+    desc = models.TextField(default="xyz")
+    donation_date = models.DateField(auto_now_add=True)
+     
     def __str__(self):
         return self.name
     
@@ -65,12 +57,17 @@ class chat(models.Model):
     seen_time = models.TimeField()
 
     
-class stats(models.Model):
-    city = models.CharField(max_length=250)
-    plates_served_week = models.IntegerField()
-    plates_served_month = models.IntegerField()
-    plates_served_total = models.IntegerField()
+# class Image(models.Model):
+#     name = models.CharField(max_length=255)
+#     image = VersatileImageField(
+#         'Image',
+#         upload_to='images/',
+#         ppoi_field='image_ppoi'
+#     )
+#     image_ppoi = PPOIField()
 
-    def __str__(self):
-        return self.city
+#     def __str__(self):
+#         return self.name
+
+
 
