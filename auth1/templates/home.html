@@ -1,0 +1,16 @@
+{% extends 'base.html' %} {% block content %}
+<main class="container text-center">
+    {% if user.is_authenticated %}
+    <h1 class="display-2 mt-5">
+        Welcome {{ user.username }}! 
+        <span>&#128516;</span>
+    </h1>
+    {% else %}
+    <h1 class="display-2 mt-5">
+        Create an account to start donating
+        <span>&#128516;</span>
+    </h1>
+    <a href="{% url 'register' %}" class="btn btn-primary btn-lg mt-4">Sign up for free</a>
+    {% endif %}
+</main>
+{% endblock content %}
