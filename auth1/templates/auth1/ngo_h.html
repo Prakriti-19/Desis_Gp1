@@ -1,0 +1,18 @@
+{% extends 'auth1/base.html' %}
+
+{% block content %}
+  {% if user.is_authenticated %}
+    {% if user.is_donor %}
+      <h1>Welcome, Donor {{ user.username }}!</h1>
+      <p>You can view your donation history, update your profile, and explore new opportunities to donate.</p>
+      <!-- Add donor-specific content here -->
+    {% elif user.is_ngo %}
+      <h1>Welcome, NGO {{ user.username }}!</h1>
+      <p>You can view your organization's donation history, manage your campaigns, and update your profile.</p>
+      <!-- Add NGO-specific content here -->
+    {% endif %}
+  {% else %}
+    <h1>Welcome to our donation platform!</h1>
+    <p>Please login or register to start donating or creating campaigns.</p>
+  {% endif %}
+{% endblock %}

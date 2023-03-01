@@ -11,6 +11,7 @@ urlpatterns = [
     path("nr/", views.NgoSignUpView.as_view(), name="ngo_register"),
     path("dr/", views.DonorSignUpView.as_view(), name="donor_register"),
     path("", views.HomeView.as_view(), name="home"),
+    path("nh", views.HomeView2.as_view(), name="log_home"),
     path("nl/", views.NgoLoginView, name="ngo_login"),
     path("dl/", views.DonorLoginView, name="donor_login"),
 ]

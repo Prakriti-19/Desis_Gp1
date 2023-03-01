@@ -3,7 +3,34 @@ from django.contrib.auth.models import Permission,Group
 from django.contrib.auth.models import AbstractUser
 # from versatileimagefield.fields import VersatileImageField, PPOIField
 
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 
+class NgoManager(BaseUserManager):
+    def create_user(self, email, password=None, **kwargs):
+        if not email:
+            raise ValueError('Email is required')
+
+        user = self.model(email=self.normalize_email(email), **kwargs)
+        user.set_password(password)
+        user.is_ngo = True
+        user.is_donor = False
+        user.save(using=self._db)
+        return user    
+
+class DonorManager(BaseUserManager):
+    def create_user(self, email, password=None, **kwargs):
+        if not email:
+            raise ValueError('Email is required')
+
+        user = self.model(email=self.normalize_email(email), **kwargs)
+        user.set_password(password)
+        user.is_donor = True
+        user.is_ngo = False
+        user.save(using=self._db)
+        return user
+
+
+    
 class location(models.Model):
     code = models.IntegerField(default=248001)
     city = models.CharField(max_length=250,default="es")
@@ -12,11 +39,11 @@ class location(models.Model):
         return self.city
 
 class ngo(AbstractUser):
-    id = models.AutoField(primary_key=True)
     ngo_name = models.CharField(max_length=255,default="a")
     email = models.CharField(max_length=55,default="b")
     phone_no = models.IntegerField(default=123456789)
     is_ngo = models.BooleanField(default=True)
+    is_donor = models.BooleanField(default=False)
     pincode = models.ForeignKey(location, on_delete=models.CASCADE,null=True)
     longitude = models.DecimalField(decimal_places=10,max_digits=15,default=2.313)
     latitude = models.DecimalField(decimal_places=10,max_digits=15,default=13.131)
@@ -24,19 +51,19 @@ class ngo(AbstractUser):
     user_permissions = models.ManyToManyField(
         Permission,
         related_name='ngo_user_permissions',
-        # blank=True,
     )
-    
+    objects = NgoManager()
+
     def __str__(self):
         return self.email
     pass
     
 class donor(AbstractUser):
-    id = models.AutoField(primary_key=True)
     donor_name = models.CharField(max_length=255)
     email = models.CharField(max_length=55)
     phone_no = models.IntegerField(default=123456789)
     points = models.PositiveBigIntegerField(default=0)
+    is_ngo = models.BooleanField(default=False)
     pincode = models.ForeignKey(location, on_delete=models.CASCADE,null=True)
     longitude = models.DecimalField(decimal_places=10,max_digits=15,default=2.313)
     latitude = models.DecimalField(decimal_places=10,max_digits=15,default=13.13)
@@ -45,9 +72,9 @@ class donor(AbstractUser):
     user_permissions = models.ManyToManyField(
         Permission,
         related_name='donor_user_permissions',
-        # blank=True,
     )
-    
+    objects = DonorManager()
+
     def __str__(self):
         return self.email
     pass

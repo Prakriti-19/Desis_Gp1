@@ -77,7 +77,10 @@ TEMPLATES = [
         },
     },
 ]
-
+AUTHENTICATION_BACKENDS = [
+    'auth1.backends.MyUserBackend',
+    'django.contrib.auth.backends.ModelBackend',
+]
 WSGI_APPLICATION = 'test1.wsgi.application'
 
 VERSATILEIMAGEFIELD_RENDITION_KEY_SETS = {
