@@ -17,6 +17,10 @@ from .forms import DonationForm
 #     permission_classes = [IsAuthenticated]
 
 
+def donations_list(request):
+    donat = donations.objects.all()
+    return render(request, "inventory/donations_list", {'donations': donat})
+
 class ngoViewSet(ReadOnlyModelViewSet):
 
     serializer_class = ngoSerializer
@@ -61,3 +65,4 @@ class DonationView(LoginRequiredMixin, TemplateView):
         context = self.get_context_data()
         context.update({"form": form})
         return render(request, self.template_name, context)
+    

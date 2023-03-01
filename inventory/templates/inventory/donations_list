@@ -1,0 +1,10 @@
+{% extends 'auth1/base.html' %}
+
+{% block content %}
+  <h1>List of Donors</h1>
+  <ul>
+    {% for donations in donations %}
+      <li>{{ donations }} - Donations made: {{ donations.donations_made }}</li>
+    {% endfor %}
+  </ul>
+{% endblock %}

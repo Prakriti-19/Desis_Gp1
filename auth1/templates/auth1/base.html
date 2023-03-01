@@ -32,10 +32,16 @@
                         </li>
                         {% else %}
                         <li class="nav-item">
-                            <a class="nav-link" href="{% url 'register' %}">Sign up</a>
+                            <a class="nav-link" href="{% url 'ngo_register' %}">NGO Sign up</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="{% url 'login' %}">Login</a>
+                            <a class="nav-link" href="{% url 'ngo_login' %}">NGO Login</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'donor_register' %}">Donor Sign up</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'donor_login' %}">Donor Login</a>
                         </li>
                         {% endif %}
                     </ul>

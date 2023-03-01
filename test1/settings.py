@@ -167,5 +167,8 @@ CSRF_TRUSTED_ORIGINS = [
 
 CORS_ALLOW_CREDENTIALS = True
 
+AUTH_USER_MODEL = 'inventory.ngo'
+AUTH_USER_MODEL = 'inventory.donor'
+
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')

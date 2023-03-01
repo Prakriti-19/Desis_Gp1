@@ -1,49 +1,38 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
+from inventory.models import ngo,donor
 
-
-class UserRegisterForm(UserCreationForm):
-    username = forms.CharField(
-        label="Username",
-        widget=forms.TextInput(
-            attrs={"class": "form-control", "placeholder": "Username"}
-        ),
-    )
-    email = forms.EmailField(
-        label="Email",
-        widget=forms.EmailInput(
-            attrs={"class": "form-control", "placeholder": "name@example.com"}
-        ),
-    )
-    password1 = forms.CharField(
-        label="Password",
-        widget=forms.PasswordInput(
-            attrs={"class": "form-control", "placeholder": "Password"}
-        ),
-    )
-    password2 = forms.CharField(
-        label="Confirm password",
-        widget=forms.PasswordInput(
-            attrs={"class": "form-control", "placeholder": "Retype password"}
-        ),
-    )
-
-    class Meta:
-        model = User
-        fields = ["username", "email", "password1", "password2"]
-
-
-class UserLoginForm(forms.Form):
-    username = forms.CharField(
-        label="Username",
-        widget=forms.TextInput(
-            attrs={"class": "form-control", "placeholder": "Username"}
-        ),
-    )
-    password = forms.CharField(
-        label="Password",
-        widget=forms.PasswordInput(
-            attrs={"class": "form-control", "placeholder": "Password"}
-        ),
-    )
+class ngoUserCreationForm(UserCreationForm):
+    class Meta(UserCreationForm.Meta):
+        model = ngo
+        fields = ('username', 'email', 'phone_no','latitude','longitude','password1', 'password2')
+    email = forms.CharField(max_length=30, required=True)
+    phone_no = forms.IntegerField(required=True)
+    longitude = forms.DecimalField(decimal_places=10,max_digits=15,required=True)
+    latitude = forms.DecimalField(decimal_places=10,max_digits=15,required=True)
+   
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        user.is_ngo = True
+        if commit:
+            user.save()
+        return user
+    
+class donorUserCreationForm(UserCreationForm):
+    class Meta(UserCreationForm.Meta):
+        model = donor
+        fields = ('username', 'email', 'phone_no','points','latitude','longitude','password1', 'password2')
+    email = forms.CharField(max_length=30, required=True)
+    phone_no = forms.IntegerField(required=True)
+    points = forms.IntegerField(required=True)
+    longitude = forms.DecimalField(decimal_places=10,max_digits=15,required=True)
+    latitude = forms.DecimalField(decimal_places=10,max_digits=15,required=True)
+   
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        user.is_donor = True
+        if commit:
+            user.save()
+        return user
+   

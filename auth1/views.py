@@ -1,8 +1,8 @@
 from auth1.forms import *
-from django.contrib import messages
-from django.contrib.auth import authenticate, login, logout
-from django.shortcuts import redirect, render
-from django.views import View
+from django.contrib.auth import logout,authenticate,login
+from django.urls import reverse_lazy
+from django.shortcuts import redirect,render
+from django.views import View,generic
 from django.views.generic import TemplateView
 
 class HomeView(TemplateView):
@@ -13,65 +13,61 @@ class HomeView(TemplateView):
         context["title"] = "HandsForHunger | Home"
         return context
     
-class RegisterView(TemplateView):
-    template_name = "auth1/register.html"
-    form_class = UserRegisterForm
+def NgoLoginView(request):
+    if request.method == 'POST':
+        username = request.POST['username']
+        password = request.POST['password']
+        user = authenticate(request, username=username, password=password)
+        print(f"username: {username}")
+        print(f"password: {password}")
+        print(f"user: {user}") 
+        if user is not None and user.is_ngo:
+            login(request, user)
+            return redirect('auth1/home.html')
+        else:
+            return render(request, 'auth1/login.html', {'error_message': 'Invalid login credentials'})
+    else:
+        return render(request, 'auth1/login.html')
+    
+def DonorLoginView(request):
+    if request.method == 'POST':
+        username = request.POST['username']
+        password = request.POST['password']
+        user = authenticate(request, username=username, password=password)
+        print(f"username: {username}")
+        print(f"password: {password}")
+        print(f"user: {user}") 
+        if user is not None and user.is_donor:
+            login(request, user)
+            return redirect('auth1/home.html')
+        else:
+            return render(request, 'auth1/login.html', {'error_message': 'Invalid login credentials'})
+    else:
+        return render(request, 'auth1/login.html')
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["title"] = "HandsForHunger | Register"
-        return context
+    
 
-    def get(self, request):
-        form = self.form_class()
-        context = self.get_context_data()
-        context.update({"form": form})
-        return render(request, self.template_name, context)
+    
+    
+class NgoSignUpView(generic.CreateView):
+    form_class = ngoUserCreationForm
+    template_name = "auth1/signup.html"
+    success_url = reverse_lazy('ngo_login')
+    
+    def form_valid(self, form):
+        return super().form_valid(form)
 
-    def post(self, request):
-        form = self.form_class(request.POST)
-        if form.is_valid():
-            form.save()
-            messages.success(request, "You have been registered! Login now!")
-            return redirect("/")
-        context = self.get_context_data()
-        context.update({"form": form})
-        return render(request, self.template_name, context)
-
-
-class LoginView(TemplateView):
-    template_name = "auth1/login.html"
-    form_class = UserLoginForm
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["title"] = "HandsForHunger | Login"
-        return context
-
-    def get(self, request):
-        form = self.form_class()
-        context = self.get_context_data()
-        context.update({"form": form})
-        return render(request, self.template_name, context)
-
-    def post(self, request):
-        form = self.form_class(request.POST)
-        if form.is_valid():
-            username = form.cleaned_data.get("username")
-            password = form.cleaned_data.get("password")
-            user = authenticate(request, username=username, password=password)
-            if user:
-                login(request, user)
-                messages.success(request, "Successfully logged in")
-                return redirect("/")
-            else:
-                messages.error(request, "Invalid credentials")
-        context = self.get_context_data()
-        context.update({"form": form})
-        return render(request, self.template_name, context)
-
+class DonorSignUpView(generic.CreateView):
+    form_class = donorUserCreationForm
+    template_name = "auth1/signup.html"
+    success_url = reverse_lazy('donor_login')
+    
+    def form_valid(self, form):
+        return super().form_valid(form)
 
 class LogoutView(View):
     def get(self, request):
         logout(request)
         return redirect("/")
+    
+
