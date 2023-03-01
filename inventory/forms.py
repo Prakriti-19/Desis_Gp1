@@ -1,25 +1,23 @@
 from django import forms
-from .models import donations
+from .models import donations,ngo
+
 
 class DonationForm(forms.ModelForm):
-    desc = forms.Field(
-        required=True,
-        label="Description",
-        widget=forms.Textarea(
-            attrs={"class": "form-control", "placeholder": "Add some details.."}
-        ),
-    )
-    exp_date = forms.DateField(
-        required = True,
-        label = "UsedBy_Date",
-        widget = forms.DateInput(attrs={"class": "form-control", "type": "date"})
-    )
-    quantity = forms.IntegerField(
-        required=True,
-        label="Quantity",
-        widget=forms.NumberInput(attrs={"class": "form-control", "type": "Integer"}),
-    )
-
     class Meta:
         model = donations
-        fields = ["desc", "quantity", "exp_date"]
+        fields = ('exp_date', 'quantity', 'desc')
+
+    def __init__(self, *args, **kwargs):
+        self.user = kwargs.pop('user')
+        super().__init__(*args, **kwargs)
+
+    ngo = forms.ModelChoiceField(queryset=ngo.objects.all(), required=False)
+
+    def save(self, commit=True):
+        donation = super().save(commit=False)
+        donation.donor_id = self.user
+        if self.cleaned_data['ngo']:
+            donation.ngo_id = self.cleaned_data['ngo']
+        if commit:
+            donation.save()
+        return donation

@@ -1,9 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import Permission,Group
+from django.contrib.auth.models import User
 from django.contrib.auth.models import AbstractUser
-# from versatileimagefield.fields import VersatileImageField, PPOIField
-
-from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
+from django.contrib.auth.models import  BaseUserManager
 
 class NgoManager(BaseUserManager):
     def create_user(self, email, password=None, **kwargs):
@@ -28,8 +27,6 @@ class DonorManager(BaseUserManager):
         user.is_ngo = False
         user.save(using=self._db)
         return user
-
-
     
 class location(models.Model):
     code = models.IntegerField(default=248001)
@@ -82,8 +79,8 @@ class donor(AbstractUser):
 
 class donations(models.Model):
     id = models.AutoField(primary_key=True)
-    # donor_id =  models.ForeignKey(User, on_delete=models.CASCADE,default=None)
-    # ngo_id = models.ForeignKey(ngo, on_delete=models.CASCADE,default=None,blank=True)
+    donor_id = models.ForeignKey(donor, on_delete=models.CASCADE)
+    ngo_id = models.ForeignKey(ngo, on_delete=models.CASCADE, related_name='ngo_donations', blank=True, null=True)
     exp_date = models.DateField()
     quantity = models.IntegerField(default=10)
     desc = models.TextField(default="xyz")
@@ -102,18 +99,7 @@ class chat(models.Model):
     sent_time = models.TimeField(auto_now_add=True)
     seen_time = models.TimeField()
 
-    
-# class Image(models.Model):
-#     name = models.CharField(max_length=255)
-#     image = VersatileImageField(
-#         'Image',
-#         upload_to='images/',
-#         ppoi_field='image_ppoi'
-#     )
-#     image_ppoi = PPOIField()
 
-#     def __str__(self):
-#         return self.name
 
 
 

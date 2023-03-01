@@ -6,7 +6,7 @@ from auth1.views import *
 
 urlpatterns = [
     path("logout/", views.LogoutView.as_view(), name="logout"),
-    path("donate/", DonationView.as_view(), name="add_donation"),
+    path("donate/", donate, name="add_donation"),
     path("list/",donations_list, name="donations_list"),
     path("nr/", views.NgoSignUpView.as_view(), name="ngo_register"),
     path("dr/", views.DonorSignUpView.as_view(), name="donor_register"),

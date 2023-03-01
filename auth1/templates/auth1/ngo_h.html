@@ -5,10 +5,16 @@
     {% if user.is_donor %}
       <h1>Welcome, Donor {{ user.username }}!</h1>
       <p>You can view your donation history, update your profile, and explore new opportunities to donate.</p>
+    <li class="nav-item">
+        <a class="nav-link" href="{% url 'logout' %}">Logout</a>
+    </li>
       <!-- Add donor-specific content here -->
     {% elif user.is_ngo %}
       <h1>Welcome, NGO {{ user.username }}!</h1>
       <p>You can view your organization's donation history, manage your campaigns, and update your profile.</p>
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'logout' %}">Logout</a>
+    </li>
       <!-- Add NGO-specific content here -->
     {% endif %}
   {% else %}

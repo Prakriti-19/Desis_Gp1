@@ -4,7 +4,7 @@
   <h1>List of Donors</h1>
   <ul>
     {% for donations in donations %}
-      <li>{{ donations }} - Donations made: {{ donations.donations_made }}</li>
+      <li>{{ donations }} - Donations made: {{ donations.donor_id.email }}</li>
     {% endfor %}
   </ul>
 {% endblock %}
