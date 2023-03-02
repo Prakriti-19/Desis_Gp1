@@ -5,8 +5,9 @@ from inventory.models import ngo,donor
 class ngoUserCreationForm(UserCreationForm):
     class Meta(UserCreationForm.Meta):
         model = ngo
-        fields = ('username', 'email', 'phone_no','latitude','longitude','password1', 'password2')
+        fields = ('username','ngo_name', 'email', 'phone_no','latitude','longitude','password1', 'password2')
     email = forms.CharField(max_length=30, required=True)
+    ngo_name = forms.CharField(max_length=255)
     phone_no = forms.IntegerField(required=True)
     longitude = forms.DecimalField(decimal_places=10,max_digits=15,required=True)
     latitude = forms.DecimalField(decimal_places=10,max_digits=15,required=True)
@@ -21,10 +22,10 @@ class ngoUserCreationForm(UserCreationForm):
 class donorUserCreationForm(UserCreationForm):
     class Meta(UserCreationForm.Meta):
         model = donor
-        fields = ('username', 'email', 'phone_no','points','latitude','longitude','password1', 'password2')
+        fields = ('username','donor_name', 'email', 'phone_no','latitude','longitude','password1', 'password2')
     email = forms.CharField(max_length=30, required=True)
     phone_no = forms.IntegerField(required=True)
-    points = forms.IntegerField(required=True)
+    donor_name = forms.CharField(max_length=255)
     longitude = forms.DecimalField(decimal_places=10,max_digits=15,required=True)
     latitude = forms.DecimalField(decimal_places=10,max_digits=15,required=True)
    

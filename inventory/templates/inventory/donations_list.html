@@ -1,0 +1,11 @@
+{% extends 'auth1/base.html' %}
+
+{% block content %}
+  <h1>List of Donors</h1>
+  <ul>
+    {% for donations in donations %}
+      <li>{{ donations }} - Donation made by: {{ donations.donor_id.email }}
+           for: {{ donations.quantity }}people, valid till: {{ donations.exp_date}}</li>
+    {% endfor %}
+  </ul>
+{% endblock %}

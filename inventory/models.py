@@ -27,6 +27,10 @@ class DonorManager(BaseUserManager):
         user.is_ngo = False
         user.save(using=self._db)
         return user
+    def create_superuser(self, email, password, **extra_fields):
+        extra_fields.setdefault('is_staff', True)
+        extra_fields.setdefault('is_superuser', True)
+        return self.create_user(email, password, **extra_fields)
     
 class location(models.Model):
     code = models.IntegerField(default=248001)
@@ -50,9 +54,8 @@ class ngo(AbstractUser):
         related_name='ngo_user_permissions',
     )
     objects = NgoManager()
-
     def __str__(self):
-        return self.email
+        return self.ngo_name
     pass
     
 class donor(AbstractUser):
@@ -70,10 +73,13 @@ class donor(AbstractUser):
         Permission,
         related_name='donor_user_permissions',
     )
-    objects = DonorManager()
 
+    objects = DonorManager()
+    # def save(self, *args, **kwargs):
+    #     self.username = self.donor_name
+    #     super().save(*args, **kwargs)
     def __str__(self):
-        return self.email
+        return self.donor_name
     pass
     
 

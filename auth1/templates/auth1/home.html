@@ -1,10 +1,13 @@
-{% extends 'auth1/base.html' %} {% block content %}
+<!-- {% extends 'auth1/base.html' %} {% block content %}
 <main class="container text-center">
     {% if user.is_authenticated %}
     <h1 class="display-2 mt-5">
         Welcome {{ user.username }}! 
         <span>&#128516;</span>
     </h1>
+    <li class="nav-item">
+        <a class="nav-link" href="{% url 'logout' %}">Logout</a>
+    </li>
     {% else %}
     <h1 class="display-2 mt-5">
         Create an account to start donating
@@ -13,4 +16,4 @@
     <a href="{% url 'ngo_register' %}" class="btn btn-primary btn-lg mt-4">Sign up for free</a>
     {% endif %}
 </main>
-{% endblock content %}
+{% endblock content %} -->
