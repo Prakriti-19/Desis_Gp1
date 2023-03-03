@@ -1,10 +1,35 @@
-{% extends 'auth1/base.html' %}
-
-{% block content %}
-  <h2>Donate</h2>
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Donate</title>
+  <a href="{% url 'home' %}" class="navbar-brand">Home</a>
+</head>
+<body onload="getLocation()">
   <form method="post">
     {% csrf_token %}
     {{ form.as_p }}
+    <input type="hidden" name="latitude" id="latitude">
+    <input type="hidden" name="longitude" id="longitude">
+    <!-- other form fields go here -->
     <button type="submit">Submit</button>
   </form>
-{% endblock %}
+  <script>
+    function getLocation() {
+      console.log('getLocation called');
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(showPosition);
+      } else {
+        alert("Geolocation is not supported by this browser.");
+      }
+    }
+
+    function showPosition(position) {
+      var latitude = position.coords.latitude;
+      var longitude = position.coords.longitude;
+      document.getElementById("latitude").value = latitude;
+      document.getElementById("longitude").value = longitude;
+    }
+  </script>
+
+</body>
+</html>

@@ -32,7 +32,7 @@ class DonorManager(BaseUserManager):
         extra_fields.setdefault('is_superuser', True)
         return self.create_user(email, password, **extra_fields)
     
-class location(models.Model):
+class pincode(models.Model):
     code = models.IntegerField(default=248001)
     city = models.CharField(max_length=250,default="es")
     state= models.CharField(max_length=250,default="qw")
@@ -45,9 +45,7 @@ class ngo(AbstractUser):
     phone_no = models.IntegerField(default=123456789)
     is_ngo = models.BooleanField(default=True)
     is_donor = models.BooleanField(default=False)
-    pincode = models.ForeignKey(location, on_delete=models.CASCADE,null=True)
-    longitude = models.DecimalField(decimal_places=10,max_digits=15,default=2.313)
-    latitude = models.DecimalField(decimal_places=10,max_digits=15,default=13.131)
+    pincode = models.ForeignKey(pincode, on_delete=models.CASCADE,null=True)
     groups = models.ManyToManyField(Group, related_name='ngo_groups')
     user_permissions = models.ManyToManyField(
         Permission,
@@ -64,9 +62,6 @@ class donor(AbstractUser):
     phone_no = models.IntegerField(default=123456789)
     points = models.PositiveBigIntegerField(default=0)
     is_ngo = models.BooleanField(default=False)
-    pincode = models.ForeignKey(location, on_delete=models.CASCADE,null=True)
-    longitude = models.DecimalField(decimal_places=10,max_digits=15,default=2.313)
-    latitude = models.DecimalField(decimal_places=10,max_digits=15,default=13.13)
     is_donor = models.BooleanField(default=True)
     groups = models.ManyToManyField(Group, related_name='donor_groups')
     user_permissions = models.ManyToManyField(
@@ -75,9 +70,6 @@ class donor(AbstractUser):
     )
 
     objects = DonorManager()
-    # def save(self, *args, **kwargs):
-    #     self.username = self.donor_name
-    #     super().save(*args, **kwargs)
     def __str__(self):
         return self.donor_name
     pass
@@ -88,9 +80,13 @@ class donations(models.Model):
     donor_id = models.ForeignKey(donor, on_delete=models.CASCADE)
     ngo_id = models.ForeignKey(ngo, on_delete=models.CASCADE, related_name='ngo_donations', blank=True, null=True)
     exp_date = models.DateField()
+    longitude = models.DecimalField(decimal_places=10,max_digits=15)
+    latitude = models.DecimalField(decimal_places=10,max_digits=15)
+    pincode = models.ForeignKey(pincode, on_delete=models.CASCADE,null=True)
     quantity = models.IntegerField(default=10)
     desc = models.TextField(default="xyz")
     donation_date = models.DateField(auto_now_add=True)
+     
     def __str__(self):
         return self.desc
     def donations_made(self):

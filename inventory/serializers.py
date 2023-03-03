@@ -1,4 +1,4 @@
-from .models import ngo,donor,donations,location
+from .models import ngo,donor,donations,pincode
 from rest_framework import serializers
 
 class donorSerializer(serializers.ModelSerializer):
@@ -13,7 +13,7 @@ class donationsSerializer(serializers.ModelSerializer):
 
 class locationSerializer(serializers.ModelSerializer):
     class Meta:
-        model = location
+        model = pincode
         fields = '__all__' 
         
 

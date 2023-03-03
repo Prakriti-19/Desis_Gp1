@@ -1,6 +1,7 @@
 from rest_framework.viewsets import ReadOnlyModelViewSet
 from .serializers import ngoSerializer,donorSerializer,donationsSerializer,locationSerializer
-from .models import *
+from inventory.models import *
+from inventory.models import pincode
 from django.shortcuts import  redirect, render
 from .forms import DonationForm
 from django.contrib.auth.decorators import login_required
@@ -11,7 +12,10 @@ def donate(request):
     if request.method == 'POST':
         form = DonationForm(request.POST, user=request.user)
         if form.is_valid():
-            form.save()
+            donation = form.save(commit=False)
+            donation.latitude = form.cleaned_data['latitude']
+            donation.longitude = form.cleaned_data['longitude']
+            donation.save()
             return redirect("home")
     else:
         form = DonationForm(user=request.user)
@@ -35,7 +39,7 @@ class donationsViewSet(ReadOnlyModelViewSet):
 
 class locationViewSet(ReadOnlyModelViewSet):
     serializer_class = locationSerializer
-    queryset = location.objects.all()
+    queryset = pincode.objects.all()
 
 
 class donorViewSet(ReadOnlyModelViewSet):
