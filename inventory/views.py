@@ -2,7 +2,7 @@ from rest_framework.viewsets import ReadOnlyModelViewSet
 from .serializers import ngoSerializer,donorSerializer,donationsSerializer,locationSerializer
 from inventory.models import *
 from inventory.models import pincode
-from django.shortcuts import  redirect, render
+from django.shortcuts import  get_object_or_404, redirect, render
 from .forms import DonationForm
 from django.contrib.auth.decorators import login_required
 
@@ -23,8 +23,21 @@ def donate(request):
 
 
 def donations_list(request):
-    donate = donations.objects.all()
-    return render(request, "inventory/donations_list.html", {'donations': donate})
+    codes = request.GET.get('pincode')
+    min_quantity = request.GET.get('min_quantity',0)
+    max_quantity = request.GET.get('max_quantity',100)
+    if codes is not None and min_quantity is not None and max_quantity is not None and min_quantity != '' and codes != ''and max_quantity != '':
+        donation = donations.objects.filter(pincode__code=codes, 
+                                        quantity__range=(min_quantity, max_quantity))
+    elif codes is not None  and  min_quantity != '' and codes == ''and max_quantity != '':
+        donation = donations.objects.filter(pincode__code=request.user.pincode.code, 
+                                        quantity__range=(min_quantity, max_quantity))
+    elif codes is not None  and  min_quantity == '' and codes != ''and max_quantity == '':
+        donation = donations.objects.filter(pincode__code=codes, 
+                                        quantity__range=(0, 500))
+    else:
+        donation = donations.objects.all()
+    return render(request, "inventory/donations_list.html", {'donations': donation})
 
 
 class ngoViewSet(ReadOnlyModelViewSet):

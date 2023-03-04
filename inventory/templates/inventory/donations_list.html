@@ -1,11 +1,35 @@
 {% extends 'auth1/base.html' %}
 
 {% block content %}
-  <h1>List of Donors</h1>
+  <h1>List of Donations</h1>
+  <!-- <form method="get">
+    <label for="pincode">Filter by Pincode:</label>
+    <input type="text" name="pincode" id="pincode">
+    <br>
+    <label for="min_quantity">Minimum Quantity:</label>
+    <input type="number" name="min_quantity" id="min_quantity">
+    <label for="max_quantity">Maximum Quantity:</label>
+    <input type="number" name="max_quantity" id="max_quantity">
+    <br>
+    <button type="submit">Apply Filters</button>
+  </form> -->
+  <form method="get">
+    <label for="pincode">Filter by Pincode:</label>
+    <input type="text" name="pincode" id="pincode" value="{{ request.GET.pincode }}">
+    <br>
+    <label for="min_quantity">Minimum Quantity:</label>
+    <input type="number" name="min_quantity" id="min_quantity" value="{{ request.GET.min_quantity }}">
+    <label for="max_quantity">Maximum Quantity:</label>
+    <input type="number" name="max_quantity" id="max_quantity" value="{{ request.GET.max_quantity }}">
+    <br>
+    <button type="submit">Apply Filters</button>
+  </form>
   <ul>
-    {% for donations in donations %}
-      <li>{{ donations }} - Donation made by: {{ donations.donor_id.email }}
-           for: {{ donations.quantity }}people, valid till: {{ donations.exp_date}}</li>
+    {% for donation in donations %}
+      <li>{{ donation }} - Donation made by: {{ donation.donor.email }}
+           for: {{ donation.quantity }} people, valid till: {{ donation.exp_date }}</li>
+    {% empty %}
+      <li>No donations found.</li>
     {% endfor %}
   </ul>
 {% endblock %}

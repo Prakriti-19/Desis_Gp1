@@ -82,11 +82,17 @@ class donations(models.Model):
     exp_date = models.DateField()
     longitude = models.DecimalField(decimal_places=10,max_digits=15)
     latitude = models.DecimalField(decimal_places=10,max_digits=15)
-    pincode = models.ForeignKey(pincode, on_delete=models.CASCADE,null=True)
+    pincode = models.ForeignKey("pincode", on_delete=models.CASCADE,null=True)
     quantity = models.IntegerField(default=10)
     desc = models.TextField(default="xyz")
     donation_date = models.DateField(auto_now_add=True)
-     
+    def save(self, *args, **kwargs):
+        # Call the parent save method to save the donation object
+        super(donations, self).save(*args, **kwargs)
+        
+        # Update the donor's points
+        self.donor_id.points += self.quantity
+        self.donor_id.save()
     def __str__(self):
         return self.desc
     def donations_made(self):

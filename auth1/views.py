@@ -54,24 +54,12 @@ class DonorSignUpView(generic.CreateView):
     template_name = "auth1/signup.html"
     success_url = reverse_lazy('donor_login')
     def form_valid(self, form):
-        # Save the user object
         response = super().form_valid(form)
         user = form.save()
-
-        # Get the pincode and city from the form data
-        pincode = form.cleaned_data.get('pincode')
-        # city = pincode.city
-
-        # Create the Pincode object if it does not exist
-        pincode_obj, created = pincode.objects.get_or_create(code=pincode.code)
-
-        # Link the Pincode object to the user object
-        user.pincode = pincode_obj
         user.save()
         return response
 
-    # def form_valid(self, form):
-    #     return super().form_valid(form)
+
 
 class LogoutView(View):
     def get(self, request):
