@@ -5,12 +5,40 @@
     <p>Your username and password didn't match. Please try again.</p>
   {% endif %}
 
-  <form method="post">
-    {% csrf_token %}
-    <label for="username">Username:</label>
-    <input type="text" id="username" name="username" required><br><br>
-    <label for="password">Password:</label>
-    <input type="password" id="password" name="password" required><br><br>
-    <button type="submit">Login</button>
-  </form>
+  <div class="container-full h-full flex flex-col items-center justify-center" style="padding: 300px 0 0 0;">
+    <!-- wrapper   -->
+    <div class="wrapper relative w-full relative flex flex-col justify-center items-center ">
+      <!--   create account form   -->
+      <div class="w-11/12 sm:w-11/12 md:w-2/3 lg:w-1/2 p-4 bg-white absolute form active-form border-t-4 border-solid border-teal-500 shadow-2xl rounded">
+        <div class="text-2xl mb-8 text-gray-700 uppercase font-medium tracking-wide">Login Here</div>
+        <form method="post">
+          {% csrf_token %}
+          <div class="flex flex-col mb-4">
+  
+            <label for="username" class="text-gray-600 mb-2 text-xs">Username : </label>
+            <div class="relative flex flex-col">
+              <div class="absolute inset-y-0 left-0 inline-flex items-center h-8 w-8 m-auto justify-center text-teal-400"><i class="fas fa-envelope"></i></div>
+              <input type="text" id="username" name="username" class=" pl-8 outline-none border border-solid text-teal-400 focus:border-teal-400 p-2 rounded-sm" />
+            </div>
+          </div>
+          <div class="flex flex-col mb-4">
+            <label for="password" class="text-gray-600 mb-2 text-xs">Password : </label>
+            <div class="relative flex flex-col">
+              <div class="absolute inset-y-0 left-0 inline-flex items-center h-8 w-8 m-auto justify-center text-teal-400"><i class="fas fa-lock"></i></div>
+              <input type="password" id="password" name="password" class="pl-8 outline-none border border-solid text-teal-400 focus:border-teal-400 p-2 rounded-sm" />
+            </div>
+          </div>
+          <div class="flex justify-center py-2">
+            <button type="submit" class="bg-teal-500 px-8 py-3 rounded text-sm text-white uppercase tracking-wide w-64"> Let's Donate</button>
+          </div>
+        </form>
+      </div>
+      <!--   create account form   -->
+    </div>
+    <!--  wrapper  -->
+  
+  </div>
 {% endblock %}
+
+
+

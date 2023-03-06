@@ -1,0 +1,6 @@
+djangorestframework-simplejwt==5.2.2
+python-magic-bin==0.4.14
+django-versatileimagefield==3.0
+django-filter==22.1
+django-cors-headers==3.14.0
+djangorestframework==3.14.0
