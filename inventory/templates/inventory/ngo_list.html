@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>List of NGOs</h1>
+    <ul>
+        {% for ngo in ngos %}
+            <li><a href="{% url 'ngo_detail' ngo.id %}">{{ ngo.ngo_name }}</a></li>
+        {% endfor %}
+    </ul>
+{% endblock %}

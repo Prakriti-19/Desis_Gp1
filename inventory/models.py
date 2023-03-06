@@ -45,6 +45,7 @@ class ngo(AbstractUser):
     phone_no = models.IntegerField(default=123456789)
     is_ngo = models.BooleanField(default=True)
     is_donor = models.BooleanField(default=False)
+    points = models.PositiveBigIntegerField(default=0)
     pincode = models.ForeignKey(pincode, on_delete=models.CASCADE,null=True)
     groups = models.ManyToManyField(Group, related_name='ngo_groups')
     user_permissions = models.ManyToManyField(
@@ -86,17 +87,24 @@ class donations(models.Model):
     quantity = models.IntegerField(default=10)
     desc = models.TextField(default="xyz")
     donation_date = models.DateField(auto_now_add=True)
-    def save(self, *args, **kwargs):
-        # Call the parent save method to save the donation object
-        super(donations, self).save(*args, **kwargs)
+    def redeem(self, action, quantity):
+        if action == 'donate':
+            self.points -= quantity
+            self.ngo_id.points += self.quantity
+            self.ngo_id.save()
+        elif action == 'redeem':
+            self.points -= quantity
+            # logic to redeem points for goodies goes here
+        self.save()
         
-        # Update the donor's points
-        self.donor_id.points += self.quantity
-        self.donor_id.save()
+    def update_points(donor_id, quantity):
+        donors = donor.objects.get(id=donor_id)
+        donors.points += quantity
+        donors.save()
+  
     def __str__(self):
         return self.desc
     def donations_made(self):
-        # return donations made by this donor
         pass
     
 
@@ -107,7 +115,10 @@ class chat(models.Model):
     sent_time = models.TimeField(auto_now_add=True)
     seen_time = models.TimeField()
 
-
+class Redemption(models.Model):
+    donor = models.ForeignKey(donor, on_delete=models.CASCADE)
+    points = models.PositiveIntegerField()
+    date = models.DateTimeField(auto_now_add=True)
 
 
 

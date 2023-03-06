@@ -1,0 +1,21 @@
+{% extends 'auth1/base.html' %}
+
+{% block content %}
+<h2>Donate Points</h2>
+<form method="post">
+  {% csrf_token %}
+  <div class="form-group">
+    <label for="ngo">Choose an NGO:</label>
+    <select class="form-control" id="ngo" name="ngo">
+      {% for ngo in ngos %}
+        <option value="{{ ngo.id }}">{{ ngo.ngo_name }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="form-group">
+    <label for="points">Enter Points to Donate:</label>
+    <input type="number" class="form-control" id="points" name="points">
+  </div>
+  <button type="submit" class="btn btn-primary">Submit</button>
+</form>
+{% endblock %}

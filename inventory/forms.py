@@ -22,3 +22,6 @@ class DonationForm(forms.ModelForm):
         if commit:
             donation.save()
         return donation
+    
+class RedemptionForm(forms.Form):
+    points = forms.IntegerField(min_value=1)
