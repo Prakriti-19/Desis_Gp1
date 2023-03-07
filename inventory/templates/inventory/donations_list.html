@@ -2,17 +2,6 @@
 
 {% block content %}
   <h1>List of Donations</h1>
-  <!-- <form method="get">
-    <label for="pincode">Filter by Pincode:</label>
-    <input type="text" name="pincode" id="pincode">
-    <br>
-    <label for="min_quantity">Minimum Quantity:</label>
-    <input type="number" name="min_quantity" id="min_quantity">
-    <label for="max_quantity">Maximum Quantity:</label>
-    <input type="number" name="max_quantity" id="max_quantity">
-    <br>
-    <button type="submit">Apply Filters</button>
-  </form> -->
   <form method="get">
     <label for="pincode">Filter by Pincode:</label>
     <input type="text" name="pincode" id="pincode" value="{{ request.GET.pincode }}">
@@ -24,10 +13,17 @@
     <br>
     <button type="submit">Apply Filters</button>
   </form>
-  <ul>
+  <ul class="donation-list">
     {% for donation in donations %}
-      <li>{{ donation }} - Donation made by: {{ donation.donor.email }}
-           for: {{ donation.quantity }} people, valid till: {{ donation.exp_date }}</li>
+      <li>
+        <div class="donation-info">
+          <h2>{{ donation.desc|truncatechars:20 }}{% if donation.desc|length > 20 %}...{% endif %}</h2>
+          <p>Donation made by: {{ donation.donor_id.donor_name }}</p>
+          <p>For: {{ donation.quantity }} people</p>
+          <p>Used By: {{ donation.exp_date }}</p>
+        </div>
+        <a href="{% url 'donation-details' donation.id %}" class="btn btn-primary">Connect with the Donor</a>
+      </li>
     {% empty %}
       <li>No donations found.</li>
     {% endfor %}

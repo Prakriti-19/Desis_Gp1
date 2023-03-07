@@ -6,7 +6,11 @@ class ngoUserCreationForm(UserCreationForm):
     pincode = forms.ModelChoiceField(queryset=pincode.objects.all())
     class Meta(UserCreationForm.Meta):
         model = ngo
-        fields = ('username','ngo_name', 'email','pincode', 'phone_no','password1', 'password2')
+        fields = ('username','ngo_name', 'email','pincode', 'phone_no','latitude','longitude','password1', 'password2')
+        widgets = {
+            'latitude': forms.HiddenInput(),
+            'longitude': forms.HiddenInput(),
+        }
     email = forms.CharField(max_length=30, required=True)
     ngo_name = forms.CharField(max_length=255)
     phone_no = forms.IntegerField(required=True)
@@ -21,7 +25,11 @@ class ngoUserCreationForm(UserCreationForm):
 class donorUserCreationForm(UserCreationForm):
     class Meta(UserCreationForm.Meta):
         model = donor
-        fields = ('username','donor_name', 'email', 'phone_no','password1', 'password2')
+        fields = ('username','donor_name', 'email', 'phone_no','latitude','longitude','password1', 'password2')
+        widgets = {
+            'latitude': forms.HiddenInput(),
+            'longitude': forms.HiddenInput(),
+        }
     email = forms.CharField(max_length=30, required=True)
     phone_no = forms.IntegerField(required=True)
     donor_name = forms.CharField(max_length=255)

@@ -46,6 +46,8 @@ class ngo(AbstractUser):
     is_ngo = models.BooleanField(default=True)
     is_donor = models.BooleanField(default=False)
     points = models.PositiveBigIntegerField(default=0)
+    longitude = models.DecimalField(decimal_places=10,max_digits=15,default=0.000)
+    latitude = models.DecimalField(decimal_places=10,max_digits=15,default=0.000)
     pincode = models.ForeignKey(pincode, on_delete=models.CASCADE,null=True)
     groups = models.ManyToManyField(Group, related_name='ngo_groups')
     user_permissions = models.ManyToManyField(
@@ -62,6 +64,8 @@ class donor(AbstractUser):
     email = models.CharField(max_length=55)
     phone_no = models.IntegerField(default=123456789)
     points = models.PositiveBigIntegerField(default=0)
+    longitude = models.DecimalField(decimal_places=10,max_digits=15,default=0.000)
+    latitude = models.DecimalField(decimal_places=10,max_digits=15,default=0.000)
     is_ngo = models.BooleanField(default=False)
     is_donor = models.BooleanField(default=True)
     groups = models.ManyToManyField(Group, related_name='donor_groups')
@@ -73,8 +77,11 @@ class donor(AbstractUser):
     objects = DonorManager()
     def __str__(self):
         return self.donor_name
-    pass
     
+    def donations_made(self):
+        print(self.id)
+        return donations.objects.filter(donor_id=self.id)
+
 
 class donations(models.Model):
     id = models.AutoField(primary_key=True)
@@ -87,15 +94,6 @@ class donations(models.Model):
     quantity = models.IntegerField(default=10)
     desc = models.TextField(default="xyz")
     donation_date = models.DateField(auto_now_add=True)
-    def redeem(self, action, quantity):
-        if action == 'donate':
-            self.points -= quantity
-            self.ngo_id.points += self.quantity
-            self.ngo_id.save()
-        elif action == 'redeem':
-            self.points -= quantity
-            # logic to redeem points for goodies goes here
-        self.save()
         
     def update_points(donor_id, quantity):
         donors = donor.objects.get(id=donor_id)
@@ -104,16 +102,8 @@ class donations(models.Model):
   
     def __str__(self):
         return self.desc
-    def donations_made(self):
-        pass
     
-
-class chat(models.Model):
-    text = models.TextField()
-    sent = models.DateField(auto_now_add=True)
-    seen = models.DateField()
-    sent_time = models.TimeField(auto_now_add=True)
-    seen_time = models.TimeField()
+    
 
 class Redemption(models.Model):
     donor = models.ForeignKey(donor, on_delete=models.CASCADE)

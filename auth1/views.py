@@ -47,17 +47,27 @@ class NgoSignUpView(generic.CreateView):
     success_url = reverse_lazy('ngo_login')
     
     def form_valid(self, form):
-        return super().form_valid(form)
+        if form.is_valid():
+            donation = form.save(commit=False)
+            donation.latitude = form.cleaned_data['latitude']
+            donation.longitude = form.cleaned_data['longitude']
+            donation.save()
+            return super().form_valid(form)
 
 class DonorSignUpView(generic.CreateView):
     form_class = donorUserCreationForm
     template_name = "auth1/signup.html"
     success_url = reverse_lazy('donor_login')
     def form_valid(self, form):
-        response = super().form_valid(form)
-        user = form.save()
-        user.save()
-        return response
+        if form.is_valid():
+            donation = form.save(commit=False)
+            donation.latitude = form.cleaned_data['latitude']
+            donation.longitude = form.cleaned_data['longitude']
+            donation.save()
+            response = super().form_valid(form)
+            user = form.save()
+            user.save()
+            return response
 
 
 

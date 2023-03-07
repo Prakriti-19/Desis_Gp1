@@ -1,0 +1,11 @@
+<h1>Donations made by {{ donor.donor_name }}</h1>
+
+{% if donations_made %}
+    <ul>
+    {% for donation in donations_made %}
+        <li>{{ donation.desc }} - {{ donation.donation_date }}</li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No donations made yet.</p>
+{% endif %}
