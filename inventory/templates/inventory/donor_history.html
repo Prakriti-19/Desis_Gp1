@@ -1,11 +1,35 @@
 <h1>Donations made by {{ donor.donor_name }}</h1>
+{% if donations_made %}
+
+  <ul>
+    {% for donation in donations_made %}
+      <li>
+        {{ donation.desc }} - {{ donation.donation_date }}
+        {% if donation.status %}
+          Donated
+        {% else %}
+          Donation in progress
+          <form method="post" action="{% url 'update_donation_status' %}">
+            {% csrf_token %}
+            <input type="hidden" name="donation_id" value="{{ donation.id }}">
+            <input type="hidden" name="status" value="true">
+            <button type="submit">Mark as Donated</button>
+          </form>
+        {% endif %}
+      </li>
+    {% endfor %}
+  </ul>
+{% else %}
+  <p>No donations made yet.</p>
+{% endif %}
+<!-- <h1>Donations made by {{ donor.donor_name }}</h1>
 
 {% if donations_made %}
-    <ul>
+  <ul>
     {% for donation in donations_made %}
-        <li>{{ donation.desc }} - {{ donation.donation_date }}</li>
+      <li>{{ donation.desc }} - {{ donation.donation_date }}</li>
     {% endfor %}
-    </ul>
+  </ul>
 {% else %}
-    <p>No donations made yet.</p>
-{% endif %}
+  <p>No donations made yet.</p>
+{% endif %} -->

@@ -93,7 +93,8 @@ class donations(models.Model):
     pincode = models.ForeignKey("pincode", on_delete=models.CASCADE,null=True)
     quantity = models.IntegerField(default=10)
     desc = models.TextField(default="xyz")
-    donation_date = models.DateField(auto_now_add=True)
+    donation_date = models.DateField(null=True)
+    status = models.BooleanField(default=True)
         
     def update_points(donor_id, quantity):
         donors = donor.objects.get(id=donor_id)

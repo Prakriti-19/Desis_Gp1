@@ -1,16 +1,21 @@
+from django.http import HttpResponse
 from rest_framework.viewsets import ReadOnlyModelViewSet
 from .serializers import ngoSerializer,donorSerializer,donationsSerializer,locationSerializer
 from inventory.models import *
 from inventory.models import pincode
+from datetime import datetime, timedelta
 from django.shortcuts import redirect, render, get_object_or_404
 import matplotlib.pyplot as plt
 from django.contrib import messages
+from django.db.models.functions import TruncMonth
 from .forms import DonationForm, RedemptionForm
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
-from django.db.models.functions import ExtractYear, ExtractMonth
+import matplotlib.pyplot as plt
 from django.db.models import Avg, Max, Min, Count, Sum
 from .models import donations
+import io
+import base64
 from django.db.models import Q
 @login_required
 def donate(request):
@@ -26,125 +31,6 @@ def donate(request):
     else:
         form = DonationForm(user=request.user)
     return render(request, 'inventory/donate.html', {'form': form})
-
-def donations_list(request):
-    codes = request.GET.get('pincode')
-    min_quantity = request.GET.get('min_quantity',0)
-    max_quantity = request.GET.get('max_quantity',100)
-    if codes is not None and min_quantity is not None and max_quantity is not None and min_quantity != '' and codes != ''and max_quantity != '':
-        donation = donations.objects.filter(pincode__code=codes, 
-                                        quantity__range=(min_quantity, max_quantity))
-    elif codes is not None  and  min_quantity != '' and codes == ''and max_quantity != '':
-        donation = donations.objects.filter(pincode__code=request.user.pincode.code, 
-                                        quantity__range=(min_quantity, max_quantity))
-    elif codes is not None  and  min_quantity == '' and codes != ''and max_quantity == '':
-        donation = donations.objects.filter(pincode__code=codes, 
-                                        quantity__range=(0, 500))
-    else:
-        donation = donations.objects.all()
-    return render(request, "inventory/donations_list.html", {'donations': donation})
-
-def donation_details(request, pk):
-    donation = get_object_or_404(donations, pk=pk)
-    return render(request, 'inventory/chat.html', {'donation': donation})
-
-def donor_history(request):
-    donor_instance = donor.objects.get(id=request.user.id)
-    donations_made = donor_instance.donations_made()
-
-    context = {
-        'donor': donor_instance,
-        'donations_made': donations_made,
-    }
-
-    return render(request, 'inventory/donor_history.html', context)
-
-class ngoViewSet(ReadOnlyModelViewSet):
-    serializer_class = ngoSerializer
-    queryset = ngo.objects.all()
-
-
-class donationsViewSet(ReadOnlyModelViewSet):
-    serializer_class = donationsSerializer
-    queryset = donations.objects.all()
-
-
-class locationViewSet(ReadOnlyModelViewSet):
-    serializer_class = locationSerializer
-    queryset = pincode.objects.all()
-
-
-class donorViewSet(ReadOnlyModelViewSet):
-    serializer_class = donorSerializer
-    queryset = donor.objects.all()
-
-@login_required
-def donations_stats(request):
-    total_donations = donations.objects.count()
-    avg_quantity = donations.objects.aggregate(Avg('quantity'))
-    max_quantity = donations.objects.aggregate(Max('quantity'))
-    min_quantity = donations.objects.aggregate(Min('quantity'))
-
-    # donations_by_month = donations.objects.annotate(year=ExtractYear('donation_date'),
-    # month=ExtractMonth('donation_date')).values('year', 'month').annotate(total_donations=Sum('quantity'))
-    # print(donations_by_month)
-
-    previous_year_donors = donations.objects.filter(donation_date__year=2022).values_list('donor_id', flat=True).distinct()
-    # print(previous_year_donors)
-    current_year_donors = donations.objects.filter(Q(donation_date__year=2023) & Q(donor_id__in=previous_year_donors)).values_list('donor_id', flat=True).distinct()
-    if(previous_year_donors.count() == 0):
-        retention_rate = (current_year_donors.count() ) * 100
-    else:
-        retention_rate = (current_year_donors.count() / previous_year_donors.count()) * 100
-    print(retention_rate)
-
-    retention_rates = []
-    for i in range(1, 13):
-        prev_month_donations = previous_year_donors.filter(donation_date__month=i)
-        curr_month_donations = current_year_donors.filter(donation_date__month=i)
-        if prev_month_donations.exists():
-            rate = (curr_month_donations.count() / prev_month_donations.count()) * 100
-        else:
-            rate = 0
-            retention_rates.append(rate)
-    donations_by_month = donations.objects.filter( donation_date__year=2023).values('donation_date__month').annotate(total_donations=Count('donor_id'))
-    # for donation in donations_by_month:
-    #     print(donation['donation_date__month'], donation['total_donations'])
-    print(retention_rates)
-
-    donations_by_donor = donations.objects.values('donor_id').annotate(total_donations=Count('donor_id'))
-    donor_names = [donor.donor_name for donor in donor.objects.all()]
-    donation_counts = [donation['total_donations'] for donation in donations_by_donor]
-    fig, ax = plt.subplots()
-    ax.bar(donor_names, donation_counts)
-    ax.set_xlabel('Donor')
-    ax.set_ylabel('Total Donations')
-    ax.set_title('Donations by Donor')
-    from io import BytesIO
-    import base64
-    # def save_plot_to_image(fig):
-    #     buffer = io.BytesIO()
-    #     fig.savefig(buffer, format='png')
-    #     buffer.seek(0)
-    #     plot_url = base64.b64encode(buffer.getvalue()).decode('utf-8')
-    #     plt.close()
-    
-
-    context = {
-        'total_donations': total_donations,
-        'avg_quantity': avg_quantity,
-        'max_quantity': max_quantity,
-        'min_quantity': min_quantity,
-        'donations_by_donor': donations_by_donor,
-        # 'donations_by_pincode': donations_by_pincode,
-        'donations_by_month': donations_by_month,
-        # 'retention_rate': retention_rate,
-        # 'donations_within_radius': donations_within_radius,
-        # 'donor_chart': image_data
-    }
-
-    return render(request, 'inventory/donations_stats.html', context)
-
 
 @login_required
 def redeem_points(request):
@@ -193,3 +79,144 @@ def donate_points(request):
         messages.success(request, f'{points} points donated to {ngo_user.ngo_name}')
         return redirect('home')
     return render(request, 'inventory/donatep.html', {'ngos': ngos})
+
+def donations_list(request):
+    codes = request.GET.get('pincode')
+    min_quantity = request.GET.get('min_quantity',0)
+    max_quantity = request.GET.get('max_quantity',100)
+    if codes is not None and min_quantity is not None and max_quantity is not None and min_quantity != '' and codes != ''and max_quantity != '':
+        donation = donations.objects.filter(pincode__code=codes, 
+                                        quantity__range=(min_quantity, max_quantity),status=True)
+    elif codes is not None  and  min_quantity != '' and codes == ''and max_quantity != '':
+        donation = donations.objects.filter(pincode__code=request.user.pincode.code, 
+                                        quantity__range=(min_quantity, max_quantity),status=True)
+    elif codes is not None  and  min_quantity == '' and codes != ''and max_quantity == '':
+        donation = donations.objects.filter(pincode__code=codes, 
+                                        quantity__range=(0, 500),status=True)
+    else:
+        donation = donations.objects.filter(status=True)
+    return render(request, "inventory/donations_list.html", {'donations': donation})
+
+def donation_details(request, pk):
+    donation = get_object_or_404(donations, pk=pk)
+    return render(request, 'inventory/chat.html', {'donation': donation})
+
+def update_points(donor_id, quantity):
+    donors = donor.objects.get(id=donor_id)
+    donors.points += quantity
+    donors.save()
+
+def update_donation_status(request):
+    if request.method == 'POST':
+        donation_id = request.POST.get('donation_id')
+        status_str = request.POST.get('status')
+        status = True if status_str.lower() == 'true' else False
+        try:
+            donation = donations.objects.get(id=donation_id)
+            donation.status = status
+            donation.save()
+            update_points(donation.donor_id.id, donation.quantity)
+        except donations.DoesNotExist:
+            # handle donation not found error
+            return HttpResponse("Donation not found.")
+        else:
+            return redirect('donor_history')
+
+    
+def donor_history(request):
+    donor_instance = donor.objects.get(id=request.user.id)
+    donations_made = donor_instance.donations_made()
+
+    context = {
+        'donor': donor_instance,
+        'donations_made': donations_made,
+    }
+
+    return render(request, 'inventory/donor_history.html', context)
+
+class ngoViewSet(ReadOnlyModelViewSet):
+    serializer_class = ngoSerializer
+    queryset = ngo.objects.all()
+
+
+class donationsViewSet(ReadOnlyModelViewSet):
+    serializer_class = donationsSerializer
+    queryset = donations.objects.all()
+
+
+class locationViewSet(ReadOnlyModelViewSet):
+    serializer_class = locationSerializer
+    queryset = pincode.objects.all()
+
+
+class donorViewSet(ReadOnlyModelViewSet):
+    serializer_class = donorSerializer
+    queryset = donor.objects.all()
+
+@login_required
+def donations_stats(request):
+    total_donations = donations.objects.count()
+    avg_quantity = donations.objects.aggregate(Avg('quantity'))
+    max_quantity = donations.objects.aggregate(Max('quantity'))
+    min_quantity = donations.objects.aggregate(Min('quantity'))
+    context = {
+        'total_donations': total_donations,
+        'avg_quantity': avg_quantity,
+        'max_quantity': max_quantity,
+        'min_quantity': min_quantity
+    }
+    
+    retention_period = timedelta(days=365)
+    recent_donations = donations.objects.filter(donation_date__gt=datetime.now()-retention_period)
+    returning_donors = {}
+    for donation in recent_donations:
+        month = donation.donation_date.replace(day=1)
+        donors_id = donation.donor_id.id
+        donors = donor.objects.filter(id=donors_id).first()
+        if donors_id in returning_donors.get(month - retention_period, set()):
+            continue
+        if donors is not None and donations.objects.filter(donor_id=donors_id, donation_date__lt=month, donation_date__gt=month-retention_period).exists():
+            returning_donors.setdefault(month, set()).add(donors_id)
+
+    # Sort the dictionary by month and convert it to a list of (month, percentage) tuples
+    returning_donors = sorted(returning_donors.items())
+    total_donors = set(donations.objects.values_list('id', flat=True).distinct())
+    retention_rates = [(month, len(returning)/len(total_donors)*100) for month, returning in returning_donors]
+
+    # Create the line chart
+    months = [month.strftime('%b %Y') for month, rate in retention_rates]
+    rates = [rate for month, rate in retention_rates]
+    for r in retention_rates:
+        print("Ferf")
+        print(r)
+    plt.plot(months, rates)
+    plt.xlabel('Month')
+    plt.ylabel('Returning donors (%)')
+    plt.title('Donor retention over time')
+    buf = io.BytesIO()
+    plt.savefig(buf, format='png')
+    buf.seek(0)
+    plot_data2 = base64.b64encode(buf.getvalue()).decode('ascii')
+
+    donations_by_month = donations.objects.annotate(month=TruncMonth('donation_date')) \
+        .values('month') \
+        .annotate(count=Count('id')) \
+        .order_by('month')
+
+    # convert queryset to lists for plotting
+    months = [d['month'].strftime('%b %Y') for d in donations_by_month]
+    donation_counts = [d['count'] for d in donations_by_month]
+
+    fig, ax = plt.subplots()
+    ax.bar(months, donation_counts)
+    ax.set_ylabel('Number of Donations')
+    ax.set_xlabel('Month')
+    ax.set_title('Donations per Month')
+
+    buf = io.BytesIO()
+    plt.savefig(buf, format='png')
+    buf.seek(0)
+    plot_data = base64.b64encode(buf.getvalue()).decode('ascii')
+    return render(request, 'inventory/donations_stats.html', {'plot_data': plot_data,'plot_data2': plot_data2, **context})
+   
+

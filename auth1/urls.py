@@ -15,6 +15,7 @@ urlpatterns = [
     path("donate_points/", donate_points, name="donate_points"),
     path("redeem_success/", redeem_success, name="redeem_success"),
     path('donations/<int:pk>/', donation_details, name='donation-details'),
+    path("update_donation_status/", update_donation_status, name="update_donation_status"),
     path("ngo_login/", views.NgoLoginView, name="ngo_login"),
     path("donor_history/", donor_history, name="donor_history"),
     path("donor_login/", views.DonorLoginView, name="donor_login"),

@@ -1,15 +1,24 @@
-<h1>Donations Statistics</h1>
+{% extends 'auth1/base.html' %}
 
-<p>Total number of donations made: {{ total_donations }}</p>
+{% block content %}
+    <div class="container">
+        <h1>Statistics</h1>
 
-<p>Average number of plates served: {{ avg_quantity.quantity__avg }}</p>
+        <p>Total donations made: {{ total_donations }}</p>
+        <p>Average quantity per donation: {{ avg_quantity.quantity__avg }}</p>
+        <p>Maximum quantity donated: {{ max_quantity.quantity__max }}</p>
+        <p>Minimum quantity donated: {{ min_quantity.quantity__min }}</p>
+        
+        {% if plot_data %}
+            <img src="data:image/png;base64,{{ plot_data }}" alt="Donations per Month">
+        {% else %}
+            <p>No donations made yet.</p>
+        {% endif %}
 
-<p>Maximum number of plats served in one donation: {{ max_quantity.quantity__max }}</p>
-{% for donation in donations_by_donor %}
-   Donation by {{ donation.donor_id}}: {{ donation.total_donations }}<br>
-{% endfor %}
-
-
-<h2>Donations by Donor</h2>
-
-<img src="data:image/png;base64,{{ donor_chart }}" alt="Donations by Donor">
+        {% if plot_data %}
+            <img src="data:image/png;base64,{{ plot_data2 }}" alt="Donations per Month">
+        {% else %}
+            <p>No donations made yet.</p>
+        {% endif %}
+    </div>
+{% endblock %}
