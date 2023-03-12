@@ -3,20 +3,30 @@
 {% block content %}
     <div class="container">
         <h1>Statistics</h1>
+        <p>Total Number of Donations: {{ total_donations }}</p>
+        <p>Meals Served: {{ total_quantity.quantity__sum}}</p>
+        <p>Average Meals served per donation: {{ avg_quantity }}</p>
+        <p>Maximum Meals served in single Donation: {{ max_quantity.quantity__max }}</p>
+        {% if image %}
+            <img src="data:image/png;base64,{{ image }}" alt="Donations by Donor">
+        {% else %}
+            <p>No donations data available.</p>
+        {% endif %}
 
-        <p>Total donations made: {{ total_donations }}</p>
-        <p>Average quantity per donation: {{ avg_quantity.quantity__avg }}</p>
-        <p>Maximum quantity donated: {{ max_quantity.quantity__max }}</p>
-        <p>Minimum quantity donated: {{ min_quantity.quantity__min }}</p>
-        
         {% if plot_data %}
             <img src="data:image/png;base64,{{ plot_data }}" alt="Donations per Month">
         {% else %}
             <p>No donations made yet.</p>
         {% endif %}
 
-        {% if plot_data %}
-            <img src="data:image/png;base64,{{ plot_data2 }}" alt="Donations per Month">
+        {% if plot_data3 %}
+            <img src="data:image/png;base64,{{ plot_data3 }}" alt="Donations in your city">
+        {% else %}
+            <p>No donations made yet.</p>
+        {% endif %}
+
+        {% if plot_data2 %}
+            <img src="data:image/png;base64,{{ plot_data2 }}" alt="Retention rate">
         {% else %}
             <p>No donations made yet.</p>
         {% endif %}

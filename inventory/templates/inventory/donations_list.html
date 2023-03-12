@@ -22,6 +22,17 @@
           <p>For: {{ donation.quantity }} people</p>
           <p>Used By: {{ donation.exp_date }}</p>
         </div>
+        {% if donation.status2 %}
+        Donation in progress
+        <form method="post" action="{% url 'update_donation_status_ngo' %}">
+          {% csrf_token %}
+          <input type="hidden" name="donation_id" value="{{ donation.id }}">
+          <input type="hidden" name="status" value="true">
+          <button type="submit">Donation Taken</button>
+        {% else %}
+        Donation Taken
+         </form>
+        {% endif %}
         <a href="{% url 'donation-details' donation.id %}" class="btn btn-primary">Connect with the Donor</a>
       </li>
     {% empty %}

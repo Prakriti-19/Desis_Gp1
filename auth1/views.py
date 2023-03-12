@@ -14,6 +14,7 @@ class HomeView2(TemplateView):
         context["title"] = "HandsForHunger | Home"
         return context
     
+       
 def NgoLoginView(request):
     if request.method == 'POST':
         username = request.POST['username']
