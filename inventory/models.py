@@ -41,7 +41,7 @@ class pincode(models.Model):
 
 class ngo(AbstractUser):
     ngo_name = models.CharField(max_length=255,default="a")
-    email = models.CharField(max_length=55,default="b")
+    email = models.EmailField(max_length=55,default="b")
     phone_no = models.IntegerField(default=123456789)
     is_ngo = models.BooleanField(default=True)
     is_donor = models.BooleanField(default=False)
@@ -61,11 +61,12 @@ class ngo(AbstractUser):
     
 class donor(AbstractUser):
     donor_name = models.CharField(max_length=255)
-    email = models.CharField(max_length=55)
+    email = models.EmailField(max_length=55)
     phone_no = models.IntegerField(default=123456789)
     points = models.PositiveBigIntegerField(default=0)
     longitude = models.DecimalField(decimal_places=10,max_digits=15,default=0.000)
     latitude = models.DecimalField(decimal_places=10,max_digits=15,default=0.000)
+    pincode = models.ForeignKey(pincode, on_delete=models.CASCADE,null=True)
     is_ngo = models.BooleanField(default=False)
     is_donor = models.BooleanField(default=True)
     groups = models.ManyToManyField(Group, related_name='donor_groups')
