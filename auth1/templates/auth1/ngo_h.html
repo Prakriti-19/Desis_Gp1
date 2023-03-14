@@ -2,7 +2,7 @@
 
 {% block content %}
   {% if user.is_authenticated %}
-    {% if user.is_donor %}
+    {% if not user.is_ngo %}
       <h1>Welcome, Donor {{ user.username }}!</h1>
       <p>You can view your donation history, update your profile, and explore new opportunities to donate.</p>
       <li class="nav-item">

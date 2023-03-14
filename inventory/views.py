@@ -2,9 +2,9 @@ from django.http import HttpResponse
 import matplotlib
 matplotlib.use('Agg')
 from rest_framework.viewsets import ReadOnlyModelViewSet
-from .serializers import ngoSerializer,donorSerializer,donationsSerializer,locationSerializer
+from .serializers import DonationSerializer
 from inventory.models import *
-import requests
+from django.db.models import Q
 import pandas as pd
 from datetime import datetime, timedelta
 from django.utils import timezone
@@ -13,7 +13,6 @@ from django.contrib import messages
 from django.db.models.functions import TruncMonth
 from .forms import DonationForm, RedemptionForm
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import render
 import matplotlib.pyplot as plt
 from django.db.models import Avg, Max, Min, Count, Sum
 import io
@@ -45,7 +44,8 @@ def redeem_points(request):
                 donor.save()
                 redemption = Redemption.objects.create(
                     donor=donor,
-                    points=points_to_redeem
+                    points=points_to_redeem,
+                    status=1
                 )
                 redemption.save()
                 return redirect('redeem_success')
@@ -77,6 +77,11 @@ def donate_points(request):
         donor_user.save()
         ngo_user.points += points
         ngo_user.save()
+        redemption = Redemption.objects.create(
+                    donor=donor_user,
+                    points=points,
+                    status=0)
+        redemption.save()
         messages.success(request, f'{points} points donated to {ngo_user.ngo_name}')
         return redirect('home')
     return render(request, 'inventory/donatep.html', {'ngos': ngos})
@@ -86,16 +91,13 @@ def donations_list(request):
     min_quantity = request.GET.get('min_quantity',0)
     max_quantity = request.GET.get('max_quantity',100)
     if codes is not None and min_quantity is not None and max_quantity is not None and min_quantity != '' and codes != ''and max_quantity != '':
-        donation = donations.objects.filter(pincode__code=codes, 
-                                        quantity__range=(min_quantity, max_quantity),status=True,status2=True)
+        donation = donations.objects.filter( Q(pincode__code=codes) &  Q(quantity__range=(min_quantity, max_quantity)) & (Q(status=True) | Q(status2=True)))
     elif codes is not None  and  min_quantity != '' and codes == ''and max_quantity != '':
-        donation = donations.objects.filter(pincode__code=request.user.pincode.code, 
-                                        quantity__range=(min_quantity, max_quantity),status=True,status2=True)
+        donation = donations.objects.filter ( Q(pincode__code=request.user.pincode.code) & Q(quantity__range=(min_quantity, max_quantity)) &  (Q(status=True) | Q(status2=True)))
     elif codes is not None  and  min_quantity == '' and codes != ''and max_quantity == '':
-        donation = donations.objects.filter(pincode__code=codes, 
-                                        quantity__range=(0, 500),status=True,status2=True)
+        donation = donations.objects.filter( Q(pincode__code=codes) & Q(quantity__range=(0, 500)) & (Q(status=True) | Q(status2=True)))
     else:
-        donation = donations.objects.filter(status=True,status2=True)
+        donation = donations.objects.filter(Q(status=True) | Q(status2=True))
     return render(request, "inventory/donations_list.html", {'donations': donation})
 
 def donation_details(request, pk):
@@ -112,14 +114,14 @@ def update_points(donor_id, quantity, ngo_id):
 
 def update_donation_status(request):
     if request.method == 'POST':
-        donation_id = request.POST.get('donation_id')
-        status_str = request.POST.get('status')
-        status = True if status_str.lower() == 'true' else False
+        donation_i = request.POST.get("donation_id")
+        print(donation_i)
         try:
-            donation = donations.objects.get(id=donation_id)
-            donation.status = not status
+            donation = donations.objects.get(id=donation_i)
+            print(donation.desc)
+            donation.status = False
             donation.save()
-            if donation.status== True and donation.status2 == True:
+            if donation.status== False and donation.status2 == False:
                 update_points(donation.donor_id.id, donation.quantity,donation.ngo_id.id)
         except donations.DoesNotExist:
             # handle donation not found error
@@ -129,21 +131,19 @@ def update_donation_status(request):
 
 def update_donation_status_ngo(request):
     if request.method == 'POST':
-        donation_id = request.POST.get('donation_id')
-        status_str = request.POST.get('status2')
-        status2 = True if status_str.lower() == 'true' else False
+        donation_id = request.POST.get('donation_id2')
         try:
             donation = donations.objects.get(id=donation_id)
-            donation.ngo_id=request.user.id
-            donation.status2 = not status2
+            donation.ngo_id=request.user
+            donation.status2 = False
             donation.save()
-            if donation.status== True and donation.status2 == True:
+            if donation.status== False and donation.status2 == False:
                 update_points(donation.donor_id.id, donation.quantity,request.user.id)
         except donations.DoesNotExist:
             # handle donation not found error
             return HttpResponse("Donation not found.")
         else:
-            return redirect('donor_history')
+            return redirect('donations_list')
 
     
 def donor_history(request):
@@ -157,24 +157,13 @@ def donor_history(request):
 
     return render(request, 'inventory/donor_history.html', context)
 
-class ngoViewSet(ReadOnlyModelViewSet):
-    serializer_class = ngoSerializer
-    queryset = ngo.objects.all()
 
 
 class donationsViewSet(ReadOnlyModelViewSet):
-    serializer_class = donationsSerializer
+    serializer_class = DonationSerializer
     queryset = donations.objects.all()
 
 
-class locationViewSet(ReadOnlyModelViewSet):
-    serializer_class = locationSerializer
-    queryset = pincode.objects.all()
-
-
-class donorViewSet(ReadOnlyModelViewSet):
-    serializer_class = donorSerializer
-    queryset = donor.objects.all()
 
 @login_required
 def donations_stats(request):
@@ -267,12 +256,20 @@ def donations_stats(request):
     
 # ----------------------------------------------------------------------------------------------------------------------
 
-    donor_donations = donations.objects.select_related('donor_id').all()
-    donor_donations_df = pd.DataFrame(list(donor_donations.values('donor_id__donor_name', 'quantity')))
-    donor_donations_grouped = donor_donations_df.groupby('donor_id__donor_name').sum()
+    total_donations = donations.objects.count()
+    user_donations = donations.objects.filter( donor_id=request.user.id).count()
+    percentage = round(user_donations / total_donations * 100, 2)
+    labels = ['Your %', 'Others']
+    sizes = [percentage, 100-percentage]
+    colors = ['green', 'black']
+    explode = (0.1, 0)
     plt.clf()
-    plt.pie(donor_donations_grouped['quantity'], labels=donor_donations_grouped.index, autopct='%1.1f%%')
-    plt.title('Donation Distribution')
+    plt.pie(sizes, explode=explode, labels=labels, colors=colors,
+            autopct='%1.1f%%', startangle=90)
+
+    plt.axis('equal')
+    plt.title('Donations Percentage')
+    plt.legend(title="Legend")
     buffer = io.BytesIO()
     plt.savefig(buffer, format='png')
     buffer.seek(0)

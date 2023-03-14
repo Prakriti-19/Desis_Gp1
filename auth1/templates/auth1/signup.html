@@ -1,26 +1,74 @@
 {% extends 'auth1/base.html' %}
 {% load static %}
-{% block extra_head %}
-    <link rel="stylesheet" href="{% static 'images/styles.css' %}">
-{% endblock %}
-
 {% block content %}
-    <div class="container">
-      <div class="row justify-content-center">
-        <div class="col-md-6">
-          <div class="card">
-            <div class="card-header">
-              <h2>Sign up</h2>
-            </div>
-            <div class="card-body">
-              <form method="post">
-                {% csrf_token %}
-                {{ form.as_p }}
-                <button type="submit" class="btn btn-primary">Sign up</button>
-              </form>
-            </div>
+<style>
+.form-control {
+    font-family: Arial, sans-serif;
+    font-size: 13px;
+    width: 300px;
+    background-color: #FDEEDC;
+    border: 1px solid black;
+    padding: 8px;
+}
+.heading{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.email-input {
+    font-family: Arial, sans-serif;
+    font-size: 16px;
+    max-width: 300px;
+    background-color: #FDEEDC;
+}
+.container {
+  border: 3px solid white;
+  padding: 20px;
+  border-radius: 8px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+label {
+  font-family: Arial, sans-serif;
+    font-size: 16px;
+    padding: 8px;
+}
+button[type="submit"] {
+  background-color: #FDEEDC;
+  color: black;
+  padding: 10px 20px;
+  margin: 8px 0;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  align-items: center;
+}
+</style>
+
+<body>
+  <div class="container-lg">
+    <h1 class="heading">Sign up</h1>
+    <p class="heading">Please fill out the following information to sign up</p>
+  </div>
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-md-6">
+        <div class="card">
+          <div class="card-body">
+            <form method="post" class="my-form">
+              {% csrf_token %}
+              {{ form.as_p }}
+              <button type="submit" class="btn btn-primary">Sign up</button>
+            </form>
           </div>
         </div>
       </div>
     </div>
+  </div>
+</body>
+   
 {% endblock %}
+
+
+

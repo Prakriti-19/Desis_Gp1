@@ -4,7 +4,8 @@
   {% if form.errors %}
     <p>Your username and password didn't match. Please try again.</p>
   {% endif %}
-
+   <h1 class="heading">Login</h1>
+  
   <form method="post">
     {% csrf_token %}
     <label for="username">Username:</label>
@@ -13,4 +14,48 @@
     <input type="password" id="password" name="password" required><br><br>
     <button type="submit">Login</button>
   </form>
+
+  <style>
+  form {
+  border: 3px solid white;
+  padding: 10px;
+  border-radius: 5px;
+  width: 300px;
+  margin: auto;
+}
+
+label {
+  font-family: Arial, sans-serif;
+    font-size: 16px;
+    padding: 8px;
+}
+
+input[type="text"], input[type="password"] {
+  font-family: Arial, sans-serif;
+    font-size: 13px;
+    width: 200px;
+   background-color: #FDEEDC;
+  align-items: center;
+    border: 1px solid black;
+    padding: 8px;
+}
+
+button[type="submit"] {
+  background-color: #FDEEDC;
+  color: black;
+  padding: 10px 20px;
+  margin: 8px 0;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  align-items: center;
+}
+.heading{
+  display: flex;
+  justify-content: center;
+   background-color: #FDEEDC;
+   padding: 2px;
+  align-items: center;
+}
+</style>
 {% endblock %}

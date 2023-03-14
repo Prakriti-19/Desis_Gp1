@@ -4,13 +4,13 @@
   <ul>
     {% for donation in donations_made %}
       <li>
-        {{ donation.desc }} - {{ donation.donation_date }}
+        {{ donation.desc }} donated by {{ donation.donor_id.donor_name }}, status:
         {% if donation.status %}
         Donation in progress
         <form method="post" action="{% url 'update_donation_status' %}">
           {% csrf_token %}
+          console.log({{ donation.id }})
           <input type="hidden" name="donation_id" value="{{ donation.id }}">
-          <input type="hidden" name="status" value="true">
           <button type="submit">Mark as Donated</button>
         {% else %}
            Donated

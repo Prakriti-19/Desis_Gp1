@@ -6,8 +6,10 @@ class DonationForm(forms.ModelForm):
     pincode = forms.ModelChoiceField(queryset=pincode.objects.all())
     class Meta:
         model = donations
-        fields = ('exp_date', 'quantity', 'desc','pincode','latitude','donation_date','longitude')
+        fields = ('desc','quantity','pincode','donation_date','exp_date', 'longitude','latitude')
         widgets = {
+
+            '__all__': forms.TextInput(attrs={'class': 'my-form-class'}),
             'latitude': forms.HiddenInput(),
             'longitude': forms.HiddenInput(),
         }

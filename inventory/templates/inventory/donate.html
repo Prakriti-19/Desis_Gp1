@@ -1,6 +1,11 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <style>
+    .my-form-class {
+        background-color: blue;
+    }
+  </style>
   <title>Donate</title>
   <a href="{% url 'home' %}" class="navbar-brand">Home</a>
 </head>
@@ -13,6 +18,7 @@
     <!-- other form fields go here -->
     <button type="submit">Submit</button>
   </form>
+ 
   <script>
     function getLocation() {
       console.log('getLocation called');
