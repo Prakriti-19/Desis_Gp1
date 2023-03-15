@@ -29,5 +29,11 @@
         {% else %}
             <p>No donations made yet.</p>
         {% endif %}
+
+        {% if plot_data4 %}
+            <img src="data:image/png;base64,{{ plot_data4 }}" alt="Areas of Foode Wastage">
+        {% else %}
+            <p>No donations made yet.</p>
+    {% endif %}
     </div>
 {% endblock %}

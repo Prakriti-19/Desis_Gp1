@@ -1,8 +1,8 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.core.exceptions import ValidationError
-from inventory.models import ngo,donor,pincode
-from django.forms import ModelForm, PasswordInput, Select, TextInput, EmailInput
+from inventory.models import ngo,donor,pincode,donations
+from django.forms import PasswordInput, Select, TextInput, EmailInput
 
 '''
 The class ngoUserCreationForm is a subclass of the UserCreationForm provided by Django.
@@ -53,8 +53,6 @@ class ngoUserCreationForm(UserCreationForm):
         email = self.cleaned_data['email']
         if ngo.objects.filter(email=email).exists():
             raise ValidationError("Email already exists.")
-        if not validate_email(email):
-            raise ValidationError("Invalid email format.")
         return email
    
     def save(self, commit=True):
@@ -109,4 +107,28 @@ class donorUserCreationForm(UserCreationForm):
         if commit:
             user.save()
         return user
+
+class DonationForm(forms.ModelForm):
+    pincode = forms.ModelChoiceField(queryset=pincode.objects.all())
+    class Meta:
+        model = donations
+        fields = ('desc','quantity','type','pincode','donation_date','exp_date', 'longitude','latitude')
+        widgets = {
+            'latitude': forms.HiddenInput(),
+            'longitude': forms.HiddenInput(),
+        }
+
+    def __init__(self, *args, **kwargs):
+        self.user = kwargs.pop('user')
+        super().__init__(*args, **kwargs)
+
+    def save(self, commit=True):
+        donation = super().save(commit=False)
+        donation.donor_id = self.user
+        if commit:
+            donation.save()
+        return donation
+    
+class RedemptionForm(forms.Form):
+    points = forms.IntegerField(min_value=1)
    

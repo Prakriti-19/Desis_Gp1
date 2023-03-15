@@ -2,6 +2,7 @@ from datetime import date
 from .models import donations
 from rest_framework import serializers
 
+# Used to validate the donation given by the user
 class DonationSerializer(serializers.ModelSerializer):
     class Meta:
         model = donations

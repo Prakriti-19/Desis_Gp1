@@ -1,5 +1,23 @@
 {% block content %}
 <style>
+  li {
+  font-family: Arial, sans-serif;
+  padding: 5px;
+  font-size: 16px;
+}
+
+li button[type="submit"] {
+  background-color: #d69f5c;
+  color: black;
+  padding: 8px 15px;
+  margin: 2px 0;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer; 
+  align-items: center;
+  font-family: Arial, sans-serif;
+  font-size: 16px;
+}
   .heading{
     display: flex;
     justify-content: center;
@@ -16,21 +34,35 @@
 
   <ul>
     {% for donation in donations_made %}
-      <li>
-        {{ donation.desc }} donated by {{ donation.donor_id.donor_name }}, status:
-        {% if donation.status %}
+  <li>
+    <span style="font-family: Arial, sans-serif; font-size: 16px;font-weight: bold;padding: 4px;">
+      {{ donation.desc }}:
+    </span>
+    {% if donation.status %}
+      <span style="font-family: Arial, sans-serif; font-size: 16px; font-weight: bold; color: rgb(228, 153, 55);">
         Donation in progress
-        <form method="post" action="{% url 'update_donation_status' %}">
-          {% csrf_token %}
-          console.log({{ donation.id }})
-          <input type="hidden" name="donation_id" value="{{ donation.id }}">
-          <button type="submit">Mark as Donated</button>
-        {% else %}
-           Donated
-         </form>
-        {% endif %}
-      </li>
-    {% endfor %}
+      </span>
+      <br>
+      <span>
+        Donation added on {{ donation.donation_date}}
+      </span>
+      <form method="post" action="{% url 'update_donation_status' %}">
+        {% csrf_token %}
+        <input type="hidden" name="donation_id" value="{{ donation.id }}">
+        <button type="submit">Mark as Donated</button>
+      </form>
+    {% else %}
+      <span style="font-family: Arial, sans-serif; font-size: 16px; font-weight: bold; color: green;">
+        Donated
+      </span>
+      <br>
+      <span>
+        Donation added on {{ donation.donation_date}}
+      </span>
+    {% endif %}
+   
+  </li>
+{% endfor %}
   </ul>
 {% else %}
   <p>No donations made yet.</p>

@@ -4,17 +4,16 @@ matplotlib.use('Agg')
 from rest_framework.viewsets import ReadOnlyModelViewSet
 from .serializers import DonationSerializer
 from inventory.models import *
-from django.db.models import Q
 import pandas as pd
 from datetime import datetime, timedelta
 from django.utils import timezone
 from django.shortcuts import redirect, render, get_object_or_404
 from django.contrib import messages
 from django.db.models.functions import TruncMonth
-from .forms import DonationForm, RedemptionForm
+from auth1.forms import *
 from django.contrib.auth.decorators import login_required
 import matplotlib.pyplot as plt
-from django.db.models import Avg, Max, Min, Count, Sum
+from django.db.models import Avg, Max, Min, Count, Sum, Q
 import io
 import base64
 
@@ -27,7 +26,7 @@ def donate(request):
             donation.latitude = form.cleaned_data['latitude']
             donation.longitude = form.cleaned_data['longitude']
             donation.save()
-            return redirect("home")
+            return redirect("d_home")
     else:
         form = DonationForm(user=request.user)
     return render(request, 'inventory/donate.html', {'form': form})
@@ -83,7 +82,7 @@ def donate_points(request):
                     status=0)
         redemption.save()
         messages.success(request, f'{points} points donated to {ngo_user.ngo_name}')
-        return redirect('home')
+        return redirect('d_home')
     return render(request, 'inventory/donatep.html', {'ngos': ngos})
 
 def donations_list(request):
@@ -157,13 +156,9 @@ def donor_history(request):
 
     return render(request, 'inventory/donor_history.html', context)
 
-
-
 class donationsViewSet(ReadOnlyModelViewSet):
     serializer_class = DonationSerializer
     queryset = donations.objects.all()
-
-
 
 @login_required
 def donations_stats(request):
@@ -276,7 +271,23 @@ def donations_stats(request):
     image = base64.b64encode(buffer.getvalue()).decode('utf-8')
       
 
-
-    return render(request, 'inventory/donations_stats.html', {'image': image,'plot_data': plot_data,'plot_data2': plot_data2,'plot_data3': plot_data3, **context})
+    homefood_count = donations.objects.filter(type='homefood').count()
+    party_count = donations.objects.filter(type='party').count()
+    restro_count = donations.objects.filter(type='restro').count()
+    other_count = donations.objects.filter(type='other').count()
+    # Create a bar graph
+    types = ['Home Food', 'Party', 'Restro', 'Other']
+    counts = [homefood_count, party_count, restro_count, other_count]
+    buf4 = io.BytesIO()
+    fig, dx = plt.subplots()
+    dx.bar(types, counts)
+    dx.set_title('Count of Each Type of Donation')
+    dx.set_xlabel('Type of Donation')
+    dx.set_ylabel('Count')
+    plt.savefig(buf4, format='png')
+    buf4.seek(0)
+    plot_data4 = base64.b64encode(buf4.getvalue()).decode('ascii')
+    
+    return render(request, 'inventory/donations_stats.html', {'image': image,'plot_data': plot_data,'plot_data2': plot_data2,'plot_data3': plot_data3,'plot_data4': plot_data4, **context})
 
 

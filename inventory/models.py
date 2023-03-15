@@ -119,6 +119,17 @@ This Class which is used to represent donation made by any donor.
     - status2 is a bool flag representing if ngo has recieved the donation, depending on these two we transfer coins from ngo to donor
 ''' 
 class donations(models.Model):
+    HOME_FOOD = 'homefood'
+    PARTY = 'party'
+    RESTAURANT = 'restro'
+    OTHER = 'other'
+
+    TYPE_CHOICES = [
+        (HOME_FOOD, 'Home Food'),
+        (PARTY, 'Party'),
+        (RESTAURANT, 'Restaurant'),
+        (OTHER, 'Other'),
+    ]
     id = models.AutoField(primary_key=True)
     donor_id = models.ForeignKey(donor, on_delete=models.CASCADE)
     ngo_id = models.ForeignKey(ngo, on_delete=models.CASCADE, related_name='ngo_donations', blank=True, null=True)
@@ -131,6 +142,7 @@ class donations(models.Model):
     desc = models.TextField(default="description")
     status = models.BooleanField(default=True)
     status2 = models.BooleanField(default=True)
+    type = models.CharField(max_length=10, choices=TYPE_CHOICES, default=OTHER)
   
     def __str__(self):
         return self.desc
@@ -139,31 +151,6 @@ class Redemption(models.Model):
     donor = models.ForeignKey(donor, on_delete=models.CASCADE)
     points = models.PositiveIntegerField()
     date = models.DateTimeField(auto_now_add=True)
-# {% extends 'auth1/base.html' %}
-# {% load static %}
-# {% block extra_head %}
-#     <link rel="stylesheet" href="{% static 'images/styles.css' %}">
-# {% endblock %}
 
-# {% block content %}
-#     <div class="container">
-#       <div class="row justify-content-center">
-#         <div class="col-md-6">
-#           <div class="card">
-#             <div class="card-header">
-#               <h2>Sign up</h2>
-#             </div>
-#             <div class="card-body">
-#               <form method="post">
-#                 {% csrf_token %}
-#                 {{ form.as_p }}
-#                 <button type="submit" class="btn btn-primary">Sign up</button>
-#               </form>
-#             </div>
-#           </div>
-#         </div>
-#       </div>
-#     </div>
-# {% endblock %} 
 
 
