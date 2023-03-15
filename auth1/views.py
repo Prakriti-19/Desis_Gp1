@@ -7,23 +7,23 @@ from django.views.generic import TemplateView
 from auth1.backends import MyUserBackend
     
 class HomeView2(TemplateView):
-    template_name = "auth1/home.html"
+    template_name = "home.html"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["title"] = "HandsForHunger | Home"
         return context
 
-class d_h(TemplateView):
-    template_name = "auth1/d_h.html"
+class donor_home(TemplateView):
+    template_name = "d_h.html"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["title"] = "HandsForHunger | Home"
         return context
 
-class n_h(TemplateView):
-    template_name = "auth1/n_h.html"
+class ngo_home(TemplateView):
+    template_name = "n_h.html"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -39,11 +39,11 @@ def NgoLoginView(request):
        
         if user is not None and user.is_ngo:
             login(request, user,backend='auth1.backends.MyUserBackend')
-            return redirect('n_home')
+            return redirect('ngo_home')
         else:
-            return render(request, 'auth1/login.html', {'error_message': 'Invalid login credentials'})
+            return render(request, 'login.html', {'error_message': 'Invalid login credentials'})
     else:
-        return render(request, 'auth1/login.html')
+        return render(request, 'login.html')
     
 def DonorLoginView(request):
     if request.method == 'POST':
@@ -52,15 +52,15 @@ def DonorLoginView(request):
         user = MyUserBackend.authenticate(request,username=username, password=password, backend='auth1.backends.MyUserBackend')
         if user is not None and not user.is_ngo:
             login(request, user,backend= 'django.contrib.auth.backends.ModelBackend')
-            return redirect('d_home')
+            return redirect('donor_home')
         else:
-            return render(request, 'auth1/login.html', {'error_message': 'Invalid login credentials'})
+            return render(request, 'login.html', {'error_message': 'Invalid login credentials'})
     else:
-        return render(request, 'auth1/login.html')
+        return render(request, 'login.html')
 
 class NgoSignUpView(generic.CreateView):
     form_class = ngoUserCreationForm
-    template_name = "auth1/signup.html"
+    template_name = "signup.html"
     success_url = reverse_lazy('ngo_login')
     
     def form_valid(self, form):
@@ -73,7 +73,7 @@ class NgoSignUpView(generic.CreateView):
 
 class DonorSignUpView(generic.CreateView):
     form_class = donorUserCreationForm
-    template_name = "auth1/signup.html"
+    template_name = "signup.html"
     success_url = reverse_lazy('donor_login')
     def form_valid(self, form):
         if form.is_valid():

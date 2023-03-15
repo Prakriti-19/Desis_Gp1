@@ -1,15 +1,73 @@
 <!DOCTYPE html>
+<style>
+  .n{
+    display: flex;
+ justify-content: center;
+ align-items: center;
+ border: 3px solid white;
+  width: 600px;
+  padding: 10px;
+  position: absolute;
+    transform: translate(-50%, -50%);
+    top: 50%;
+    left: 50%;
+  }
+  body {
+    background-color: #E38B29;
+    
+   }
+.form-control {
+   font-family: Arial, sans-serif;
+   font-size: 13px;
+   width: 300px;
+   background-color: #FDEEDC;
+   border: 1px solid black;
+   padding: 8px;
+}
+.heading{
+ color:#FDEEDC;
+ display: flex;
+ justify-content: center;
+ align-items: center;
+ font-size: 50px;
+}
+.email-input {
+   font-family: Arial, sans-serif;
+   font-size: 16px;
+   max-width: 300px;
+   background-color: #FDEEDC;
+}
+.container {
+ border: 3px solid #FDEEDC;
+ padding: 20px;
+ border-radius: 8px;
+ display: flex;
+ justify-content: center;
+ align-items: center;
+}
+label {
+ font-family: Arial, sans-serif;
+   font-size: 16px;
+   padding: 8px;
+}
+button[type="submit"] {
+ background-color: #dea054;
+ color: black;
+ padding: 10px 20px;
+ margin: 8px 0;
+ border: none;
+ border-radius: 4px;
+ cursor: pointer;
+ align-items: center;
+}
+</style>
 <html>
-<head>
-  <style>
-    .my-form-class {
-        background-color: blue;
-    }
-  </style>
-  <title>Donate</title>
-  <a href="{% url 'd_home' %}" class="navbar-brand">Home</a>
-</head>
+
 <body onload="getLocation()">
+  <a href="{% url 'donor_home' %}" class="navbar-brand">Home</a>
+  <h1 class="heading">Donate</h1>
+  <div class="n">
+  
   <form method="post">
     {% csrf_token %}
     {{ form.as_p }}
@@ -18,7 +76,7 @@
     <!-- other form fields go here -->
     <button type="submit">Submit</button>
   </form>
- 
+</div>
   <script>
     function getLocation() {
       console.log('getLocation called');

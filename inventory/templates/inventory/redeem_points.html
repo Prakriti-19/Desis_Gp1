@@ -1,4 +1,4 @@
-
+<!-- 
 {% block content %}
 <style>
     body {
@@ -48,7 +48,7 @@
   }
   </style>
 <body>
-<a href="{% url 'd_home' %}" class="navbar-brand">Home</a>
+<a href="{% url 'donor_home' %}" class="navbar-brand">Home</a>
     <h1 class="heading">Redeem Points</h1>
     <h3 class="heading">Enter points to be redeemed in exchange for goodies</h3>
         
@@ -58,4 +58,148 @@
         <button type="submit">Redeem</button>
     </form>
     </body>
-{% endblock %}
+{% endblock %} -->
+{% load static %}
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <title>Hands for Hunger</title>
+  <link rel="icon" href="favicon.ico">
+
+  <!-- GOOGLE FONTS -->
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100;300;400;500;900&family=Ubuntu:wght@300;400;700&display=swap" rel="stylesheet">
+
+  <!-- CSS STYLESHEETS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N" crossorigin="anonymous">
+  <link rel="stylesheet" href="{% static 'css/styles3.css' %}">
+  
+  <!-- FONT AWESOME -->
+  <script src="https://kit.fontawesome.com/2fd7d971bc.js" crossorigin="anonymous"></script>
+
+  <!-- BOOTSTRAP SCRIPTS -->
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-Fy6S3B9q64WdZWQUiU+q4/2Lc9npb8tCaSX9FK7E8HnRr0Jz8D6OP9dO5Vg3Q9ct" crossorigin="anonymous"></script>
+  
+
+
+</head>
+
+<body>
+
+    <section id="title-img">
+        <div class="title row row-2">
+            <div class="parent col-lg-12">
+                <div class="inside container-fluid">
+                    <!-- Nav Bar -->
+                    <nav class="navbar navbar-expand-lg navbar-dark">
+                        <img class="logo" src="/static/images/Hands For Hunger.png" alt="rice">
+                        <!-- <a class="navbar-brand" href="">Hands for Hunger</a> -->
+                        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                            <span class="navbar-toggler-icon"></span>
+                        </button>
+                        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                            <ul class="navbar-nav ml-auto">
+                                <li class="nav-item">
+                                    <div class="dropdown">
+                                        <button class="nav-link dropbtn"><i class='fas fa-user-alt'></i>{{User.userName}}</button>
+                                        <div class="dropdown-content">
+                                            <a href="{% url 'donor_home' %}">Home</a>
+                                            <a href="{% url 'logout' %}">Log Out</a>
+                                        </div>
+                                    </div> 
+                                </li>
+                            </ul>
+                        </div>
+                    </nav>
+                </div>
+                <h2 class="name">Redeem Coins</h2>
+                <h4 class="prof">Coins earned : </h4><h4 class="addr">{{User.points}}</h4>
+                <img class="image1 title-image" height="250px" src="/static/images/mountain.jpeg" alt="mountain-mockup">
+            </div>
+        </div>
+    </section>
+
+    <section id="middle">
+
+        <div class="mid float-container">
+
+            <div class="container-right row row-1">
+                <div class="column">
+                    <img class="card" src="/static/images/pen.png" alt="money" style="width:100%">
+                    <div class="imgb">
+                        <button class="imgButton1">Redeem: 200 coins</button>
+                    </div>
+                </div>
+                <div class="column">
+                    <img class="card" src="/static/images/book.png" alt="money" style="width:100%">
+                    <div class="imgb">
+                        <button class="imgButton1">Redeem: 400 coins</button>
+                    </div>
+                </div>
+                <div class="column">
+                    <img class="card" src="/static/images/cap.png" alt="money" style="width:100%">
+                    <div class="imgb">
+                        <button class="imgButton1">Redeem: 500 coins</button>
+                    </div>
+                </div>
+            </div> 
+
+            <div class="container-right row row-1">
+                <div class="column">
+                    <img class="card" src="/static/images/mug.png" alt="money" style="width:100%">
+                    <div class="imgb">
+                        <button class="imgButton1">Redeem: 600 coins</button>
+                    </div>
+                </div>
+                <div class="column">
+                    <img class="card" src="/static/images/bottle.png" alt="food" style="width:100%">
+                    <div class="imgb">
+                        <button class="imgButton1">Redeem: 800 coins</button>
+                    </div>
+                </div>
+                <div class="column">
+                    <img class="card" src="/static/images/stringbag.png" alt="food" style="width:100%">
+                    <div class="imgb">
+                        <button class="imgButton1">Redeem: 1000 coins</button>
+                    </div>
+                </div>
+            </div> 
+
+            <div class="container-right row row-1">
+                <div class="column">
+                    <img class="card" src="/static/images/shirt.png" alt="money" style="width:100%">
+                    <div class="imgb">
+                        <button class="imgButton1">Redeem: 1200 coins</button>
+                    </div>
+                </div>
+                <div class="column">
+                    <img class="card" src="/static/images/polo.png" alt="money" style="width:100%">
+                    <div class="imgb">
+                        <button class="imgButton1">Redeem: 1500 coins</button>
+                    </div>
+                </div>
+                <div class="column">
+                    <img class="card" src="/static/images/Hoodie.png" alt="money" style="width:100%">
+                    <div class="imgb">
+                        <button class="imgButton1">Redeem: 2000 coins</button>
+                    </div>
+                </div>
+                
+            </div> 
+
+        </div>
+    
+      </section>
+
+    <footer class="white-section" id="footer">
+        <div class="container-fluid">
+            <i class="social-icon fab fa-facebook-f"></i>
+            <i class="social-icon fab fa-twitter"></i>
+            <i class="social-icon fab fa-instagram"></i>
+            <i class="social-icon fas fa-envelope"></i>
+            <p>© Copyright 2023 Hands for Hunger</p>
+        </div>
+    </footer>
+</body>

@@ -2,7 +2,7 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.core.exceptions import ValidationError
 from inventory.models import ngo,donor,pincode,donations
-from django.forms import PasswordInput, Select, TextInput, EmailInput
+from django.forms import PasswordInput, Select, TextInput, EmailInput, NumberInput
 
 '''
 The class ngoUserCreationForm is a subclass of the UserCreationForm provided by Django.
@@ -109,11 +109,29 @@ class donorUserCreationForm(UserCreationForm):
         return user
 
 class DonationForm(forms.ModelForm):
-    pincode = forms.ModelChoiceField(queryset=pincode.objects.all())
+    HOME_FOOD = 'homefood'
+    PARTY = 'party'
+    RESTAURANT = 'restro'
+    OTHER = 'other'
+
+    TYPE_CHOICES = [
+        (HOME_FOOD, 'Home Food'),
+        (PARTY, 'Party'),
+        (RESTAURANT, 'Restaurant'),
+        (OTHER, 'Other'),
+    ]
+
+    type = forms.ChoiceField(choices=TYPE_CHOICES, widget=forms.Select(attrs={'class': 'form-control'}))
+    pincode = forms.ModelChoiceField(queryset=pincode.objects.all(),widget=forms.Select(attrs={'class': 'form-control'}))
+
     class Meta:
         model = donations
         fields = ('desc','quantity','type','pincode','donation_date','exp_date', 'longitude','latitude')
         widgets = {
+            'desc': forms.TextInput(attrs={'class': 'form-control'}),
+            'quantity': forms.NumberInput(attrs={'class': 'form-control'}),
+            'donation_date': forms.DateInput(attrs={'class': 'form-control'}),
+            'exp_date': forms.DateInput(attrs={'class': 'form-control'}),
             'latitude': forms.HiddenInput(),
             'longitude': forms.HiddenInput(),
         }

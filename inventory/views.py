@@ -26,7 +26,7 @@ def donate(request):
             donation.latitude = form.cleaned_data['latitude']
             donation.longitude = form.cleaned_data['longitude']
             donation.save()
-            return redirect("d_home")
+            return redirect("donor_home")
     else:
         form = DonationForm(user=request.user)
     return render(request, 'inventory/donate.html', {'form': form})
@@ -82,7 +82,7 @@ def donate_points(request):
                     status=0)
         redemption.save()
         messages.success(request, f'{points} points donated to {ngo_user.ngo_name}')
-        return redirect('d_home')
+        return redirect('donor_home')
     return render(request, 'inventory/donatep.html', {'ngos': ngos})
 
 def donations_list(request):
@@ -156,9 +156,9 @@ def donor_history(request):
 
     return render(request, 'inventory/donor_history.html', context)
 
-class donationsViewSet(ReadOnlyModelViewSet):
-    serializer_class = DonationSerializer
-    queryset = donations.objects.all()
+# class donationsViewSet(ReadOnlyModelViewSet):
+#     serializer_class = DonationSerializer
+#     queryset = donations.objects.all()
 
 @login_required
 def donations_stats(request):
