@@ -1,7 +1,6 @@
-{% extends 'auth1/base.html' %}
-
 {% block content %}
     <div class="container">
+        <a href="{% url 'd_home' %}" class="navbar-brand">Home</a>
         <h1>Statistics</h1>
         <p>Total Number of Donations: {{ total_donations }}</p>
         <p>Meals Served: {{ total_quantity.quantity__sum}}</p>

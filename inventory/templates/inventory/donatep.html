@@ -1,21 +1,83 @@
-{% extends 'auth1/base.html' %}
 
 {% block content %}
-<h2>Donate Points</h2>
-<form method="post">
-  {% csrf_token %}
-  <div class="form-group">
-    <label for="ngo">Choose an NGO:</label>
-    <select class="form-control" id="ngo" name="ngo">
-      {% for ngo in ngos %}
-        <option value="{{ ngo.id }}">{{ ngo.ngo_name }}</option>
-      {% endfor %}
-    </select>
-  </div>
-  <div class="form-group">
-    <label for="points">Enter Points to Donate:</label>
-    <input type="number" class="form-control" id="points" name="points">
-  </div>
-  <button type="submit" class="btn btn-primary">Submit</button>
-</form>
+<style>
+  body {
+  background-color:#FDEEDC;
+  }
+  .form{
+  position: absolute;
+  background-color:#FDEEDC;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border: 3px solid black;
+  font-family: Arial, sans-serif;
+  padding: 10px;
+  border-radius: 5px;
+  width: 300px;
+  height: 250px;
+  justify-content: center;
+  align-items: center;
+  }
+  label {
+  font-family: Arial, sans-serif;
+    font-size: 16px;
+    padding: 8px;
+}
+.heading2{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+.form-group{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+button[type="submit"] {
+  background-color: #ca9451; 
+  color: black;
+  padding: 10px 20px;
+  margin: 8px 0;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  align-items: center;
+}
+header{
+  text-align: left;
+  position: absolute;
+  top: 10px;
+  left: 10px;
+}
+</style>
+
+<header>
+  <a href="{% url 'd_home' %}" class="navbar-brand">Home</a>
+</header>
+<body>
+  <div class="form">
+  <h2 class="heading2">Donate Points</h2>
+  <form method="post">
+    {% csrf_token %}
+    <div class="form-group">
+      <label for="ngo">Choose an NGO:</label>
+      <select class="form-control" id="ngo" name="ngo">
+        {% for ngo in ngos %}
+          <option value="{{ ngo.id }}">{{ ngo.ngo_name }}</option>
+        {% endfor %}
+      </select>
+      <div class="form-group">
+        <label for="points">Enter Points to Donate:</label>
+        <input type="number" class="form-control" id="points" name="points">
+      </div>
+      <button type="submit" class="btn btn-primary">Submit</button>
+    </div>
+    
+  </form>
+</div>
+</body>
+
 {% endblock %}

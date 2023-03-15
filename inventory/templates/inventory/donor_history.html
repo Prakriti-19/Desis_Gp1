@@ -1,4 +1,17 @@
-<h1>Donations made by {{ donor.donor_name }}</h1>
+{% block content %}
+<style>
+  .heading{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  body {
+    background-color: #FDEEDC;
+    }
+  </style>
+  <body>
+  <a href="{% url 'd_home' %}" class="navbar-brand">Home</a>
+<h1 class="heading">Donations made by You</h1>
 {% if donations_made %}
 
   <ul>
@@ -22,3 +35,5 @@
 {% else %}
   <p>No donations made yet.</p>
 {% endif %}
+</body>
+{% endblock %}

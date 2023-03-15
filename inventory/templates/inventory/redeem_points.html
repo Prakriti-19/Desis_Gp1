@@ -1,10 +1,61 @@
-{% extends 'auth1/base.html' %}
 
 {% block content %}
-    <h1>Redeem Points</h1>
-    <form method="POST">
+<style>
+    body {
+    background-color:#FDEEDC;
+    }
+    label {
+    font-family: Arial, sans-serif;
+      font-size: 16px;
+      padding: 8px;
+  }
+  .heading{
+    display: flex;
+    font-family: Arial, sans-serif;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+  .form-group{
+    position: absolute;
+    transform: translate(-50%, -50%);
+    background-color:#FDEEDC;
+    top: 50%;
+    left: 50%;
+    border: 3px solid black;
+    width: 300px;
+    height: 250px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+  button[type="submit"] {
+    background-color: #ca9451; 
+    color: black;
+    padding: 10px 20px;
+    margin: 8px 0;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    align-items: center;
+  }
+  header{
+    text-align: left;
+    position: absolute;
+    top: 10px;
+    left: 10px;
+  }
+  </style>
+<body>
+<a href="{% url 'd_home' %}" class="navbar-brand">Home</a>
+    <h1 class="heading">Redeem Points</h1>
+    <h3 class="heading">Enter points to be redeemed in exchange for goodies</h3>
+        
+    <form method="POST" class="form-group">
         {% csrf_token %}
         {{ form.as_p }}
         <button type="submit">Redeem</button>
     </form>
+    </body>
 {% endblock %}

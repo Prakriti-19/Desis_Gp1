@@ -1,7 +1,12 @@
-{% extends 'auth1/base.html' %}
+<style> body {
+  background-color:#FDEEDC;
+  }</style>
 
 {% block content %}
-  <h1>List of Donations</h1>
+<header>
+  <a href="{% url 'n_home' %}" class="navbar-brand">Home</a>
+</header>
+<body><h1>List of Donations</h1>
   <form method="get">
     <label for="pincode">Filter by Pincode:</label>
     <input type="text" name="pincode" id="pincode" value="{{ request.GET.pincode }}">
@@ -38,5 +43,6 @@
     {% empty %}
       <li>No donations found.</li>
     {% endfor %}
-  </ul>
+  </ul></body>
+  
 {% endblock %}
