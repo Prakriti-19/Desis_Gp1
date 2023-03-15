@@ -1,0 +1,559 @@
+
+
+body
+{
+    font-family: 'Montserrat' , sans-serif;
+}
+
+#title
+{
+    background-color: #E38B29;
+    color: #fff;
+}
+
+.container-fluid
+{
+    padding: 2% 5% 2%;
+}
+
+h1
+{
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 900;
+    font-size: 3.5rem;
+    line-height: 1.5;
+}
+
+h2
+{
+    font-family: 'Montserrat' , sans-serif;
+    font-weight: bold;
+    font-size: 3rem;
+    line-height: 1.5;
+}
+
+h3
+{
+    font-family: 'Montserrat' , sans-serif;
+    font-weight: 700;
+    text-align: center;
+    padding-bottom: 3%;
+    padding-top: 7%;
+}
+
+p
+{
+    color: #000;
+}
+
+
+/* Navigation Bar */
+
+/* .navbar
+{
+    padding: 0 0 4.5rem;
+} */
+ /* Dropdown Button */
+ 
+ .dropbtn {
+  background-color: #E38B29;
+  color: white;
+  padding-top: 8px
+  ;
+  font-size: 16px;
+  border: none;
+}
+
+/* The container <div> - needed to position the dropdown content */
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+/* Dropdown Content (Hidden by Default) */
+.dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: #f1f1f1;
+  min-width: 160px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 1;
+}
+
+/* Links inside the dropdown */
+.dropdown-content a {
+  color: black;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+}
+
+/* Change color of dropdown links on hover */
+.dropdown-content a:hover {background-color: #ddd;}
+
+/* Show the dropdown menu on hover */
+.dropdown:hover .dropdown-content {display: block;}
+
+/* Change the background color of the dropdown button when the dropdown content is shown */
+.dropdown:hover .dropbtn {background-color: #F1A661;} 
+
+/* Slider */
+.content-slider {
+    width: 100%;
+    height: 100px;
+  }
+  
+  .slider {
+    height: 100px   ;
+    width: 1000px;
+    margin: 40px auto 0;
+    overflow: visible;
+    position: relative;
+  }
+  
+  .mask {
+    overflow: hidden;
+    height: 100px;
+  }
+  
+  .slider ul {
+    margin: 0;
+    padding: 0;
+    position: relative;
+  }
+  
+  .slider li {
+    width: 1000px;
+    height: 100px;
+    position: absolute;
+    top: -325px;
+    list-style: none;
+  }
+  
+  .slider .quote {
+    font-size: 25px;
+    font-style: italic;
+  }
+  
+  .slider .source {
+    font-size: 20px;
+    text-align: right;
+  }
+  
+  .slider li.anim1 {
+    animation: cycle 15s linear infinite;
+  }
+  
+  .slider li.anim2 {
+    animation: cycle2 15s linear infinite;
+  }
+  
+  .slider li.anim3 {
+    animation: cycle3 15s linear infinite;
+  }
+  
+  .slider li.anim4 {
+    animation: cycle4 15s linear infinite;
+  }
+  
+  .slider li.anim5 {
+    animation: cycle5 15s linear infinite;
+  }
+  
+  .slider:hover li {
+    animation-play-state: paused;
+  }
+  
+  @keyframes cycle {
+    0% {
+      top: 0px;
+    }
+    4% {
+      top: 0px;
+    }
+    16% {
+      top: 0px;
+      opacity: 1;
+      z-index: 0;
+    }
+    20% {
+      top: 325px;
+      opacity: 0;
+      z-index: 0;
+    }
+    21% {
+      top: -325px;
+      opacity: 0;
+      z-index: -1;
+    }
+    50% {
+      top: -325px;
+      opacity: 0;
+      z-index: -1;
+    }
+    92% {
+      top: -325px;
+      opacity: 0;
+      z-index: 0;
+    }
+    96% {
+      top: -325px;
+      opacity: 0;
+    }
+    100% {
+      top: 0px;
+      opacity: 1;
+    }
+  }
+  
+  @keyframes cycle2 {
+    0% {
+      top: -325px;
+      opacity: 0;
+    }
+    16% {
+      top: -325px;
+      opacity: 0;
+    }
+    20% {
+      top: 0px;
+      opacity: 1;
+    }
+    24% {
+      top: 0px;
+      opacity: 1;
+    }
+    36% {
+      top: 0px;
+      opacity: 1;
+      z-index: 0;
+    }
+    40% {
+      top: 325px;
+      opacity: 0;
+      z-index: 0;
+    }
+    41% {
+      top: -325px;
+      opacity: 0;
+      z-index: -1;
+    }
+    100% {
+      top: -325px;
+      opacity: 0;
+      z-index: -1;
+    }
+  }
+  
+  @keyframes cycle3 {
+    0% {
+      top: -325px;
+      opacity: 0;
+    }
+    36% {
+      top: -325px;
+      opacity: 0;
+    }
+    40% {
+      top: 0px;
+      opacity: 1;
+    }
+    44% {
+      top: 0px;
+      opacity: 1;
+    }
+    56% {
+      top: 0px;
+      opacity: 1;
+      z-index: 0;
+    }
+    60% {
+      top: 325px;
+      opacity: 0;
+      z-index: 0;
+    }
+    61% {
+      top: -325px;
+      opacity: 0;
+      z-index: -1;
+    }
+    100% {
+      top: -325px;
+      opacity: 0;
+      z-index: -1;
+    }
+  }
+  
+  @keyframes cycle4 {
+    0% {
+      top: -325px;
+      opacity: 0;
+    }
+    56% {
+      top: -325px;
+      opacity: 0;
+    }
+    60% {
+      top: 0px;
+      opacity: 1;
+    }
+    64% {
+      top: 0px;
+      opacity: 1;
+    }
+    76% {
+      top: 0px;
+      opacity: 1;
+      z-index: 0;
+    }
+    80% {
+      top: 325px;
+      opacity: 0;
+      z-index: 0;
+    }
+    81% {
+      top: -325px;
+      opacity: 0;
+      z-index: -1;
+    }
+    100% {
+      top: -325px;
+      opacity: 0;
+      z-index: -1;
+    }
+  }
+  
+  @keyframes cycle5 {
+    0% {
+      top: -325px;
+      opacity: 0;
+    }
+    76% {
+      top: -325px;
+      opacity: 0;
+    }
+    80% {
+      top: 0px;
+      opacity: 1;
+    }
+    84% {
+      top: 0px;
+      opacity: 1;
+    }
+    96% {
+      top: 0px;
+      opacity: 1;
+      z-index: 0;
+    }
+    100% {
+      top: 325px;
+      opacity: 0;
+      z-index: 0;
+    }
+  }
+
+/* 
+  ---------- */
+
+
+.navbar-brand
+{
+    font-family: 'Ubuntu';
+    font-size: 2.5rem;
+    font-weight: bold;
+}
+
+.nav-item
+{
+    padding: 0 18px;
+}
+
+.nav-link
+{
+    font-family: 'Montserrat';
+    font-weight: 500;
+    -webkit-text-fill-color: #FDEEDC;
+    font-size: 1.2rem;
+}
+
+.whib
+{
+  -webkit-text-fill-color: #000;
+}
+/* Download Buttons */
+
+.download-button
+{
+    margin: 5% 3% 5% 0;
+}
+
+/* Title Image */
+
+.title-image
+{
+    /* width: 60%; */
+    /* transform: rotate(25deg); */
+    position: relative;
+    /* right: 30%; */
+    background-size: cover;
+    background-position: center;
+    width: 100%;
+  z-index: 0;
+}
+
+/* about */
+
+.abt
+{
+    text-align: center;
+    color: #E38B29;
+}
+.abt_why
+{
+    padding-bottom: 0%;
+}
+#About
+{
+    padding: 7% 15% 2% 15%;
+}
+
+/* features */
+
+#features
+{
+    position: relative;
+    background-color: #fff;
+    padding: 0% 7% 3% 7%;
+}
+
+.feature-box
+{
+    text-align: center;
+    padding: 5%;
+}
+
+.icon 
+{
+    color: #F1A661;
+    margin-bottom: 1rem;
+}
+  
+.icon:hover 
+{
+    color: #E38B29;
+}
+
+.par
+{
+    padding-top: 2%;
+    padding-bottom: 7%;
+
+}
+/* Testimonial Section */
+
+#testimonials 
+{
+    /* padding: 7% 15%; */
+    text-align: center;
+    background-color: #E38B29;
+    color: #fff;
+}
+.usert
+{
+    font-size: 2rem;
+}
+.testimonial-text 
+{
+    font-size: 2.2rem;
+    line-height: 1.5;
+}
+
+.testimonial-image 
+{
+    width: 10%;
+    border-radius: 100%;
+    margin: 20px;
+}
+
+.carousel-item
+{
+    padding: 7% 15%;
+}
+
+
+#press 
+{
+    background-color: #fff;
+    padding-bottom: 3%;
+    text-align: center;
+}
+
+.press-logo 
+{
+    width: 15%;
+    margin: 20px 20px 50px;
+}
+
+/* Pricing Section */
+
+#faq 
+{
+    padding: 100px;
+    text-align: center;
+}
+.faqs
+{
+    color: #E38B29;
+}
+.price-text 
+{
+    font-size: 3rem;
+    line-height: 1.5;
+}
+  
+.pricing-column 
+{
+    padding: 3% 2%;
+}
+
+/* CTA */
+
+#cta
+{
+    text-align: center;
+    background-color: #E38B29;
+    color: #fff;
+}
+
+
+/* footer */
+
+#footer
+{
+    text-align: center;
+    background-color: #fff;
+}
+
+.social-icon 
+{
+    margin: 20px 10px;
+}
+
+@media (max-width: 1028px) 
+{
+
+    #title 
+    {
+        text-align: center;
+    }
+
+    #About
+    {
+        text-align: center;
+    }
+    .title-image 
+    {
+        position: static;
+        transform: rotate(0);
+    }
+}

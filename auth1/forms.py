@@ -44,6 +44,18 @@ class ngoUserCreationForm(UserCreationForm):
             'latitude': forms.HiddenInput(),
             'longitude': forms.HiddenInput(),
         }
+
+    email = forms.EmailField(max_length=30, required=True)
+    ngo_name = forms.CharField(max_length=255)
+    phone_no = forms.IntegerField(required=True)
+
+    def clean_email(self):
+        email = self.cleaned_data['email']
+        if ngo.objects.filter(email=email).exists():
+            raise ValidationError("Email already exists.")
+        if not validate_email(email):
+            raise ValidationError("Invalid email format.")
+        return email
    
     def save(self, commit=True):
         user = super().save(commit=False)
@@ -91,7 +103,6 @@ class donorUserCreationForm(UserCreationForm):
             'latitude': forms.HiddenInput(),
             'longitude': forms.HiddenInput(),
         }
-
     def save(self, commit=True):
         user = super().save(commit=False)
         user.is_ngo = False
