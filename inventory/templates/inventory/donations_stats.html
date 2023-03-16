@@ -14,28 +14,27 @@
             <p>No donations data available.</p>
         {% endif %}
 
-        {% if plot_data3 %}
-            <img src="data:image/png;base64,{{ plot_data3 }}" alt="Donations in your city">
-        {% else %}
-            <p>No donations made yet.</p>
-        {% endif %}
-
         {% if plot_data2 %}
-            <img src="data:image/png;base64,{{ plot_data2 }}" alt="Retention rate">
+            <img src="data:image/png;base64,{{ plot_data2 }}" alt="Donations in your city">
         {% else %}
             <p>No donations made yet.</p>
         {% endif %}
 
-        <!-- {% if plot_data5 %}
-            <img src="data:image/png;base64,{{ plot_data5 }}" alt="Retention rate">
+        {% if plot_data1 %}
+            <img src="data:image/png;base64,{{ plot_data1 }}" alt="Retention rate">
         {% else %}
             <p>No donations made yet.</p>
-        {% endif %} -->
+        {% endif %}
 
-        {% if plot_data4 %}
-            <img src="data:image/png;base64,{{ plot_data4 }}" alt="Areas of Foode Wastage">
+        {% if plot_data3 %}
+            <img src="data:image/png;base64,{{ plot_data3 }}" alt="Areas of Foode Wastage">
         {% else %}
             <p>No donations made yet.</p>
     {% endif %}
+    {% if plot_data5 %}
+            <img src="data:image/png;base64,{{ plot_data5 }}" alt="Retention rate">
+        {% else %}
+            <p>No donations made yet.</p>
+        {% endif %}
     </div>
 {% endblock %}
