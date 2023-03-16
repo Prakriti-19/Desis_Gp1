@@ -3,6 +3,8 @@
         <a href="{% url 'donor_home' %}" class="navbar-brand">Home</a>
         <h1>Statistics</h1>
         <p>Total Number of Donations: {{ total_donations }}</p>
+        <p>NGOs Registered through our website: {{ ngo_count }}</p>
+        <p>Donors active on our website: {{ donor_count }}</p>
         <p>Meals Served: {{ total_quantity.quantity__sum}}</p>
         <p>Average Meals served per donation: {{ avg_quantity }}</p>
         <p>Maximum Meals served in single Donation: {{ max_quantity.quantity__max }}</p>
@@ -10,12 +12,6 @@
             <img src="data:image/png;base64,{{ image }}" alt="Donations by Donor">
         {% else %}
             <p>No donations data available.</p>
-        {% endif %}
-
-        {% if plot_data %}
-            <img src="data:image/png;base64,{{ plot_data }}" alt="Donations per Month">
-        {% else %}
-            <p>No donations made yet.</p>
         {% endif %}
 
         {% if plot_data3 %}
@@ -29,6 +25,12 @@
         {% else %}
             <p>No donations made yet.</p>
         {% endif %}
+
+        <!-- {% if plot_data5 %}
+            <img src="data:image/png;base64,{{ plot_data5 }}" alt="Retention rate">
+        {% else %}
+            <p>No donations made yet.</p>
+        {% endif %} -->
 
         {% if plot_data4 %}
             <img src="data:image/png;base64,{{ plot_data4 }}" alt="Areas of Foode Wastage">
