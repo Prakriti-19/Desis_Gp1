@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'django_filters',
     'versatileimagefield',
+    'payment',
 ]
 
 MIDDLEWARE = [
@@ -177,3 +178,6 @@ AUTH_USER_MODEL = 'inventory.donor'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+RAZORPAY_API_KEY='rzp_test_pTCA2e6YW1Iu3T'
+RAZORPAY_API_SECRET_KEY='BZCHPvDGPPRyyyBFSGPbXUZv'
