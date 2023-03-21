@@ -1,10 +1,50 @@
-{% extends 'auth1/base.html' %}
-
 {% block content %}
-    <h1>List of NGOs</h1>
-    <ul>
-        {% for ngo in ngos %}
-            <li><a href="{% url 'ngo_detail' ngo.id %}">{{ ngo.ngo_name }}</a></li>
-        {% endfor %}
-    </ul>
+<style>
+  body {
+  background-color:#ca9451;
+  }
+    .ngo-table {
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 1rem;
+    }
+    .ngo-table th, .ngo-table td {
+      padding: 10px;
+      border: 1px solid#FDEEDC;
+      text-align: left;
+    }
+    .ngo-table th {
+      background-color:#FDEEDC;
+    }
+    .ngo-table tbody tr:nth-child(even) {
+      background-color: #FDEEDC;
+    }
+  </style>
+  <a href="{% url 'donor_home' %}" class="navbar-brand">Home</a>
+  <h1>List of NGOs</h1>
+  <table class="ngo-table">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Distance (km)</th>
+        <th>Contact Information</th>
+        <th>Donate Points</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for ngo in ngos %}
+        <tr>
+          <td>{{ ngo.ngo_name }}</td>
+          <td>{{ ngo.distance }}</td>
+          <td>{{ ngo.phone_no }}</td>
+          <td><a href="{% url 'donate_points' ngo.id %}">Donate Points</a></td>
+        </tr>
+      {% empty %}
+        <tr>
+          <td colspan="3">No NGOs found.</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
 {% endblock %}
+

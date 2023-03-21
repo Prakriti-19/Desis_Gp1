@@ -20,6 +20,12 @@
             <p>No donations made yet.</p>
         {% endif %}
 
+        {% if plot_data6 %}
+            <img src="data:image/png;base64,{{ plot_data6 }}" alt="Donations in your city">
+        {% else %}
+            <p>No transactions made yet.</p>
+        {% endif %}
+
         {% if plot_data1 %}
             <img src="data:image/png;base64,{{ plot_data1 }}" alt="Retention rate">
         {% else %}

@@ -1,7 +1,63 @@
 {% load static %}
 <!DOCTYPE html>
 <html>
+<style>
+  #popup {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: #fff;
+  border: 1px solid #ccc;
+  padding: 20px;
+  width: 400px;
+  display: none; 
+}
 
+#popup h2 {
+  font-size: 1.5em;
+  margin-top: 0;
+}
+
+#popup form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+#popup form input[type="text"] {
+  padding: 10px;
+  margin-bottom: 20px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  width: 100%;
+}
+
+#popup form button[type="submit"] {
+  background-color: #007bff;
+  color: #fff;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  font-size: 1em;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+#popup .closeButton {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background-color: transparent;
+  border: none;
+  font-size: 1.5em;
+  cursor: pointer;
+}
+
+#popup form button[type="submit"]:hover {
+  background-color: #0062cc;
+}
+
+</style>
 <head>
      <meta charset="utf-8">
   <title>Hands for Hunger</title>
@@ -46,7 +102,7 @@
                                         <a href="{% url 'add_donation' %}">Add</a>
                                       <a  href="{% url 'donor_history' %}">History</a>
                                         <a href="{% url 'redeem_points' %}">Redeem Coins</a>
-                                        <a href="{% url 'donate_points' %}">Donote Coins</a>
+                                        <a href="{% url 'ngo_list' %}">Donote Coins</a>
                                       <a href="{% url 'stats' %}">Stats</a>
                                       <a href="{% url 'logout' %}">Log Out</a>
                                     </div>
@@ -59,7 +115,7 @@
                 <img class="image1 title-image" height="250px" src="\static/images/mountain.jpeg" alt="mountain-mockup">
                 <img class="image2" id="pp" src="\static\images\Hands For Hunger.png" alt="Profile pic">
                 <h2 class="name">{{ user.username }}</h2>
-                <h3 class="prof">{{ user.phone_no }}</h3>
+                <h3 class="prof">{{ user.phone_no }}, {{ user.email }}</h3>
                 <h4 class="addr"><i class='fas fa-map-marker-alt'></i> {{ user.pincode.city }}, {{ user.pincode.code }}</h4>
             </div>
         </div>
@@ -90,25 +146,32 @@
                     <div class="container-right row row-1">
                         <h1 class="qn">How would you like to make a difference today?</h1>
                         <div class="column">
-                          <a href="{% url 'add_donation' %}">
-                            <img class="card" src="\static\images\c1.png" alt="food" style="width:100%">
+                          <a >
+                            <img class="card" src="\static\images\c3.png" alt="food" style="width:100%">
                             <div class="imgb">
-                                <button class="imgButton1">Donate Food</button>
+                              <button class="imgButton1" onclick="openPopup()">Donate Money</button>
+                            </div>
+                            <div id="popup">
+                              <h2>Donate Money</h2>
+                              <button class="closeButton" onclick="closePopup()">X</button>
+                              <form action="http://127.0.0.1:8000/pay">
+                                Enter the amount: <input type="text" name="amount">
+                                <button type="submit">Pay</button>
+                              </form>
                             </div>
                           </a>
                         </div>
                         <div class="column">
                           <a href="{% url 'add_donation' %}">
-                            <img class="card" src="\static\images\c3.png" alt="money" style="width:100%">
+                            <img class="card" src="\static\images\c1.png" alt="money" style="width:100%">
                             <div class="imgb">
-                                <button class="imgButton1">Donate Money</button>
+                                <button class="imgButton1">Donate Food</button>
                             </div>
                           </a>
                         </div>
                     </div> 
                   </div>
         </div>
-    
       </section>
 
 
@@ -126,17 +189,15 @@
   </footer>
 
 
-
-
-
-
-
-
-
-
-
-
   <script>
+   function openPopup() {
+    var popup = document.getElementById("popup");
+    popup.style.display = "block";
+  }
+  function closePopup() {
+  document.getElementById("popup").style.display = "none";
+}
+
     document.getElementsByClassName("tablinks")[0].click();
     function openopt(evt, opt) {
       var i, tabcontent, tablinks;

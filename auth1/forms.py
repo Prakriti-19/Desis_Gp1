@@ -9,12 +9,12 @@ The class ngoUserCreationForm is a subclass of the UserCreationForm provided by 
 The Meta class is used to provide additional metadata for the ngo model and is an example of abstraction. 
 '''
 class ngoUserCreationForm(UserCreationForm):
-    pincode = forms.ModelChoiceField(queryset=pincode.objects.all(),widget=forms.Select(attrs={'class': 'form-control'}))
-    email = forms.EmailField(max_length=30, required=True,widget=forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Email'}))
-    ngo_name = forms.CharField(max_length=255,widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'NGO name'}))
+    pincode = forms.ModelChoiceField(required=True,queryset=pincode.objects.all(),widget=forms.Select(attrs={'class': 'form-control'}))
+    email = forms.EmailField(required=True,max_length=30,widget=forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Email'}))
+    ngo_name = forms.CharField(required=True,max_length=255,widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'NGO name'}))
     phone_no = forms.IntegerField(required=True,widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Phone number'}))
-    password1 = forms.CharField(max_length=150,widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'password'}))
-    password2 = forms.CharField(max_length=150,widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'confirm password'}))
+    password1 = forms.CharField(required=True,max_length=150,widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'password'}))
+    password2 = forms.CharField(required=True,max_length=150,widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'confirm password'}))
     class Meta(UserCreationForm.Meta):
         model = ngo
         fields = ('username','ngo_name', 'email','pincode', 'phone_no','latitude','longitude','password1', 'password2')
@@ -23,9 +23,9 @@ class ngoUserCreationForm(UserCreationForm):
                 'class': "form-control",
                 }),
             'email':EmailInput(attrs={
-                'class': "form-control email-input",
+                'class': "form-control ",
                 }),
-            'phone_no': TextInput(attrs={
+            'phone_no': NumberInput(attrs={
                 'class': "form-control",
             }),
             'ngo_name': TextInput(attrs={
@@ -44,10 +44,6 @@ class ngoUserCreationForm(UserCreationForm):
             'latitude': forms.HiddenInput(),
             'longitude': forms.HiddenInput(),
         }
-
-    email = forms.EmailField(max_length=30, required=True)
-    ngo_name = forms.CharField(max_length=255)
-    phone_no = forms.IntegerField(required=True)
 
     def clean_email(self):
         email = self.cleaned_data['email']
@@ -128,10 +124,10 @@ class DonationForm(forms.ModelForm):
         model = donations
         fields = ('desc','quantity','type','pincode','donation_date','exp_date', 'longitude','latitude')
         widgets = {
-            'desc': forms.TextInput(attrs={'class': 'form-control'}),
-            'quantity': forms.NumberInput(attrs={'class': 'form-control'}),
-            'donation_date': forms.DateInput(attrs={'class': 'form-control'}),
-            'exp_date': forms.DateInput(attrs={'class': 'form-control'}),
+            'desc': forms.TextInput(attrs={'class': 'form-control','placeholder': 'Description'}),
+            'quantity': forms.NumberInput(attrs={'class': 'form-control','placeholder': 'No. of people it can serve'}),
+            'donation_date': forms.DateInput(attrs={'class': 'form-control','placeholder': 'Donation date'}),
+            'exp_date': forms.DateInput(attrs={'class': 'form-control','placeholder': 'Use-by Date'}),
             'latitude': forms.HiddenInput(),
             'longitude': forms.HiddenInput(),
         }

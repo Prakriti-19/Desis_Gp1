@@ -15,7 +15,7 @@
   padding: 10px;
   border-radius: 5px;
   width: 300px;
-  height: 250px;
+  height: 200px;
   justify-content: center;
   align-items: center;
   }
@@ -42,8 +42,16 @@ button[type="submit"] {
   padding: 10px 20px;
   margin: 8px 0;
   border: none;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
   border-radius: 4px;
   cursor: pointer;
+  align-items: center;
+}
+.btn{
+  flex-direction: column;
+  justify-content: center;
   align-items: center;
 }
 header{
@@ -62,20 +70,12 @@ header{
   <h2 class="heading2">Donate Points</h2>
   <form method="post">
     {% csrf_token %}
-    <div class="form-group">
-      <label for="ngo">Choose an NGO:</label>
-      <select class="form-control" id="ngo" name="ngo">
-        {% for ngo in ngos %}
-          <option value="{{ ngo.id }}">{{ ngo.ngo_name }}</option>
-        {% endfor %}
-      </select>
       <div class="form-group">
         <label for="points">Enter Points to Donate:</label>
         <input type="number" class="form-control" id="points" name="points">
-      </div>
-      <button type="submit" class="btn btn-primary">Submit</button>
-    </div>
-    
+        <br>
+      <button type="submit" class="btn ">Submit</button>
+    </div>   
   </form>
 </div>
 </body>
