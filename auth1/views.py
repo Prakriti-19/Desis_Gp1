@@ -5,6 +5,7 @@ from django.shortcuts import redirect,render
 from django.views import View,generic
 from django.views.generic import TemplateView
 from auth1.backends import MyUserBackend
+from django.db.models import Sum
     
 class HomeView2(TemplateView):
     template_name = "home.html"
@@ -13,6 +14,15 @@ class HomeView2(TemplateView):
         context = super().get_context_data(**kwargs)
         context["title"] = "HandsForHunger | Home"
         return context
+    
+def my_view(request):
+    lives=donations.objects.filter(donor_id=request.user).aggregate(Sum('quantity'))
+    count=donations.objects.filter(donor_id=request.user).count()
+    context = {
+        'count':count,
+        'lives': lives,
+    }
+    return render(request, 'd_h.html', context)
 
 class donor_home(TemplateView):
     template_name = "d_h.html"

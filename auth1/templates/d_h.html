@@ -127,19 +127,20 @@
 
             <div class="float-child-1">
                 <div class="data">
-                  <div id="number" style="color: transparent;">{{user.points}}</div>
-                    <div class="ach">
-                      <h4>Lives saved from starvation</h4>
-                        <h4><div id="result"></div></h4>
-                    </div>
+                  <div class="ach">
+                    <h4>Your Donation Count </h4>
+                    <h4> {{count}}</h4>
+                  </div>
+                  <div class="ach">
+                    <h4>Lives saved from starvation</h4>
+                    <h4> {{ lives.quantity__sum }}</h4>
+                  </div>
                     <h4>Coins earned</h4>
                     <h4>{{ user.points }}</h4>
-                    <div class="ach">
-                        
-                    </div>
-                </div>
+                    <br>
+                    <img class="card" src="\static\images\c12.png" alt="food" style="width:300px;height:450px;padding: 10px;">
             </div>
-            
+          </div>
             <div class="float-child-2">
                 <div class="tab">
                     <button class="tablinks active" onclick="openopt(event, 'Donate')"></button>
@@ -199,13 +200,6 @@
   function closePopup() {
   document.getElementById("popup").style.display = "none";
 }
-const numberEl = document.getElementById('number');
-const number = parseInt(numberEl.textContent);
-
-// divide the number by 5 and display the result
-const resultEl = document.getElementById('result');
-const result = number / 5;
-resultEl.textContent = `${result}`;
 
     document.getElementsByClassName("tablinks")[0].click();
     function openopt(evt, opt) {

@@ -1,4 +1,4 @@
-from django.http import HttpResponse, HttpResponseBadRequest
+from django.http import HttpResponse, HttpResponseBadRequest, JsonResponse
 import matplotlib
 matplotlib.use('Agg')
 from inventory.models import *
@@ -7,7 +7,7 @@ from math import radians, sin, cos, sqrt, atan2
 import numpy as np
 from datetime import datetime, timedelta, timezone
 import math
-from django.shortcuts import redirect, render, get_object_or_404
+from django.shortcuts import redirect, render, get_object_or_404, redirect
 from django.contrib import messages
 from django.db.models.functions import TruncMonth
 from auth1.forms import *
@@ -17,8 +17,10 @@ import matplotlib.pyplot as plt
 from django.db.models import Avg, Max,Sum, Q
 import calendar
 import io
+from django.template.loader import render_to_string
+from django.contrib import messages
+from django.core.mail import send_mail
 import base64
-
 
 
 @login_required
@@ -38,23 +40,34 @@ def donate(request):
 @login_required
 def redeem_points(request):
     if request.method == 'POST':
-        form = RedemptionForm(request.POST)
-        if form.is_valid():
-            points_to_redeem = form.cleaned_data['points']
-            donor = request.user
-            if donor.points >= points_to_redeem:
-                donor.points -= points_to_redeem
-                donor.save()
-                transaction = Transaction.objects.create(donor=donor, ngo=None, points_transferred=-points_to_redeem)
-                return redirect('redeem_success')
-            else:
-                form.add_error('points', 'You do not have enough points to redeem.')
+        points_to_redeem = int(request.POST.get('points'))
+        print(points_to_redeem)
+        donor = request.user
+        if donor.points >= points_to_redeem:
+            donor.points -= points_to_redeem
+            donor.save()
+            transaction = Transaction.objects.create(donor=donor, ngo=None, points_transferred=-points_to_redeem)
     else:
         form = RedemptionForm()
     return render(request, 'inventory/redeem_points.html', {'form': form})
 
 def redeem_success(request):
     return render(request, 'inventory/redeem_success.html')
+
+def send_donation_email(request, donor_id):
+    don=get_object_or_404(donor, donor_name=donor_id)
+    donor_email = don.email
+    user_email = request.user.email
+    message = render_to_string('inventory/donation_email.html', {'donor_email': donor_email, 'user_email': user_email})
+    send_mail(
+        'Connect with the Donor',
+        message,
+        user_email,
+        [donor_email],
+        fail_silently=False,
+    )
+    messages.success(request, 'Email sent to donor!')
+    return redirect('donor_home')
 
 @login_required
 def donate_points(request, ngo_id):
