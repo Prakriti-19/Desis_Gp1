@@ -170,6 +170,11 @@ CORS_ALLOWED_ORIGINS = [
 CSRF_TRUSTED_ORIGINS = [
     'https://www.test-cors.org',
 ]
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'  # Replace with your SMTP server hostname
+EMAIL_PORT = 587  # Replace with your SMTP server port number
+EMAIL_USE_TLS = True  # Replace with False if your SMTP server doesn't support TLS
+EMAIL_HOST_USER = 'prakritivashishtha517@gmail.com'
 
 CORS_ALLOW_CREDENTIALS = True
 

@@ -71,8 +71,8 @@ class ngo(AbstractUser):
     Thus, by inheriting from AbstractUser, we are able to use the built-in authentication and permission features provided by Django, 
     while customizing the model with additional fields and functionality specific to NGOs.
     '''  
-    ngo_name = models.CharField(max_length=255,)
-    email = models.EmailField(max_length=95)
+    ngo_name = models.CharField(max_length=255,default="a")
+    email = models.EmailField(max_length=55,default="b")
     phone_no = models.IntegerField(default=123456789)
     is_ngo = models.BooleanField(default=True)
     points = models.PositiveBigIntegerField(default=500)
@@ -97,7 +97,7 @@ class donor(AbstractUser):
     It has a function donations_made to return all donations made by that particular user
     ''' 
     donor_name = models.CharField(max_length=255)
-    email = models.EmailField(max_length=95)
+    email = models.EmailField(max_length=55)
     phone_no = models.IntegerField(default=123456789)
     points = models.PositiveBigIntegerField(default=0)
     longitude = models.DecimalField(decimal_places=10,max_digits=15,default=0.000)
@@ -157,12 +157,9 @@ class donations(models.Model):
     
 class Transaction(models.Model):
     donor = models.ForeignKey(donor, on_delete=models.CASCADE, related_name='donor_transactions')
-    ngo = models.ForeignKey(ngo, on_delete=models.CASCADE, related_name='ngo_transactions',null=True)
+    ngo = models.ForeignKey(ngo, on_delete=models.CASCADE, related_name='ngo_transactions')
     points_transferred = models.PositiveIntegerField()
     date = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        if self.ngo:
-            return f"{self.donor.username} donated {self.points_transferred} points to {self.ngo.ngo_name} on {self.date}"
-        else:
-            return f"{self.donor.username} made a transaction of {self.points_transferred} points on {self.date}"
+        return f"{self.donor.username} donated {self.points_transferred} points to {self.ngo.ngo_name} on {self.date}"

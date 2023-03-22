@@ -1,4 +1,4 @@
-from django.http import HttpResponse, HttpResponseBadRequest
+from django.http import HttpResponse, HttpResponseBadRequest, JsonResponse
 import matplotlib
 matplotlib.use('Agg')
 from inventory.models import *
@@ -6,8 +6,12 @@ from dateutil.relativedelta import relativedelta
 from math import radians, sin, cos, sqrt, atan2
 import numpy as np
 from datetime import datetime, timedelta, timezone
+<<<<<<< HEAD
 import math
+from django.shortcuts import redirect, render, get_object_or_404, redirect
+=======
 from django.shortcuts import redirect, render, get_object_or_404
+>>>>>>> parent of 9eef982b (payment portal integrated with frontend)
 from django.contrib import messages
 from django.db.models.functions import TruncMonth
 from auth1.forms import *
@@ -17,8 +21,10 @@ import matplotlib.pyplot as plt
 from django.db.models import Avg, Max,Sum, Q
 import calendar
 import io
+from django.template.loader import render_to_string
+from django.contrib import messages
+from django.core.mail import send_mail
 import base64
-
 
 
 @login_required
@@ -38,17 +44,13 @@ def donate(request):
 @login_required
 def redeem_points(request):
     if request.method == 'POST':
-        form = RedemptionForm(request.POST)
-        if form.is_valid():
-            points_to_redeem = form.cleaned_data['points']
-            donor = request.user
-            if donor.points >= points_to_redeem:
-                donor.points -= points_to_redeem
-                donor.save()
-                transaction = Transaction.objects.create(donor=donor, ngo=None, points_transferred=-points_to_redeem)
-                return redirect('redeem_success')
-            else:
-                form.add_error('points', 'You do not have enough points to redeem.')
+        points_to_redeem = int(request.POST.get('points'))
+        print(points_to_redeem)
+        donor = request.user
+        if donor.points >= points_to_redeem:
+            donor.points -= points_to_redeem
+            donor.save()
+            transaction = Transaction.objects.create(donor=donor, ngo=None, points_transferred=-points_to_redeem)
     else:
         form = RedemptionForm()
     return render(request, 'inventory/redeem_points.html', {'form': form})
@@ -56,18 +58,33 @@ def redeem_points(request):
 def redeem_success(request):
     return render(request, 'inventory/redeem_success.html')
 
+def send_donation_email(request, donor_id):
+    don=get_object_or_404(donor, donor_name=donor_id)
+    donor_email = don.email
+    user_email = request.user.email
+    message = render_to_string('inventory/donation_email.html', {'donor_email': donor_email, 'user_email': user_email})
+    send_mail(
+        'Connect with the Donor',
+        message,
+        user_email,
+        [donor_email],
+        fail_silently=False,
+    )
+    messages.success(request, 'Email sent to donor!')
+    return redirect('donor_home')
+
 @login_required
 def donate_points(request, ngo_id):
     if request.method == 'POST':
             ng = ngo.objects.get(id=ngo_id)
             points_to_donate = int(request.POST.get('points'))
-            donors = request.user
-            if donors.points >= points_to_donate:
-                donors.points -= points_to_donate
-                donors.save()
+            donor = request.user
+            if donor.points >= points_to_donate:
+                donor.points -= points_to_donate
+                donor.save()
                 ng.points += points_to_donate
                 ng.save()
-                transaction = Transaction.objects.create(donor=donors, ngo=ng, points_transferred=-points_to_donate)
+                transaction = Transaction.objects.create(donor=donor, ngo=ng, points_transferred=-points_to_donate)
                 messages.success(request, f"You have successfully donated {points_to_donate} points to {ng.ngo_name}.")
             else:
                 messages.warning(request, "Insufficient points to donate.")
@@ -137,7 +154,7 @@ def update_points(donor_id, quantity, ngo_id):
     donors = donor.objects.get(id=donor_id)
     donors.points += 5*quantity
     ngos.points -= 5*quantity
-    transaction = Transaction.objects.create(donor=donors, ngo=None, points_transferred=5*quantity)
+    transaction = Transaction.objects.create(donor=donor, ngo=None, points_transferred=5*quantity)
     donors.save()
     ngos.save()
 
@@ -401,8 +418,8 @@ def donations_stats(request):
 # -------------------------------------------------------------------------------------------------------------------------------------------------------------------
     '''
     Creates a 2D array with current users donation on each day to be displayed as a grid
-'''
-   # create the donation array and fill it with zeros
+    '''
+    # Create a 2D array to hold the donations for each day of the week for each week of the year
     donation_array = [[0 for i in range(52)] for j in range(7)]
 
     # Loop through all donations in the database
@@ -414,10 +431,8 @@ def donations_stats(request):
         # Add the donation amount to the appropriate day and week in the array
         donation_array[day_num][week_num] += donation.quantity
 
+    # Define the labels for the y-axis
     y_labels = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
-
-    # Get the year of the first donation
-    year = donations.objects.earliest('donation_date').donation_date.year
 
     # Create a new figure with a size of 16x3 inches and add heatmap using the donation array and the 'Oranges' colormap
     fig, ax = plt.subplots(figsize=(16,3))
@@ -427,39 +442,25 @@ def donations_stats(request):
     for i in range(len(donation_array)):
         for j in range(len(donation_array[i])):
             rect = plt.Rectangle((j-0.5,i-0.5),1,1,linewidth=1,edgecolor='white',facecolor='none')
-            ax.add_patch(rect)
-
-    # Define x-tick locations and labels
-    xtick_locs = []
-    xtick_labels = []
-    for i in range(1, len(calendar.month_name)):
-        month_days = calendar.monthrange(year, i)[1]
-        month_weeks = math.ceil((month_days + calendar.monthrange(year, i)[0]) / 7)
-        month_xticks = np.linspace(0, month_days-1, month_weeks*7) + calendar.monthrange(year, i)[0]
-        xtick_locs.extend(month_xticks)
-        if i == 1:
-            xtick_labels.extend([f"{calendar.month_name[i]} {year}"])
-        else:
-            xtick_labels.extend([f"{calendar.month_name[i]}"])
-
-    # Set x- and y-tick locations and labels, and plot title
-    ax.set_xticks(xtick_locs)
-    ax.set_xticklabels(xtick_labels, rotation=45, ha="right", rotation_mode="anchor")
+            ax.add_patch(rect)   
+    
+    # Set the labels and ticks and title
+    cbar = ax.figure.colorbar(heatmap, ax=ax)
+    ax.set_xticks(np.arange(0, len(calendar.month_name[1:])*4, 4))
+    ax.set_xticklabels(calendar.month_name[1:])
+    plt.setp(ax.get_xticklabels(), rotation=45, ha="right", rotation_mode="anchor")
+    ax.set_title("Your Activity")
     ax.set_yticks(np.arange(len(y_labels)))
     ax.set_yticklabels(y_labels)
-    ax.set_title("Your Activity")
     fig.tight_layout()
-
-    # Create a colorbar
-    cbar = ax.figure.colorbar(heatmap, ax=ax)
-
+    
     # Save the figure to a buffer in PNG format
     buf5 = io.BytesIO()
     plt.savefig(buf5, format='png')
     buf5.seek(0)
 
     # Convert the PNG image to a base64 string for display on the web page
-    plot_data5 = base64.b64encode(buf5.getvalue())
+    plot_data5 = base64.b64encode(buf5.getvalue()).decode('ascii')
 
 # -------------------------------------------------------------------------------------------------------------------------------------------------------------------
    
@@ -514,7 +515,7 @@ def donations_stats(request):
     average_weight_state = total_weight / total_edges
     min_weight_state = min([G_state.edges[edge]['weight'] for edge in G_state.edges])
     max_weight_state = max([G_state.edges[edge]['weight'] for edge in G_state.edges])
-# --------------------------------------------------------------------------------------------------------------------
+
     context = {
         'ngo_count':ngo_count,
         'donor_count':donor_count-2,
@@ -540,7 +541,7 @@ def donations_stats(request):
 
     # Calculate the cumulative sum of points over time
     cumulative_points = [sum(points[:i+1]) for i in range(len(points))]
-    plt.clf()
+
     # Create a line chart
     plt.plot(dates, cumulative_points)
 
@@ -553,7 +554,7 @@ def donations_stats(request):
     buffer2 = io.BytesIO()
     plt.savefig(buffer2, format='png')
     buffer2.seek(0)
-    plot_data6 = base64.b64encode(buffer2.getvalue()).decode('ascii')
+    plot_data6 = base64.b64encode(buf.getvalue()).decode('ascii')
         
     return render(request, 'inventory/donations_stats.html', {'image': image,'plot_data2': plot_data2,'plot_data6': plot_data6,'plot_data3': plot_data3,'plot_data1': plot_data1,'plot_data5': plot_data5, **context})
 

@@ -37,8 +37,8 @@
         {% else %}
         Donation Taken
          </form>
-        {% endif %}
-        <a href="{% url 'donation-details' donation.id %}" class="btn btn-primary">Connect with the Donor</a>
+         <a href="{% url 'mail' donation.id %}" class="btn btn-primary">Connect with the Donor</a>
+        {% endif %}        
       </li>
     {% empty %}
       <li>No donations found.</li>
