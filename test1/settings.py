@@ -176,6 +176,7 @@ EMAIL_PORT = 587  # Replace with your SMTP server port number
 EMAIL_USE_TLS = True  # Replace with False if your SMTP server doesn't support TLS
 EMAIL_HOST_USER = 'prakritivashishtha517@gmail.com'
 
+
 CORS_ALLOW_CREDENTIALS = True
 
 AUTH_USER_MODEL = 'inventory.ngo'
