@@ -6,12 +6,9 @@ from dateutil.relativedelta import relativedelta
 from math import radians, sin, cos, sqrt, atan2
 import numpy as np
 from datetime import datetime, timedelta, timezone
-<<<<<<< HEAD
 import math
 from django.shortcuts import redirect, render, get_object_or_404, redirect
-=======
 from django.shortcuts import redirect, render, get_object_or_404
->>>>>>> parent of 9eef982b (payment portal integrated with frontend)
 from django.contrib import messages
 from django.db.models.functions import TruncMonth
 from auth1.forms import *
