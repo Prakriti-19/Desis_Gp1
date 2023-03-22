@@ -127,13 +127,15 @@
 
             <div class="float-child-1">
                 <div class="data">
+                  <div id="number" style="color: transparent;">{{user.points}}</div>
                     <div class="ach">
-                        <h4>Lives saved from starvation</h4>
-                        <h4>{{ user.points }}</h4>
+                      <h4>Lives saved from starvation</h4>
+                        <h4><div id="result"></div></h4>
                     </div>
+                    <h4>Coins earned</h4>
+                    <h4>{{ user.points }}</h4>
                     <div class="ach">
-                        <h4>Coins earned</h4>
-                        <h4>{{ user.points }}</h4>
+                        
                     </div>
                 </div>
             </div>
@@ -197,6 +199,13 @@
   function closePopup() {
   document.getElementById("popup").style.display = "none";
 }
+const numberEl = document.getElementById('number');
+const number = parseInt(numberEl.textContent);
+
+// divide the number by 5 and display the result
+const resultEl = document.getElementById('result');
+const result = number / 5;
+resultEl.textContent = `${result}`;
 
     document.getElementsByClassName("tablinks")[0].click();
     function openopt(evt, opt) {
