@@ -1,6 +1,7 @@
 from django.http import HttpResponse, HttpResponseBadRequest
 import matplotlib
 import matplotlib.dates as mdates
+from django.views.generic import TemplateView
 matplotlib.use('Agg')
 from inventory.models import *
 from dateutil.relativedelta import relativedelta
@@ -57,20 +58,14 @@ def redeem_points(request):
 def redeem_success(request):
     return render(request, 'inventory/redeem_success.html')
 
-def send_donation_email(request, donor_id):
-    don=get_object_or_404(donor, donor_name=donor_id)
-    donor_email = don.email
-    user_email = request.user.email
-    message = render_to_string('inventory/donation_email.html', {'donor_email': donor_email, 'user_email': user_email})
-    send_mail(
-        'Connect with the Donor',
-        message,
-        user_email,
-        [donor_email],
-        fail_silently=False,
-    )
-    messages.success(request, 'Email sent to donor!')
-    return redirect('donor_home')
+class mail(TemplateView):
+    template_name = "inventory/donation_email.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["title"] = "HandsForHunger | Home"
+        return context
+    
 
 @login_required
 def donate_points(request, ngo_id):
@@ -438,20 +433,55 @@ def donations_stats(request):
     '''
     Creates a 2D array with current users donation on each day to be displayed as a grid
     '''
-    # Create a 2D array to hold the donations for each day of the week for each week of the year
-    donation_array = [[0 for i in range(52)] for j in range(7)]
+    import datetime
+    # Get today's date
+    today = datetime.date.today()
+
+    # Create a date object for the first day of the current year
+    one_year_ago = datetime.date(today.year, 1, 1)
+
+    # Create a list of all dates from one year ago to today
+    date_list = [one_year_ago + datetime.timedelta(days=x) for x in range((today - one_year_ago).days + 1)]
+
+    # Create a dictionary to store the donations for each date
+    donation_dict = {date.strftime('%Y-%m-%d'): 0 for date in date_list}
 
     # Loop through all donations in the database
-    for donation in donations.objects.all():
-        # Get the date of the donation and calculate the week number and day number
+    for donation in donations.objects.filter(donor_id=request.user):
+        # Get the date of the donation
         donation_date = donation.donation_date
-        week_num = donation_date.isocalendar()[1] - 1 
-        day_num = donation_date.weekday()
-        # Add the donation amount to the appropriate day and week in the array
-        donation_array[day_num][week_num] += donation.quantity
+        if one_year_ago <= donation_date <= today:
+            # Convert the date to a string and add the donation amount to the appropriate date in the dictionary
+            donation_dict[donation_date.strftime('%Y-%m-%d')] += donation.quantity
+
+    # Create a 2D array to store the donations by week and day
+    donation_array = [[0 for _ in range(7)] for _ in range(53)]
+
+    # Loop through all dates in the date list and add the donations to the donation array
+    for i, date in enumerate(date_list):
+        # Get the week number and day number for the date
+        week_num = date.isocalendar()[1] - 1 
+        day_num = date.weekday()
+        # Add the donation amount for the date to the donation array
+        donation_array[week_num][day_num] = donation_dict[date.strftime('%Y-%m-%d')]
+
 
     # Define the labels for the y-axis
     y_labels = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+
+    # Transpose the donation array
+    donation_array = np.transpose(donation_array)
+
+    now = dt.now()
+    k=0
+    x_labels = []
+    for i in range(0, 53):
+        if i % 4 == 0:
+            month_year = now + timedelta(weeks=4*k)
+            k=k+1
+            x_labels.append("{}-{}".format(calendar.month_abbr[month_year.month], month_year.year))
+        else:
+            x_labels.append("")
 
     # Create a new figure with a size of 16x3 inches and add heatmap using the donation array and the 'Oranges' colormap
     fig, ax = plt.subplots(figsize=(16,3))
@@ -462,15 +492,15 @@ def donations_stats(request):
         for j in range(len(donation_array[i])):
             rect = plt.Rectangle((j-0.5,i-0.5),1,1,linewidth=1,edgecolor='white',facecolor='none')
             ax.add_patch(rect)   
-    
+
     # Set the labels and ticks and title
     cbar = ax.figure.colorbar(heatmap, ax=ax)
-    ax.set_xticks(np.arange(0, len(calendar.month_name[1:])*4, 4))
-    ax.set_xticklabels(calendar.month_name[1:])
+    ax.set_xticks(np.arange(len(x_labels)))
+    ax.set_xticklabels(x_labels)
     plt.setp(ax.get_xticklabels(), rotation=45, ha="right", rotation_mode="anchor")
-    ax.set_title("Your Activity")
     ax.set_yticks(np.arange(len(y_labels)))
     ax.set_yticklabels(y_labels)
+    ax.set_title("Your Activity")
     fig.tight_layout()
     
     # Save the figure to a buffer in PNG format

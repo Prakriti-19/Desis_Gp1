@@ -34,10 +34,10 @@
           <input type="hidden" name="donation_id2" value="{{ donation.id }}">
           <input type="hidden" name="status2" value="true">
           <button type="submit">Donation Taken</button>
+          <a href="{% url 'mail' %}" class="btn btn-primary">Connect with the Donor</a>
         {% else %}
         Donation Taken
          </form>
-         <a href="{% url 'mail' donation.id %}" class="btn btn-primary">Connect with the Donor</a>
         {% endif %}        
       </li>
     {% empty %}
