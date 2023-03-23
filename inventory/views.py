@@ -1,14 +1,15 @@
-from django.http import HttpResponse, HttpResponseBadRequest, JsonResponse
+from django.http import HttpResponse, HttpResponseBadRequest
 import matplotlib
+import matplotlib.dates as mdates
 matplotlib.use('Agg')
 from inventory.models import *
 from dateutil.relativedelta import relativedelta
+import datetime
 from math import radians, sin, cos, sqrt, atan2
 import numpy as np
-from datetime import datetime, timedelta, timezone
-import math
+from datetime import datetime as dt, timedelta
+from django.utils import timezone
 from django.shortcuts import redirect, render, get_object_or_404, redirect
-from django.shortcuts import redirect, render, get_object_or_404
 from django.contrib import messages
 from django.db.models.functions import TruncMonth
 from auth1.forms import *
@@ -47,10 +48,11 @@ def redeem_points(request):
         if donor.points >= points_to_redeem:
             donor.points -= points_to_redeem
             donor.save()
-            transaction = Transaction.objects.create(donor=donor, ngo=None, points_transferred=-points_to_redeem)
-    else:
-        form = RedemptionForm()
-    return render(request, 'inventory/redeem_points.html', {'form': form})
+            transaction = BaseTransaction.objects.create(donor=donor, points_transferred=-points_to_redeem)
+            transaction.save()
+        else:
+            return render(request, 'inventory/redeem_points.html')
+    return render(request, 'inventory/redeem_points.html')
 
 def redeem_success(request):
     return render(request, 'inventory/redeem_success.html')
@@ -81,8 +83,8 @@ def donate_points(request, ngo_id):
                 donor.save()
                 ng.points += points_to_donate
                 ng.save()
-                transaction = Transaction.objects.create(donor=donor, ngo=ng, points_transferred=-points_to_donate)
-                messages.success(request, f"You have successfully donated {points_to_donate} points to {ng.ngo_name}.")
+                transaction = NGODonation_t.objects.create(donor=donor, ngo=ng, points_transferred=-points_to_donate)
+                transaction.save()
             else:
                 messages.warning(request, "Insufficient points to donate.")
             
@@ -105,16 +107,17 @@ def process_payment(request):
     
 def donations_list(request):
     codes = request.GET.get('pincode')
-    min_quantity = request.GET.get('min_quantity',0)
-    max_quantity = request.GET.get('max_quantity',100)
-    if codes is not None and min_quantity is not None and max_quantity is not None and min_quantity != '' and codes != ''and max_quantity != '':
-        donation = donations.objects.filter( Q(pincode__code=codes) &  Q(quantity__range=(min_quantity, max_quantity)) & (Q(status=True) | Q(status2=True)))
-    elif codes is not None  and  min_quantity != '' and codes == ''and max_quantity != '':
-        donation = donations.objects.filter ( Q(pincode__code=request.user.pincode.code) & Q(quantity__range=(min_quantity, max_quantity)) &  (Q(status=True) | Q(status2=True)))
-    elif codes is not None  and  min_quantity == '' and codes != ''and max_quantity == '':
-        donation = donations.objects.filter( Q(pincode__code=codes) & Q(quantity__range=(0, 500)) & (Q(status=True) | Q(status2=True)))
+    min_quantity = request.GET.get('min_quantity', 0)
+    max_quantity = request.GET.get('max_quantity', 100)
+    now = timezone.now()
+    if codes is not None and min_quantity is not None and max_quantity is not None and min_quantity != '' and codes != '' and max_quantity != '':
+        donation = donations.objects.filter(Q(exp_date__gt=now) & Q(pincode__code=codes) & Q(quantity__range=(min_quantity, max_quantity)) & (Q(status=True) | Q(status2=True)))
+    elif codes is not None and min_quantity != '' and codes == '' and max_quantity != '':
+        donation = donations.objects.filter(Q(exp_date__gt=now) & Q(pincode__code=request.user.pincode.code) & Q(quantity__range=(min_quantity, max_quantity)) & (Q(status=True) | Q(status2=True)))
+    elif codes is not None and min_quantity == '' and codes != '' and max_quantity == '':
+        donation = donations.objects.filter(Q(exp_date__gt=now) & Q(pincode__code=codes) & Q(quantity__range=(0, 500)) & (Q(status=True) | Q(status2=True)))
     else:
-        donation = donations.objects.filter(Q(status=True) | Q(status2=True))
+        donation = donations.objects.filter(Q(exp_date__gt=now) & (Q(status=True) | Q(status2=True)))
     return render(request, "inventory/donations_list.html", {'donations': donation})
 
 def donation_details(request, pk):
@@ -151,9 +154,10 @@ def update_points(donor_id, quantity, ngo_id):
     donors = donor.objects.get(id=donor_id)
     donors.points += 5*quantity
     ngos.points -= 5*quantity
-    transaction = Transaction.objects.create(donor=donor, ngo=None, points_transferred=5*quantity)
     donors.save()
     ngos.save()
+    transaction = NGODonation_t.objects.create(donor=donors, ngo=ngos, points_transferred=5*quantity).save()
+    
 
 def update_donation_status(request):
     if request.method == 'POST':
@@ -203,22 +207,36 @@ def donor_history(request):
 def donations_stats(request): 
   
     ngo_count = ngo.objects.count()
-    donor_count = donor.objects.count()
+    donor_count = donor.objects.filter(is_superuser=False).count()
     total_donations = donations.objects.count()
     avg_quantity = donations.objects.aggregate(Avg('quantity'))
     max_quantity = donations.objects.aggregate(Max('quantity'))
     total_quantity = donations.objects.aggregate(Sum('quantity'))
     avg_quantity =int(avg_quantity['quantity__avg'])
 
-
+    context = {
+        'ngo_count':ngo_count,
+        'donor_count':donor_count,
+        'total_donations': total_donations,
+        'avg_quantity': avg_quantity,
+        'max_quantity': max_quantity,
+        'total_quantity': total_quantity,
+        # 'total_edges_state':total_edges_state,
+        # 'total_weight_state':total_weight_state,
+        # 'average_weight_state':average_weight_state,
+        # 'total_edges':total_edges,
+        # 'total_weight':total_weight,
+        # 'average_weight':average_weight,
+    }
+    
 # --------------------------------------------------------------------------------------------------------------------
     '''
     Calculating Donors Retention rate
     '''
     retention_period = timedelta(days=365)
-    start_date = (datetime.now() - retention_period).replace(day=1)
+    start_date = (dt.now() - retention_period).replace(day=1)
     total_donors = donations.objects.count()
-    end_date = datetime.now().replace(day=1)
+    end_date = dt.now().replace(day=1)
 
     # Create a list of all months within the retention period
     all_months = []
@@ -227,7 +245,7 @@ def donations_stats(request):
         start_date += relativedelta(months=1)
 
     returning_donors = {}
-    for donation in donations.objects.filter(donation_date__gt=datetime.now()-retention_period):
+    for donation in donations.objects.filter(donation_date__gt=dt.now()-retention_period):
         month = donation.donation_date.replace(day=1)
         donor_id = donation.donor_id.id
         donors = donor.objects.filter(id=donor_id).first()
@@ -268,7 +286,7 @@ def donations_stats(request):
     '''
     Donations per month Distribution: Overall, User's city and User-specific 
     '''
-    today = datetime.now()
+    today = dt.now()
     first_day_of_month = today.replace(day=1)
 
     # Create a list of all the months in the current year
@@ -378,30 +396,34 @@ def donations_stats(request):
     '''
     Donation Type Distribution: Overall and User-specific
     '''
-    # Count the donations for the current user
+    # Get the user's donation counts
     user_homefood_count = donations.objects.filter(donor_id=request.user, type='homefood').aggregate(Sum('quantity'))['quantity__sum'] or 0
     user_party_count = donations.objects.filter(donor_id=request.user, type='party').aggregate(Sum('quantity'))['quantity__sum'] or 0
     user_restro_count = donations.objects.filter(donor_id=request.user, type='restro').aggregate(Sum('quantity'))['quantity__sum'] or 0
     user_other_count = donations.objects.filter(donor_id=request.user, type='other').aggregate(Sum('quantity'))['quantity__sum'] or 0
 
-    # Count the overall donations
+    # Get the overall donation counts
     overall_homefood_count = donations.objects.filter(type='homefood').aggregate(Sum('quantity'))['quantity__sum'] or 0
     overall_party_count = donations.objects.filter(type='party').aggregate(Sum('quantity'))['quantity__sum'] or 0
     overall_restro_count = donations.objects.filter(type='restro').aggregate(Sum('quantity'))['quantity__sum'] or 0
     overall_other_count = donations.objects.filter(type='other').aggregate(Sum('quantity'))['quantity__sum'] or 0
 
     # Create a bar graph
-    types = ['Households', 'Parties', 'Restro', 'Others']
-    user_counts = [user_homefood_count, user_party_count, user_restro_count, user_other_count]
-    overall_counts = [overall_homefood_count, overall_party_count, overall_restro_count, overall_other_count]
-    
-    # Set the axis to be equal and add a title and legend to the chart
+    types = ['Homefood', 'Party', 'Restro', 'Other']
+    user_x = [i - 0.175 for i in range(len(types))]  # x-coordinates for user bars
+    overall_x = [i + 0.175 for i in range(len(types))]  # x-coordinates for overall bars
+    bar_width = 0.35
     fig, ax = plt.subplots()
-    ax.bar(types, user_counts, label='Your',color= 'orange')
-    ax.bar(types, overall_counts, bottom=user_counts, label='Overall Donations',color= 'yellow')
+    ax.bar(user_x, [user_homefood_count, user_party_count, user_restro_count, user_other_count],
+        label='Your', color='orange', width=bar_width)
+    ax.bar(overall_x, [overall_homefood_count, overall_party_count, overall_restro_count, overall_other_count],
+        label='Overall Donations', color='yellow', width=bar_width)
+        
     ax.set_title('Sources of food wastage')
     ax.set_xlabel('Sources')
     ax.set_ylabel('Quantity')
+    ax.set_xticks(range(len(types)))
+    ax.set_xticklabels(types)
     ax.legend()
 
     # Save the figure to a buffer in PNG format
@@ -460,6 +482,36 @@ def donations_stats(request):
     plot_data5 = base64.b64encode(buf5.getvalue()).decode('ascii')
 
 # -------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+    # Get the transaction data
+    donorss = request.user
+   
+    transactions = BaseTransaction.objects.filter(donor=donorss).order_by('date')
+    prefix_sum = 0
+    daily_totals = []
+
+    for transaction in transactions:
+        prefix_sum += transaction.points_transferred
+        daily_totals.append(prefix_sum)
+    daily_totals.insert(0, 0)
+    dates = [transaction.date.strftime('%m/%d/%Y') for transaction in transactions]
+    dates.insert(0, '1/1/2020')
+
+    fig, ax = plt.subplots(figsize=(15, 6))  # set the figure size
+    ax.plot(dates, daily_totals,color='orange')
+    ax.set_xlabel('Transaction Date')
+    ax.set_ylabel('Coins')
+    ax.set_title('Transaction History')
+    ax.set_xticklabels(dates)
+
+    # Save the plot to a buffer and encode it as base64 for display in the HTML template
+    buffer9 = io.BytesIO()
+    plt.savefig(buffer9, format='png')
+    buffer9.seek(0)
+    plot_data6 = base64.b64encode(buffer9.getvalue()).decode('ascii')
+    plt.close()
+
+# -------------------------------------------------------------------------------------------------------------------------------------------------------------------
    
     # Created a weighted graph with each node as the city and edge as the transaction 
     # between the city having edge weight as the quantity of transaction
@@ -513,45 +565,7 @@ def donations_stats(request):
     min_weight_state = min([G_state.edges[edge]['weight'] for edge in G_state.edges])
     max_weight_state = max([G_state.edges[edge]['weight'] for edge in G_state.edges])
 
-    context = {
-        'ngo_count':ngo_count,
-        'donor_count':donor_count-2,
-        'total_donations': total_donations,
-        'avg_quantity': avg_quantity,
-        'max_quantity': max_quantity,
-        'total_quantity': total_quantity,
-        'total_edges_state':total_edges_state,
-        'total_weight_state':total_weight_state,
-        'average_weight_state':average_weight_state,
-        'total_edges':total_edges,
-        'total_weight':total_weight,
-        'average_weight':average_weight,
-    }
     
-
-    donorss = request.user
-    transactions = Transaction.objects.filter(donor=donorss).order_by('date')
-
-    # Extract the dates and point values from the transactions
-    dates = [t.date.date() for t in transactions]
-    points = [t.points_transferred for t in transactions]
-
-    # Calculate the cumulative sum of points over time
-    cumulative_points = [sum(points[:i+1]) for i in range(len(points))]
-
-    # Create a line chart
-    plt.plot(dates, cumulative_points)
-
-    # Add labels and title
-    plt.xlabel('Date')
-    plt.ylabel('Cumulative Points')
-    plt.title(f'{donorss.username}\'s Coin Trend')
-  
-    # Display the chart
-    buffer2 = io.BytesIO()
-    plt.savefig(buffer2, format='png')
-    buffer2.seek(0)
-    plot_data6 = base64.b64encode(buf.getvalue()).decode('ascii')
         
     return render(request, 'inventory/donations_stats.html', {'image': image,'plot_data2': plot_data2,'plot_data6': plot_data6,'plot_data3': plot_data3,'plot_data1': plot_data1,'plot_data5': plot_data5, **context})
 

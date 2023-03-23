@@ -97,6 +97,12 @@ class donorUserCreationForm(UserCreationForm):
             'latitude': forms.HiddenInput(),
             'longitude': forms.HiddenInput(),
         }
+    def clean_email(self):
+        email = self.cleaned_data['email']
+        if donor.objects.filter(email=email).exists():
+            raise ValidationError("Email already exists.")
+        return email
+    
     def save(self, commit=True):
         user = super().save(commit=False)
         user.is_ngo = False

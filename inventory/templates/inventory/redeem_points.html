@@ -148,7 +148,7 @@
     <form id="redeemForm" method="post" action="{% url 'redeem_points' %}">
         {% csrf_token %}
         <input id="pointsInput" type="hidden" name="points" value="50">
-        <button type="button" class="imgButton1" onclick="myFunction(50)">Redeem: 50 coins</button>
+        <button type="button" class="imgButton1" onclick="myFunction(50)"></button>
       </form>
       
       <script>

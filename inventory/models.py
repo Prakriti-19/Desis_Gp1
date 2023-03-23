@@ -155,11 +155,15 @@ class donations(models.Model):
     def __str__(self):
         return self.desc
     
-class Transaction(models.Model):
+class BaseTransaction(PolymorphicModel):
     donor = models.ForeignKey(donor, on_delete=models.CASCADE, related_name='donor_transactions')
-    ngo = models.ForeignKey(ngo, on_delete=models.CASCADE, related_name='ngo_transactions')
-    points_transferred = models.PositiveIntegerField()
-    date = models.DateTimeField(auto_now_add=True)
+    points_transferred = models.IntegerField()
+    date = models.DateTimeField(default=12/12/23)
 
     def __str__(self):
-        return f"{self.donor.username} donated {self.points_transferred} points to {self.ngo.ngo_name} on {self.date}"
+        return f"{self.donor.username} made transaction of {self.points_transferred} points on {self.date}"
+
+class NGODonation_t(BaseTransaction):
+    ngo = models.ForeignKey(ngo, on_delete=models.CASCADE, related_name='ngo_transactions')
+
+

@@ -16,7 +16,7 @@ class HomeView2(TemplateView):
         return context
     
 def my_view(request):
-    lives=donations.objects.filter(donor_id=request.user).aggregate(Sum('quantity'))
+    lives=donations.objects.filter(donor_id=request.user, status=False, status2=False).aggregate(Sum('quantity'))
     count=donations.objects.filter(donor_id=request.user).count()
     context = {
         'count':count,
