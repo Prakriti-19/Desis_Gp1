@@ -6,7 +6,7 @@
   {% endif %}
    <h1 class="heading">Login</h1>
   
-  <form method="post">
+  <form method="post" class="my-form">
     {% csrf_token %}
     <label for="username">Username:</label>
     <input type="text" id="username" name="username" required><br><br>
@@ -16,28 +16,32 @@
   </form>
 
   <style>
-  form {
-  border: 3px solid white;
-  padding: 10px;
-  border-radius: 5px;
-  width: 300px;
-  margin: auto;
-}
-
+ 
+.my-form {
+  margin: 0 auto;
+  justify-content: center;
+  text-align: center;
+  align-items: center;
+  border: 3px solid #FDEEDC;
+  padding: 15px;
+  border-radius: 8px;
+  width: 100%;
+  max-width: 300px;
+} 
 label {
   font-family: Arial, sans-serif;
     font-size: 16px;
     padding: 8px;
 }
 
-input[type="text"], input[type="password"] {
-  font-family: Arial, sans-serif;
-    font-size: 13px;
-    width: 200px;
-   background-color: #FDEEDC;
-  align-items: center;
-    border: 1px solid black;
-    padding: 8px;
+.my-form input[type="text"], 
+.my-form input[type="password"]{
+  display: inline-block;
+  width: 200px;
+  padding: 10px;
+  border-radius: 4px;
+  color: #FDEEDC ;
+  border: 1px solid#FDEEDC;
 }
 
 button[type="submit"] {
@@ -45,16 +49,16 @@ button[type="submit"] {
   color: black;
   padding: 10px 20px;
   margin: 8px 0;
-  border: none;
   border-radius: 4px;
-  cursor: pointer;
-  align-items: center;
-}
+  display: block;
+  margin: 0 auto;
+} 
 .heading{
   display: flex;
   justify-content: center;
-   background-color: #FDEEDC;
-   padding: 2px;
+  color: #000;
+  background-color: #FDEEDC;
+  padding: 2px;
   align-items: center;
 }
 </style>

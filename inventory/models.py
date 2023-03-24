@@ -1,3 +1,4 @@
+from django.utils import timezone
 from django.db import models
 from polymorphic.models import PolymorphicModel
 from django.contrib.auth.models import Permission, Group, AbstractUser, BaseUserManager
@@ -73,7 +74,7 @@ class ngo(AbstractUser):
     '''  
     ngo_name = models.CharField(max_length=255,default="a")
     email = models.EmailField(max_length=55,default="b")
-    phone_no = models.IntegerField(default=123456789)
+    phone_no = models.CharField(max_length=17)
     is_ngo = models.BooleanField(default=True)
     points = models.PositiveBigIntegerField(default=500)
     longitude = models.DecimalField(decimal_places=10,max_digits=15,default=0.000)
@@ -98,7 +99,7 @@ class donor(AbstractUser):
     ''' 
     donor_name = models.CharField(max_length=255)
     email = models.EmailField(max_length=55)
-    phone_no = models.IntegerField(default=123456789)
+    phone_no = models.CharField(max_length=17)
     points = models.PositiveBigIntegerField(default=0)
     longitude = models.DecimalField(decimal_places=10,max_digits=15,default=0.000)
     latitude = models.DecimalField(decimal_places=10,max_digits=15,default=0.000)
@@ -158,7 +159,7 @@ class donations(models.Model):
 class BaseTransaction(PolymorphicModel):
     donor = models.ForeignKey(donor, on_delete=models.CASCADE, related_name='donor_transactions')
     points_transferred = models.IntegerField()
-    date = models.DateTimeField(default=12/12/23)
+    date = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
         return f"{self.donor.username} made transaction of {self.points_transferred} points on {self.date}"

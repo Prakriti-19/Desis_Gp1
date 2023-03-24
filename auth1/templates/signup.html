@@ -2,6 +2,23 @@
 {% load static %}
 {% block content %}
 <style>
+.my-form label {
+  display: inline-block;
+  width: 150px;
+  text-align: right;
+  margin-right: 10px;
+  font-family: Arial, sans-serif;
+    font-size: 16px;
+    padding: 8px;
+}
+
+.my-form input[type="text"], 
+.my-form input[type="email"], 
+.my-form input[type="password"] {
+  display: inline-block;
+  width: 200px;
+  margin-bottom: 3px;
+}
 .form-control {
     font-family: Arial, sans-serif;
     font-size: 13px;
@@ -14,60 +31,54 @@
   display: flex;
   justify-content: center;
   align-items: center;
-}
-.email-input {
-    font-family: Arial, sans-serif;
-    font-size: 16px;
-    max-width: 300px;
-    background-color: #FDEEDC;
+  margin-bottom: 0px;
 }
 .container {
-  border: 3px solid #FDEEDC;
-  padding: 20px;
-  border-radius: 8px;
   display: flex;
   justify-content: center;
   align-items: center;
+  height: 100vh;
+  margin-top: -70px;
 }
-label {
-  font-family: Arial, sans-serif;
-    font-size: 16px;
-    padding: 8px;
+
+.my-form {
+  border: 3px solid #FDEEDC;
+  padding: 20px;
+  border-radius: 8px;
+  width: 100%;
+  max-width: 500px;
 }
+
+.my-form input {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 10px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+}
+
 button[type="submit"] {
   background-color: #FDEEDC;
   color: black;
   padding: 10px 20px;
   margin: 8px 0;
-  border: none;
   border-radius: 4px;
-  cursor: pointer;
-  align-items: center;
+  display: block;
+  margin: 0 auto;
 }
 </style>
 
 <body>
-  <div class="container-lg">
     <h1 class="heading">Sign up</h1>
     <p class="heading">Please fill out the following information to sign up</p>
-  </div>
   <div class="container">
-    <div class="row justify-content-center">
-      <div class="col-md-6">
-        <div class="card">
-          <div class="card-body">
-            <form method="post" class="my-form">
-              {% csrf_token %}
-              {{ form.as_p }}
-              <button type="submit" class="btn btn-primary">Sign up</button>
-            </form>
-          </div>
-        </div>
-      </div>
-    </div>
+    <form method="post" class="my-form">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <button type="submit" class="btn btn-primary">Sign up</button>
+    </form>
   </div>
 </body>
-   
 {% endblock %}
 
 
