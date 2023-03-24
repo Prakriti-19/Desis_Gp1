@@ -15,6 +15,7 @@
 .my-form input[type="text"], 
 .my-form input[type="email"], 
 .my-form input[type="password"] {
+  color: black;
   display: inline-block;
   width: 200px;
   margin-bottom: 3px;
@@ -68,7 +69,7 @@ button[type="submit"] {
 }
 </style>
 
-<body>
+<body onload=getLocation()>
     <h1 class="heading">Sign up</h1>
     <p class="heading">Please fill out the following information to sign up</p>
   <div class="container">
@@ -79,6 +80,21 @@ button[type="submit"] {
     </form>
   </div>
 </body>
+<script>
+ function getLocation() {
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(showPosition, showError);
+  } else {
+    alert("Geolocation is not supported by this browser.");
+  }
+}
+
+function showPosition(position) {
+  var latitude = position.coords.latitude;
+  var longitude = position.coords.longitude;
+  document.getElementById("latitude").value = latitude;
+  document.getElementById("longitude").value = longitude;
+}</script>
 {% endblock %}
 
 

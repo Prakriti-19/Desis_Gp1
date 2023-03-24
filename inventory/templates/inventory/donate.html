@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <style>
    .popup {
 position: fixed;
@@ -88,9 +89,13 @@ background-color: #ac7a40;
  align-items: center;
 }
 label {
- font-family: Arial, sans-serif;
-   font-size: 16px;
-   padding: 8px;
+  display: inline-block;
+  width: 150px;
+  text-align: right;
+  margin-right: 10px;
+  font-family: Arial, sans-serif;
+    font-size: 16px;
+    padding: 8px;
 }
 button[type="submit"] {
  background-color: #FDEEDC;
@@ -99,13 +104,12 @@ button[type="submit"] {
  margin: 8px 0;
  border: none;
  border-radius: 4px;
- cursor: pointer;
- align-items: center;
+ display: block;
+  margin: 0 auto;
 }
 </style>
 <html>
-
-<body onload="getLocation()">
+<body onload=getLocation()>
   <a href="{% url 'donor_home' %}" class="navbar-brand">Home</a>
   <h1 class="heading">Donate</h1>
   <div class="n">
@@ -136,21 +140,22 @@ button[type="submit"] {
     document.getElementById('popup').style.display = 'none';
     form.submit();
   });
-    function getLocation() {
-      console.log('getLocation called');
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(showPosition);
-      } else {
-        alert("Geolocation is not supported by this browser.");
-      }
-    }
 
-    function showPosition(position) {
-      var latitude = position.coords.latitude;
-      var longitude = position.coords.longitude;
-      document.getElementById("latitude").value = latitude;
-      document.getElementById("longitude").value = longitude;
-    }
+  function getLocation() {
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(showPosition, showError);
+  } else {
+    alert("Geolocation is not supported by this browser.");
+  }
+}
+
+function showPosition(position) {
+  var latitude = position.coords.latitude;
+  var longitude = position.coords.longitude;
+  document.getElementById("latitude").value = latitude;
+  document.getElementById("longitude").value = longitude;
+}
+
   </script>
 
 </body>
