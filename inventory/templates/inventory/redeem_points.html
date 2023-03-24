@@ -26,7 +26,19 @@
 </head>
 
 <body>
-
+    {% if messages %}
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags }}">
+        {{ message }}
+      </div>
+      <script>
+        setTimeout(function() {
+          document.querySelector('.alert').remove();
+        }, 3000);
+      </script>
+    {% endfor %}
+    <meta http-equiv="refresh" content="3;URL='{{ request.path }}'">
+  {% endif %}
     <section id="title-img">
         <div class="title row row-2">
             <div class="parent col-lg-12">
@@ -53,8 +65,8 @@
                         </div>
                     </nav>
                 </div>
-                <h2 class="name">Redeem Coins</h2>
-                <h4 class="prof">Coins earned : </h4><h4 class="addr">{{user.points}}</h4>
+                <h2 class="name">Redeem DESCoins</h2>
+                <h4 class="prof">Your DESCoins: </h4><h4 class="addr">{{user.points}}</h4>
                 <img class="image1 title-image" height="250px" src="/static/images/mountain.jpeg" alt="mountain-mockup">
             </div>
         </div>
@@ -70,19 +82,19 @@
                 <div class="column">
                     <img class="card" src="/static/images/pen.png" alt="money" style="width:100%">
                     <div class="imgb">
-                        <button onclick="myFunction(50)" class="imgButton1">Redeem: 50 coins</button>
+                        <button onclick="myFunction(50)" class="imgButton1">50 DESCoins</button>
                     </div>
                 </div>
                 <div class="column">
                     <img class="card" src="/static/images/book.png" alt="money" style="width:100%">
                     <div class="imgb">
-                        <button onclick="myFunction(150)" class="imgButton1">Redeem: 150 coins</button>
+                        <button onclick="myFunction(150)" class="imgButton1">150 DESCoins</button>
                     </div>
                 </div>
                 <div class="column">
                     <img class="card" src="/static/images/cap.png" alt="money" style="width:100%">
                     <div class="imgb">
-                        <button onclick="myFunction(200)" class="imgButton1">Redeem: 200 coins</button>
+                        <button onclick="myFunction(200)" class="imgButton1">200 DESCoins</button>
                     </div>
                 </div>
             </div> 
@@ -91,19 +103,19 @@
                 <div class="column">
                     <img class="card" src="/static/images/mug.png" alt="money" style="width:100%">
                     <div class="imgb">
-                        <button onclick="myFunction(300)" class="imgButton1">Redeem: 300 coins</button>
+                        <button onclick="myFunction(300)" class="imgButton1">300 DESCoins</button>
                     </div>
                 </div>
                 <div class="column">
                     <img class="card" src="/static/images/bottle.png" alt="food" style="width:100%">
                     <div class="imgb">
-                        <button onclick="myFunction(400)" class="imgButton1">Redeem: 400 coins</button>
+                        <button onclick="myFunction(400)" class="imgButton1">400 DESCoins</button>
                     </div>
                 </div>
                 <div class="column">
                     <img class="card" src="/static/images/stringbag.png" alt="food" style="width:100%">
                     <div class="imgb">
-                        <button onclick="myFunction(500)" class="imgButton1">Redeem: 500 coins</button>
+                        <button onclick="myFunction(500)" class="imgButton1">500 DESCoins</button>
                     </div>
                 </div>
             </div> 
@@ -112,19 +124,19 @@
                 <div class="column">
                     <img class="card" src="/static/images/shirt.png" alt="money" style="width:100%">
                     <div class="imgb">
-                        <button onclick="myFunction(600)" class="imgButton1">Redeem: 600 coins</button>
+                        <button onclick="myFunction(600)" class="imgButton1">600 DESCoins</button>
                     </div>
                 </div>
                 <div class="column">
                     <img class="card" src="/static/images/polo.png" alt="money" style="width:100%">
                     <div class="imgb">
-                        <button onclick="myFunction(750)" class="imgButton1">Redeem: 750 coins</button>
+                        <button onclick="myFunction(750)" class="imgButton1">750 DESCoins</button>
                     </div>
                 </div>
                 <div class="column">
                     <img class="card" src="/static/images/Hoodie.png" alt="money" style="width:100%">
                     <div class="imgb">
-                        <button onclick="myFunction(1000)" class="imgButton1">Redeem: 1000 coins</button>
+                        <button onclick="myFunction(1000)" class="imgButton1">1000 DESCoins</button>
                     </div>
                 </div>
                 

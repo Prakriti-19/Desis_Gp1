@@ -1,16 +1,15 @@
 from django.http import HttpResponse, HttpResponseBadRequest
 import matplotlib
-import matplotlib.dates as mdates
 from django.views.generic import TemplateView
 matplotlib.use('Agg')
 from inventory.models import *
 from dateutil.relativedelta import relativedelta
-import datetime
 from math import radians, sin, cos, sqrt, atan2
 import numpy as np
 from datetime import datetime as dt, timedelta
 from django.utils import timezone
-from django.shortcuts import redirect, render, get_object_or_404, redirect
+from django.shortcuts import redirect, render
+import time
 from django.contrib import messages
 from django.db.models.functions import TruncMonth
 from auth1.forms import *
@@ -20,7 +19,6 @@ import matplotlib.pyplot as plt
 from django.db.models import Avg, Max,Sum, Q
 import calendar
 import io
-from django.template.loader import render_to_string
 from django.contrib import messages
 from django.core.mail import send_mail
 import base64
@@ -51,12 +49,11 @@ def redeem_points(request):
             donor.save()
             transaction = BaseTransaction.objects.create(donor=donor, points_transferred=-points_to_redeem)
             transaction.save()
+            messages.success(request, 'Points redeemed successfully.')
         else:
-            return render(request, 'inventory/redeem_points.html')
+            messages.error(request, 'You do not have enough points to redeem.')
     return render(request, 'inventory/redeem_points.html')
 
-def redeem_success(request):
-    return render(request, 'inventory/redeem_success.html')
 
 class mail(TemplateView):
     template_name = "inventory/donation_email.html"
@@ -106,18 +103,15 @@ def donations_list(request):
     max_quantity = request.GET.get('max_quantity', 100)
     now = timezone.now()
     if codes is not None and min_quantity is not None and max_quantity is not None and min_quantity != '' and codes != '' and max_quantity != '':
-        donation = donations.objects.filter(Q(exp_date__gt=now) & Q(pincode__code=codes) & Q(quantity__range=(min_quantity, max_quantity)) & (Q(status=True) | Q(status2=True)))
+        donation = donations.objects.filter(Q(exp_date__gt=now) & Q(pincode__code=codes) & Q(quantity__range=(min_quantity, max_quantity)) & (Q(status=True) | Q(status2=True))).order_by('-exp_date')
     elif codes is not None and min_quantity != '' and codes == '' and max_quantity != '':
-        donation = donations.objects.filter(Q(exp_date__gt=now) & Q(pincode__code=request.user.pincode.code) & Q(quantity__range=(min_quantity, max_quantity)) & (Q(status=True) | Q(status2=True)))
+        donation = donations.objects.filter(Q(exp_date__gt=now) & Q(pincode__code=request.user.pincode.code) & Q(quantity__range=(min_quantity, max_quantity)) & (Q(status=True) | Q(status2=True))).order_by('-exp_date')
     elif codes is not None and min_quantity == '' and codes != '' and max_quantity == '':
-        donation = donations.objects.filter(Q(exp_date__gt=now) & Q(pincode__code=codes) & Q(quantity__range=(0, 500)) & (Q(status=True) | Q(status2=True)))
+        donation = donations.objects.filter(Q(exp_date__gt=now) & Q(pincode__code=codes) & Q(quantity__range=(0, 500)) & (Q(status=True) | Q(status2=True))).order_by('-exp_date')
     else:
-        donation = donations.objects.filter(Q(exp_date__gt=now) & (Q(status=True) | Q(status2=True)))
+        donation = donations.objects.filter(Q(exp_date__gt=now) & (Q(status=True) | Q(status2=True))).order_by('-exp_date')
     return render(request, "inventory/donations_list.html", {'donations': donation})
 
-def donation_details(request, pk):
-    donation = get_object_or_404(donations, pk=pk)
-    return render(request, 'inventory/chat.html', {'donation': donation})
 
 # @login_required
 def ngo_list(request):
@@ -188,7 +182,7 @@ def update_donation_status_ngo(request):
     
 def donor_history(request):
     donor_instance = donor.objects.get(id=request.user.id)
-    donations_made = donor_instance.donations_made()
+    donations_made = donor_instance.donations_made().order_by('donation_date')
 
     context = {
         'donor': donor_instance,
@@ -455,7 +449,7 @@ def donations_stats(request):
             donation_dict[donation_date.strftime('%Y-%m-%d')] += donation.quantity
 
     # Create a 2D array to store the donations by week and day
-    donation_array = [[0 for _ in range(7)] for _ in range(53)]
+    donation_array = [[0 for _ in range(7)] for _ in range(52)]
 
     # Loop through all dates in the date list and add the donations to the donation array
     for i, date in enumerate(date_list):
@@ -473,13 +467,13 @@ def donations_stats(request):
     donation_array = np.transpose(donation_array)
 
     now = dt.now()
-    k=0
+    k = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec","Jan"]
     x_labels = []
-    for i in range(0, 53):
+    l = 0
+    for i in range(0, 52):
         if i % 4 == 0:
-            month_year = now + timedelta(weeks=4*k)
-            k=k+1
-            x_labels.append("{}-{}".format(calendar.month_abbr[month_year.month], month_year.year))
+            x_labels.append(k[l])
+            l += 1
         else:
             x_labels.append("")
 
@@ -594,8 +588,142 @@ def donations_stats(request):
     average_weight_state = total_weight / total_edges
     min_weight_state = min([G_state.edges[edge]['weight'] for edge in G_state.edges])
     max_weight_state = max([G_state.edges[edge]['weight'] for edge in G_state.edges])
-
-    
-        
+      
     return render(request, 'inventory/donations_stats.html', {'image': image,'plot_data2': plot_data2,'plot_data6': plot_data6,'plot_data3': plot_data3,'plot_data1': plot_data1,'plot_data5': plot_data5, **context})
 
+
+@login_required
+def ngo_stats(request): 
+  
+    ngo_count = ngo.objects.count()
+    donor_count = donor.objects.filter(is_superuser=False).count()
+    total_donations = donations.objects.count()
+    avg_quantity = donations.objects.aggregate(Avg('quantity'))
+    max_quantity = donations.objects.aggregate(Max('quantity'))
+    total_quantity = donations.objects.aggregate(Sum('quantity'))
+    avg_quantity =int(avg_quantity['quantity__avg'])
+
+    context = {
+        'ngo_count':ngo_count,
+        'donor_count':donor_count,
+        'total_donations': total_donations,
+        'avg_quantity': avg_quantity,
+        'max_quantity': max_quantity,
+        'total_quantity': total_quantity,
+    }
+    
+# --------------------------------------------------------------------------------------------------------------------
+    '''
+    Calculating Donors Retention rate
+    '''
+    retention_period = timedelta(days=365)
+    start_date = (dt.now() - retention_period).replace(day=1)
+    total_donors = donations.objects.count()
+    end_date = dt.now().replace(day=1)
+
+    # Create a list of all months within the retention period
+    all_months = []
+    while start_date <= end_date:
+        all_months.append(start_date)
+        start_date += relativedelta(months=1)
+
+    returning_donors = {}
+    for donation in donations.objects.filter(donation_date__gt=dt.now()-retention_period):
+        month = donation.donation_date.replace(day=1)
+        donor_id = donation.donor_id.id
+        donors = donor.objects.filter(id=donor_id).first()
+        if donor_id in returning_donors.get(month - retention_period, set()):
+            continue
+        if donors is not None and donations.objects.filter(donor_id=donor_id, donation_date__lt=month, donation_date__gt=month-retention_period).exists():
+            returning_donors.setdefault(month, set()).add(donor_id)
+
+    returning_donors = sorted(returning_donors.items())
+
+    # Create a dictionary with all months as keys, and 0 as the initial value
+    retention_dict = {}
+    for month in all_months:
+        retention_dict[month] = 0
+
+    # Update the retention dictionary with the actual retention rates
+    for month, returning in returning_donors:
+        retention_dict[month] = len(returning)/total_donors*100
+
+    # Convert the retention dictionary into two lists (months and rates)
+    months = [month.strftime('%b %Y') for month in retention_dict.keys()]
+    rates = [rate for rate in retention_dict.values()]
+
+    buf = io.BytesIO()
+    fig, ax = plt.subplots()
+    ax.bar(months, rates,color='orange')
+    ax.set_ylabel('Returning donors (%)')
+    ax.set_xlabel('Month')
+    ax.set_title('Donor retention over time')
+    plt.xticks(rotation=45,fontsize=7)
+
+    # Convert the PNG image to a base64 string for display on the web page
+    plt.savefig(buf, format='png')
+    buf.seek(0)
+    plot_data1 = base64.b64encode(buf.getvalue()).decode('ascii')
+
+# -------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    '''
+    Donations per month Distribution: Overall, User's city and User-specific 
+    '''
+    today = dt.now()
+    first_day_of_month = today.replace(day=1)
+
+    # Create a list of all the months in the current year
+    all_months = []
+    for i in range(12):
+        month = (first_day_of_month - timedelta(days=30*i)).strftime('%b %Y')
+        all_months.append(month)
+    city_donations = list(donations.objects.filter(pincode__code=request.user.pincode.code)
+                        .annotate(month=TruncMonth('donation_date'))
+                        .values('month')
+                        .annotate(total_donations=Sum('quantity'))
+                        .order_by('month'))
+    tot_donations = list(donations.objects
+                        .annotate(month=TruncMonth('donation_date'))
+                        .values('month')
+                        .annotate(total_donations=Sum('quantity'))
+                        .order_by('month'))
+
+    # Create a dictionary with all the months and their corresponding donation amounts
+    city_donation_dict = {month: 0 for month in all_months}
+    tot_donation_dict = {month: 0 for month in all_months}
+
+    # Populate the dictionaries with the actual donation amounts
+    for donation in city_donations:
+        month_str = donation['month'].strftime('%b %Y')
+        city_donation_dict[month_str] = donation['total_donations']
+    for donation in tot_donations:
+        month_str = donation['month'].strftime('%b %Y')
+        tot_donation_dict[month_str] = donation['total_donations']
+
+    # Convert the dictionaries to lists for plotting
+    city_month = list(city_donation_dict.keys())
+    city_donation_amounts = list(city_donation_dict.values())
+    tot_month = list(tot_donation_dict.keys())
+    tot_donation_amounts = list(tot_donation_dict.values())
+
+    # Plot the donations per month
+    fig, ax = plt.subplots()
+    ax.plot(city_month, city_donation_amounts, label='City Donations',color= 'black')
+    ax.plot(tot_month, tot_donation_amounts, label='Total Donations',color= 'yellow')
+    ax.set_xlabel('Month')
+    ax.set_ylabel('Donation Amount')
+    ax.set_title('Donations per Month')
+    ax.legend()
+    plt.xticks(rotation=45,fontsize=7)
+
+    # Save the plot to a PNG image
+    buf = io.BytesIO()
+    plt.savefig(buf, format='png')
+    buf.seek(0)
+
+    # Convert the PNG image to a base64 string for display on the web page
+    plot_data2 = base64.b64encode(buf.getvalue()).decode('ascii')
+        
+# -------------------------------------------------------------------------------------------------------------------------------------------------------------------
+   
+    return render(request, 'inventory/ngo_stats.html', {'plot_data2': plot_data2,'plot_data1': plot_data1, **context})

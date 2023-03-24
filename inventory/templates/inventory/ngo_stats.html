@@ -1,0 +1,23 @@
+{% block content %}
+    <div class="container">
+        <a href="{% url 'ngo_home' %}" class="navbar-brand">Home</a>
+        <h1>Statistics</h1>
+        <p>Total Number of Donations: {{ total_donations }}</p>
+        <p>NGOs Registered through our website: {{ ngo_count }}</p>
+        <p>Donors active on our website: {{ donor_count }}</p>
+        <p>Meals Served: {{ total_quantity.quantity__sum}}</p>
+        <p>Average Meals served per donation: {{ avg_quantity }}</p>
+        <p>Maximum Meals served in single Donation: {{ max_quantity.quantity__max }}</p>
+        {% if plot_data2 %}
+            <img src="data:image/png;base64,{{ plot_data2 }}" alt="Donations in your city">
+        {% else %}
+            <p>No donations made yet.</p>
+        {% endif %}
+
+        {% if plot_data1 %}
+            <img src="data:image/png;base64,{{ plot_data1 }}" alt="Retention rate">
+        {% else %}
+            <p>No donations made yet.</p>
+        {% endif %}
+    </div>
+{% endblock %}

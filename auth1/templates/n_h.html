@@ -45,7 +45,7 @@
                                     <button class="nav-link dropbtn"><i class='fas fa-user-alt'></i> {{ user.username }}</button>
                                     <div class="dropdown-content">
                                         <a  href="{% url 'donations_list' %}">List of Donations</a>
-                                        <a href="{% url 'stats' %}">Stats</a>
+                                        <a href="{% url 'ngo_stats' %}">Stats</a>
                                         <a href="{% url 'logout' %}">Log Out</a>
                                     </div>
                                 </div> 
@@ -57,7 +57,7 @@
                 <img class="image1 title-image" height="250px" src="\static/images\mountain.jpeg" alt="mountain-mockup">
                 <img class="image2" id="pp" src="\static/images/Hands For Hunger.png" alt="Profile pic">
                 <h2 class="name">{{ user.ngo_name}}</h2>
-                <h3 class="prof">{{ user.phone_no}}</h3>
+                <h3 class="prof">{{ user.phone_no}}, {{ user.email}}</h3>
                 <h4 class="addr"><i class='fas fa-map-marker-alt'></i>   {{ user.pincode.city }}, {{ user.pincode.code }}</h4>
             </div>
         </div>
@@ -70,7 +70,7 @@
             <div class="float-child-1">
                 <div class="data">
                     <div class="ach top-ach">
-                        <h3>Coins</h3>
+                        <h3>Your DESCoins</h3>
                         <h4>{{user.points}}</h4>
                         <br>
                         <img class="card" src="\static\images\Plants.png" alt="food" style="width:300px;height:440px;padding: 10px;">

@@ -101,8 +101,8 @@
                                     <div class="dropdown-content">
                                         <a href="{% url 'add_donation' %}">Add</a>
                                       <a  href="{% url 'donor_history' %}">History</a>
-                                        <a href="{% url 'redeem_points' %}">Redeem Coins</a>
-                                        <a href="{% url 'ngo_list' %}">Donote Coins</a>
+                                        <a href="{% url 'redeem_points' %}">Redeem DESCoins</a>
+                                        <a href="{% url 'ngo_list' %}">Donote DESCoins</a>
                                       <a href="{% url 'stats' %}">Stats</a>
                                       <a href="{% url 'logout' %}">Log Out</a>
                                     </div>
@@ -135,10 +135,10 @@
                     <h4>Lives saved from starvation</h4>
                     <h4> {{ lives.quantity__sum }}</h4>
                   </div>
-                    <h4>Coins earned</h4>
+                    <h4>Your DESCoins</h4>
                     <h4>{{ user.points }}</h4>
                     <br>
-                    <img class="card" src="\static\images\c12.png" alt="food" style="width:300px;height:450px;padding: 10px;">
+                    <!-- <img class="card" src="\static\images\c12.png" alt="food" style="width:300px;height:450px;padding: 10px;"> -->
 
             </div>
           </div>
