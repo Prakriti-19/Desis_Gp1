@@ -1,10 +1,7 @@
-{% extends 'auth1/base.html' %} {% block content %} {% if form.errors %}
-
-<p>Your username and password didn't match. Please try again.</p>
-{% endif %}
+{% extends 'auth1/base.html' %} {% block content %}
 <h1 class="heading">Login</h1>
-
-<form method="post" class="my-form">
+<div class="err"> {{ error_message }}</div>
+<form method="post" class="my-form"> 
   {% csrf_token %}
   <label for="username">Username:</label>
   <input type="text" id="username" name="username" required /><br /><br />
@@ -14,6 +11,16 @@
 </form>
 
 <style>
+ .err{
+  margin: 0 auto;
+    justify-content: center;
+    text-align: center;
+    align-items: center;
+    padding: 15px;
+    color: black;
+    width: 100%;
+    max-width: 300px;
+ }
   .my-form {
     margin: 0 auto;
     justify-content: center;

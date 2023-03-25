@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
-from django.core.validators import validate_email, RegexValidator
+from django.core.validators import EmailValidator, RegexValidator  
 from inventory.models import ngo, donor, pincode, donations
 
 
@@ -18,11 +18,10 @@ class ngoUserCreationForm(UserCreationForm):
     )
     email = forms.EmailField(
         required=True,
-        max_length=30,
+        max_length=350,
         widget=forms.EmailInput(
             attrs={"class": "form-control", "placeholder": "Email"}
         ),
-        validators=[validate_email],
     )
     phone_regex = RegexValidator(
         regex=r"^\+?1?\d{9,15}$",
@@ -122,12 +121,11 @@ class donorUserCreationForm(UserCreationForm):
         label="City",
     )
     email = forms.EmailField(
-        max_length=30,
+        max_length=350,
         required=True,
         widget=forms.EmailInput(
             attrs={"class": "form-control", "placeholder": "Email"}
         ),
-        validators=[validate_email],
     )
     donor_name = forms.CharField(
         max_length=255,

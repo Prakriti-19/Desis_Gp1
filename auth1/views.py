@@ -27,11 +27,8 @@ def donor_home(request):
     return render(request, "d_h.html", context)
 
 
-def ngo_home(request):
-    context = {
-        "title": "HandsForHunger | Ngo_Home",
-    }
-    return render(request, "n_h.html", context)
+def ngo_home(request):    
+    return render(request, "n_h.html")
 
 
 def logout_view(request):
@@ -39,7 +36,7 @@ def logout_view(request):
     return redirect("/")
 
 
-def NgoLoginView(request):
+def ngo_login_view(request):
     if request.method == "POST":
         username = request.POST["username"]
         password = request.POST["password"]
@@ -61,7 +58,7 @@ def NgoLoginView(request):
         return render(request, "login.html")
 
 
-def DonorLoginView(request):
+def donor_login_view(request):
     if request.method == "POST":
         username = request.POST["username"]
         password = request.POST["password"]
@@ -85,7 +82,7 @@ def DonorLoginView(request):
 class NgoSignUpView(generic.CreateView):
     form_class = ngoUserCreationForm
     template_name = "signup.html"
-    success_url = reverse_lazy("ngo_login")
+    success_url = reverse_lazy("ngo_home")
 
     def form_valid(self, form):
         if form.is_valid():
@@ -93,13 +90,15 @@ class NgoSignUpView(generic.CreateView):
             donation.latitude = form.cleaned_data["latitude"]
             donation.longitude = form.cleaned_data["longitude"]
             donation.save()
-            return super().form_valid(form)
+            response = super().form_valid(form)
+            login(self.request, self.object, backend="auth1.backends.MyUserBackend")
+            return response
 
 
 class DonorSignUpView(generic.CreateView):
     form_class = donorUserCreationForm
     template_name = "signup.html"
-    success_url = reverse_lazy("donor_login")
+    success_url = reverse_lazy("donor_home")
 
     def form_valid(self, form):
         if form.is_valid():
@@ -110,4 +109,6 @@ class DonorSignUpView(generic.CreateView):
             response = super().form_valid(form)
             user = form.save()
             user.save()
+            response = super().form_valid(form)
+            login(self.request, self.object, backend="django.contrib.auth.backends.ModelBackend")
             return response

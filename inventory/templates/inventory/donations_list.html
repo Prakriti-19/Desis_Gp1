@@ -64,13 +64,15 @@
     <section id="middle">
       <br>
       <form method="get">
-        <div style="margin: 0 auto 0 calc(20% - 100px); display: block">
+        <div style="margin: 0 auto 0 calc(10% - 100px); display: block">
         <label for="pincode">Filter by Pincode:</label>
         <input type="text" name="pincode" id="pincode" value="{{ request.GET.pincode }}">
         <label for="min_quantity">Minimum Quantity:</label>
         <input type="number" name="min_quantity" id="min_quantity" value="{{ request.GET.min_quantity }}">
         <label for="max_quantity">Maximum Quantity:</label>
         <input type="number" name="max_quantity" id="max_quantity" value="{{ request.GET.max_quantity }}">
+        <label for="pincode">Distance:</label>
+        <input type="number" name="distance" id="distance" value="{{ request.GET.distance }}">
       </div>
         <br>
         <button type="submit"style="background-color: #E38B29;border: #E38B29;border-radius: 5px;color: white;margin: 0 auto 0 calc(50% - 50px); display: block;height: 35px;">Apply Filters</button>
