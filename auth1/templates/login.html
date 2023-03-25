@@ -1,65 +1,64 @@
-{% extends 'auth1/base.html' %}
+{% extends 'auth1/base.html' %} {% block content %} {% if form.errors %}
 
-{% block content %}
-  {% if form.errors %}
-    <p>Your username and password didn't match. Please try again.</p>
-  {% endif %}
-   <h1 class="heading">Login</h1>
-  
-  <form method="post" class="my-form">
-    {% csrf_token %}
-    <label for="username">Username:</label>
-    <input type="text" id="username" name="username" required><br><br>
-    <label for="password">Password:</label>
-    <input type="password" id="password" name="password" required><br><br>
-    <button type="submit">Login</button>
-  </form>
+<p>Your username and password didn't match. Please try again.</p>
+{% endif %}
+<h1 class="heading">Login</h1>
 
-  <style>
- 
-.my-form {
-  margin: 0 auto;
-  justify-content: center;
-  text-align: center;
-  align-items: center;
-  border: 3px solid #FDEEDC;
-  padding: 15px;
-  border-radius: 8px;
-  width: 100%;
-  max-width: 300px;
-} 
-label {
-  font-family: Arial, sans-serif;
+<form method="post" class="my-form">
+  {% csrf_token %}
+  <label for="username">Username:</label>
+  <input type="text" id="username" name="username" required /><br /><br />
+  <label for="password">Password:</label>
+  <input type="password" id="password" name="password" required /><br /><br />
+  <button type="submit">Login</button>
+</form>
+
+<style>
+  .my-form {
+    margin: 0 auto;
+    justify-content: center;
+    text-align: center;
+    align-items: center;
+    border: 3px solid #fdeedc;
+    padding: 15px;
+    border-radius: 8px;
+    width: 100%;
+    max-width: 300px;
+  }
+
+  label {
+    font-family: Arial, sans-serif;
     font-size: 16px;
     padding: 8px;
-}
+  }
 
-.my-form input[type="text"], 
-.my-form input[type="password"]{
-  display: inline-block;
-  width: 200px;
-  padding: 10px;
-  border-radius: 4px;
-  color: #FDEEDC ;
-  border: 1px solid#FDEEDC;
-}
+  .my-form input[type="text"],
+  .my-form input[type="password"] {
+    display: inline-block;
+    width: 200px;
+    padding: 10px;
+    border-radius: 4px;
+    color: black;
+    border: 1px solid#FDEEDC;
+  }
 
-button[type="submit"] {
-  background-color: #FDEEDC;
-  color: black;
-  padding: 10px 20px;
-  margin: 8px 0;
-  border-radius: 4px;
-  display: block;
-  margin: 0 auto;
-} 
-.heading{
-  display: flex;
-  justify-content: center;
-  color: #000;
-  background-color: #FDEEDC;
-  padding: 2px;
-  align-items: center;
-}
+  button[type="submit"] {
+    background-color: #fdeedc;
+    color: black;
+    padding: 10px 20px;
+    margin: 8px 0;
+    border-radius: 4px;
+    display: block;
+    margin: 0 auto;
+  }
+
+  .heading {
+    display: flex;
+    justify-content: center;
+    color: #000;
+    background-color: #fdeedc;
+    padding: 2px;
+    align-items: center;
+  }
 </style>
 {% endblock %}

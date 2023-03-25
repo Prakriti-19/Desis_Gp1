@@ -1,83 +1,90 @@
-
 {% block content %}
 <style>
   body {
-  background-color:#FDEEDC;
+    background-color: #FDEEDC;
   }
-  .form{
-  position: absolute;
-  background-color:#FDEEDC;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  border: 3px solid black;
-  font-family: Arial, sans-serif;
-  padding: 10px;
-  border-radius: 5px;
-  width: 300px;
-  height: 200px;
-  justify-content: center;
-  align-items: center;
+
+  .form {
+    position: absolute;
+    background-color: #FDEEDC;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border: 3px solid black;
+    font-family: Arial, sans-serif;
+    padding: 10px;
+    border-radius: 5px;
+    width: 300px;
+    height: 200px;
+    justify-content: center;
+    align-items: center;
   }
+
   label {
-  font-family: Arial, sans-serif;
+    font-family: Arial, sans-serif;
     font-size: 16px;
     padding: 8px;
-}
-.heading2{
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-}
-.form-group{
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-}
-button[type="submit"] {
-  background-color: #ca9451; 
-  color: black;
-  padding: 10px 20px;
-  margin: 8px 0;
-  border: none;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  border-radius: 4px;
-  cursor: pointer;
-  align-items: center;
-}
-.btn{
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-}
-header{
-  text-align: left;
-  position: absolute;
-  top: 10px;
-  left: 10px;
-}
+  }
+
+  .heading2 {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+
+  button[type="submit"] {
+    background-color: #E38B29;
+    color: black;
+    padding: 10px 20px;
+    margin: 8px 0;
+    border: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border-radius: 4px;
+    cursor: pointer;
+    align-items: center;
+  }
+
+  .btn {
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+
+  header {
+    text-align: left;
+    position: absolute;
+    top: 10px;
+    left: 10px;
+  }
 </style>
 
 <header>
   <a href="{% url 'donor_home' %}" class="navbar-brand">Home</a>
 </header>
+
 <body>
   <div class="form">
-  <h2 class="heading2">Donate DESCOins</h2>
-  <form method="post">
-    {% csrf_token %}
+    <h2 class="heading2">Donate DESCOINS</h2>
+    <form method="post">
+      {% csrf_token %}
       <div class="form-group">
-        <label for="points">Enter DESCoins to Donate:</label>
-        <input type="number" class="form-control" id="points" name="points">
+        <label for="points">Enter DESCOINS to Donate:</label>
+        <input type="number" class="form-control" id="descoins" name="descoins">
         <br>
-      <button type="submit" class="btn ">Submit</button>
-    </div>   
-  </form>
-</div>
+        <button type="submit" class="btn ">Submit</button>
+      </div>
+    </form>
+  </div>
 </body>
 
 {% endblock %}

@@ -1,162 +1,187 @@
 <!DOCTYPE html>
 
 <style>
-   .popup {
-position: fixed;
-top: 0;
-left: 0;
-width: 100%;
-height: 100%;
-background-color: rgba(0, 0, 0, 0.5);
-display: none;
-}
+  .popup {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: none;
+  }
 
-.popup-content {
-position: absolute;
-top: 50%;
-left: 50%;
-transform: translate(-50%, -50%);
-background-color: white;
-padding: 20px;
-border-radius: 5px;
-text-align: center;
-}
+  .popup-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: white;
+    padding: 20px;
+    border-radius: 5px;
+    text-align: center;
+  }
 
-.popup-content p {
-font-size: 24px;
-font-weight: bold;
-color: #E38B29;
-margin-bottom: 20px;
-}
+  .popup-content p {
+    font-size: 24px;
+    font-weight: bold;
+    color: #E38B29;
+    margin-bottom: 20px;
+  }
 
-#close-btn {
-background-color: #E38B29;
-border: none;
-padding: 5px 10px;
-border-radius: 5px;
-cursor: pointer;
-color: white;
-font-size: 18px;
-font-weight: bold;
-}
+  #close-btn {
+    background-color: #E38B29;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    color: white;
+    font-size: 18px;
+    font-weight: bold;
+  }
 
-#close-btn:hover {
-background-color: #ac7a40;
-}
-  .n{
+  #close-btn:hover {
+    background-color: #ac7a40;
+  }
+
+  .n {
     display: flex;
- justify-content: center;
- align-items: center;
- border: 3px solid white;
-  width: 600px;
-  padding: 10px;
-  position: absolute;
+    justify-content: center;
+    align-items: center;
+    border: 3px solid white;
+    width: 600px;
+    padding: 10px;
+    position: absolute;
     transform: translate(-50%, -50%);
     top: 50%;
     left: 50%;
   }
+
   body {
     background-color: #E38B29;
-    
-   }
-.form-control {
-   font-family: Arial, sans-serif;
-   font-size: 13px;
-   width: 300px;
-   background-color: #FDEEDC;
-   border: 1px solid black;
-   padding: 8px;
-}
-.heading{
- color:#FDEEDC;
- display: flex;
- justify-content: center;
- align-items: center;
- font-size: 50px;
-}
-.email-input {
-   font-family: Arial, sans-serif;
-   font-size: 16px;
-   max-width: 300px;
-   background-color: #FDEEDC;
-}
-.container {
- border: 3px solid #FDEEDC;
- padding: 20px;
- border-radius: 8px;
- display: flex;
- justify-content: center;
- align-items: center;
-}
-label {
-  display: inline-block;
-  width: 150px;
-  text-align: right;
-  margin-right: 10px;
-  font-family: Arial, sans-serif;
+
+  }
+
+  .form-control {
+    font-family: Arial, sans-serif;
+    font-size: 13px;
+    width: 300px;
+    background-color: #FDEEDC;
+    border: 1px solid black;
+    padding: 8px;
+  }
+
+  .heading {
+    color: #FDEEDC;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 50px;
+  }
+
+  .email-input {
+    font-family: Arial, sans-serif;
+    font-size: 16px;
+    max-width: 300px;
+    background-color: #FDEEDC;
+  }
+
+  .container {
+    border: 3px solid #FDEEDC;
+    padding: 20px;
+    border-radius: 8px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  label {
+    display: inline-block;
+    width: 150px;
+    text-align: right;
+    margin-right: 10px;
+    font-family: Arial, sans-serif;
     font-size: 16px;
     padding: 8px;
-}
-button[type="submit"] {
- background-color: #FDEEDC;
- color: black;
- padding: 10px 20px;
- margin: 8px 0;
- border: none;
- border-radius: 4px;
- display: block;
-  margin: 0 auto;
-}
+  }
+
+  button[type="submit"] {
+    background-color: #FDEEDC;
+    color: black;
+    padding: 10px 20px;
+    margin: 8px 0;
+    border: none;
+    border-radius: 4px;
+    display: block;
+    margin: 0 auto;
+  }
 </style>
 <html>
-<body onload=getLocation()>
+
+<body onload="getLocation()">
   <a href="{% url 'donor_home' %}" class="navbar-brand">Home</a>
   <h1 class="heading">Donate</h1>
   <div class="n">
-  
-  <form id="donation-form" method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <input type="hidden" name="latitude" id="latitude">
-    <input type="hidden" name="longitude" id="longitude">
-    <!-- other form fields go here -->
-    <button type="submit">Submit</button>
-  </form>
-</div>
-<div id="popup" class="popup">
-  <div class="popup-content">
-    <p>Thank you for your donation!</p>
-    <button id="close-btn">Close</button>
+
+    <form id="donation-form" method="post">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <input type="hidden" name="latitude" id="latitude">
+      <input type="hidden" name="longitude" id="longitude">
+      <button type="submit">Submit</button>
+    </form>
   </div>
-</div>
+  <div id="popup" class="popup">
+    <div class="popup-content">
+      <p>Thank you for your donation!</p>
+      <button id="close-btn">Close</button>
+    </div>
+  </div>
   <script>
-      var form = document.getElementById('donation-form');
-    form.addEventListener('submit', function(event) {
-    event.preventDefault();
-    document.getElementById('popup').style.display = 'block';
-  });
+    var form = document.getElementById('donation-form');
+    form.addEventListener('submit', function (event) {
+      event.preventDefault();
+      document.getElementById('popup').style.display = 'block';
+    });
 
-  document.getElementById('close-btn').addEventListener('click', function(event) {
-    document.getElementById('popup').style.display = 'none';
-    form.submit();
-  });
+    document.getElementById('close-btn').addEventListener('click', function (event) {
+      document.getElementById('popup').style.display = 'none';
+      form.submit();
+    });
 
-  function getLocation() {
-  if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(showPosition, showError);
-  } else {
-    alert("Geolocation is not supported by this browser.");
-  }
-}
+    function getLocation() {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(showPosition, showError);
+      } else {
+        alert("Geolocation is not supported by this browser.");
+      }
+    }
 
-function showPosition(position) {
-  var latitude = position.coords.latitude;
-  var longitude = position.coords.longitude;
-  document.getElementById("latitude").value = latitude;
-  document.getElementById("longitude").value = longitude;
-}
+    function showPosition(position) {
+      var latitude = position.coords.latitude;
+      var longitude = position.coords.longitude;
+      document.getElementById("latitude").value = latitude;
+      document.getElementById("longitude").value = longitude;
+    }
+    function showError(error) {
+      switch (error.code) {
+        case error.PERMISSION_DENIED:
+          alert("User denied the request for Geolocation.")
+          break;
+        case error.POSITION_UNAVAILABLE:
+          alert("Location information is unavailable.")
+          break;
+        case error.TIMEOUT:
+          alert("The request to get user location timed out.")
+          break;
+        case error.UNKNOWN_ERROR:
+          alert("An unknown error occurred.")
+          break;
+      }
+    }
 
   </script>
 
 </body>
+
 </html>

@@ -129,12 +129,14 @@ p
         position: absolute;
         top: 280px;
         left: 450px;
+        color: #777;
         font-size: 3rem;
     }
 
     .prof
     {
         font-weight: 600;
+        color: #777;
         font-size: 1.4rem;
         font-family: Arial, Helvetica, sans-serif;
         position: absolute;
@@ -145,6 +147,7 @@ p
     .addr
     {
         font-weight: 400;
+        color: #777;
         font-size: 1rem;
         position: absolute;
         top: 380px;

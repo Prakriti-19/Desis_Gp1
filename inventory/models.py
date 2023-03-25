@@ -52,9 +52,9 @@ class pincode(models.Model):
     ''' 
     This model is used to store this information in normalized and efficient way.
     ''' 
-    code = models.IntegerField(default=248001)
-    city = models.CharField(max_length=250,default="es")
-    state= models.CharField(max_length=250,default="qw")
+    code = models.IntegerField()
+    city = models.CharField(max_length=250)
+    state= models.CharField(max_length=250)
     def __str__(self):
         return self.city
     
@@ -72,19 +72,14 @@ class ngo(AbstractUser):
     Thus, by inheriting from AbstractUser, we are able to use the built-in authentication and permission features provided by Django, 
     while customizing the model with additional fields and functionality specific to NGOs.
     '''  
-    ngo_name = models.CharField(max_length=255,default="a")
-    email = models.EmailField(max_length=55,default="b")
+    ngo_name = models.CharField(max_length=255)
+    email = models.EmailField(max_length=55)
     phone_no = models.CharField(max_length=17)
     is_ngo = models.BooleanField(default=True)
-    points = models.PositiveBigIntegerField(default=500)
-    longitude = models.DecimalField(decimal_places=10,max_digits=15,default=0.000)
-    latitude = models.DecimalField(decimal_places=10,max_digits=15,default=0.000)
+    descoins = models.PositiveBigIntegerField(default=500)
+    longitude = models.DecimalField(decimal_places=7,max_digits=15)
+    latitude = models.DecimalField(decimal_places=7,max_digits=15)
     pincode = models.ForeignKey(pincode, on_delete=models.CASCADE,null=True)
-    groups = models.ManyToManyField(Group, related_name='ngo_groups')
-    user_permissions = models.ManyToManyField(
-        Permission,
-        related_name='ngo_user_permissions',
-    )
     objects = NgoManager()
    
     def __str__(self):
@@ -100,16 +95,14 @@ class donor(AbstractUser):
     donor_name = models.CharField(max_length=255)
     email = models.EmailField(max_length=55)
     phone_no = models.CharField(max_length=17)
-    points = models.PositiveBigIntegerField(default=0)
-    longitude = models.DecimalField(decimal_places=10,max_digits=15,default=0.000)
-    latitude = models.DecimalField(decimal_places=10,max_digits=15,default=0.000)
-    pincode = models.ForeignKey(pincode, on_delete=models.CASCADE,null=True)
+    descoins = models.PositiveBigIntegerField(default=0)
     is_ngo = models.BooleanField(default=False)
-    groups = models.ManyToManyField(Group, related_name='donor_groups')
-    user_permissions = models.ManyToManyField(
-        Permission,
-        related_name='donor_user_permissions',
-    )
+    longitude = models.DecimalField(decimal_places=7,max_digits=15,null=True)
+    latitude = models.DecimalField(decimal_places=7,max_digits=15,null=True)
+    pincode = models.ForeignKey(pincode, on_delete=models.CASCADE,null=True)
+    groups = models.ManyToManyField(Group, related_name="donor_groups")
+    user_permissions = models.ManyToManyField(Permission, related_name="donor_permissions")
+    
 
     objects = DonorManager()
     def __str__(self):
@@ -148,23 +141,33 @@ class donations(models.Model):
     latitude = models.DecimalField(decimal_places=10,max_digits=15)
     pincode = models.ForeignKey("pincode", on_delete=models.CASCADE,null=True)
     quantity = models.IntegerField()
-    desc = models.TextField()
-    status = models.BooleanField(default=True)
-    status2 = models.BooleanField(default=True)
+    description = models.TextField()
+    ngo_status = models.BooleanField(default=True)
+    donor_status = models.BooleanField(default=True)
     type = models.CharField(max_length=10, choices=TYPE_CHOICES, default=OTHER)
   
     def __str__(self):
-        return self.desc
+        return self.description
+        
+class Transaction(PolymorphicModel):
+    D2N = 'donor_to_ngo'
+    N2D = 'ngo_to_donor'
+    D2U = 'donor_to_us'
+    U2N = 'us_to_ngo'
+
+    TYPE_CHOICES = [
+    (D2N, 'donor_to_ngo'),
+    (N2D, 'ngo_to_donor'),
+    (D2U, 'donor_to_us'),
+    (U2N, 'us_to_ngo'),
+    ]
+    type = models.CharField(max_length=15, choices=TYPE_CHOICES)
+    sender = models.IntegerField(blank=True, null=True)
+    receiver = models.IntegerField(blank=True, null=True)
+    descoins_transferred = models.IntegerField()
+    timestamp = models.DateTimeField(default=timezone.now)
+
+
     
-class BaseTransaction(PolymorphicModel):
-    donor = models.ForeignKey(donor, on_delete=models.CASCADE, related_name='donor_transactions')
-    points_transferred = models.IntegerField()
-    date = models.DateTimeField(default=timezone.now)
-
-    def __str__(self):
-        return f"{self.donor.username} made transaction of {self.points_transferred} points on {self.date}"
-
-class NGODonation_t(BaseTransaction):
-    ngo = models.ForeignKey(ngo, on_delete=models.CASCADE, related_name='ngo_transactions')
 
 

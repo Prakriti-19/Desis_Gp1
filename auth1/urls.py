@@ -6,7 +6,7 @@ from payment.views import *
 
 
 urlpatterns = [
-    path("logout/", views.LogoutView.as_view(), name="logout"),
+    path("logout/", logout_view, name="logout"),
     path("donate/", donate, name="add_donation"),
     path("ngo_list/", ngo_list, name="ngo_list"),
     path("stats/", donations_stats, name="stats"),
@@ -17,15 +17,15 @@ urlpatterns = [
     path("redeem_points/", redeem_points, name="redeem_points"),
     path("donate_points/", donate_points, name="donate_points"),
     path('pay/', pay, name='pay'),
-    path('mail/', mail.as_view(), name='mail'),
+    path('mail/<email>/', mail, name='mail'),
     path('donate_points/<int:ngo_id>/', donate_points, name='donate_points'),
-    path("update_donation_status/", update_donation_status, name="update_donation_status"),
+    path("update_donation_status/", update_donation_status_donor, name="update_donation_status_donor"),
     path("update_donation_status_ngo/", update_donation_status_ngo, name="update_donation_status_ngo"),
-    path("ngo_login/", views.NgoLoginView, name="ngo_login"),
     path("ngo_register/", views.NgoSignUpView.as_view(), name="ngo_register"),
     path("donor_register/", views.DonorSignUpView.as_view(), name="donor_register"),
-    path("ngo_home/", views.ngo_home.as_view(), name="ngo_home"),
-    path("donor_home/", my_view, name="donor_home"),
-    path("donor_login/", views.DonorLoginView, name="donor_login"),
-    path("", views.HomeView2.as_view(), name="home"),
+    path("ngo_login/", NgoLoginView, name="ngo_login"),
+    path("donor_login/", DonorLoginView, name="donor_login"),
+    path("ngo_home/", ngo_home, name="ngo_home"),
+    path("donor_home/", donor_home, name="donor_home"),
+    path("", home_view, name="home"),
 ]

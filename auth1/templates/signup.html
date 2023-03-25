@@ -2,100 +2,124 @@
 {% load static %}
 {% block content %}
 <style>
-.my-form label {
-  display: inline-block;
-  width: 150px;
-  text-align: right;
-  margin-right: 10px;
-  font-family: Arial, sans-serif;
+  .my-form label {
+    display: inline-block;
+    width: 150px;
+    text-align: right;
+    margin-right: 10px;
+    font-family: Arial, sans-serif;
     font-size: 16px;
     padding: 8px;
-}
+  }
 
-.my-form input[type="text"], 
-.my-form input[type="email"], 
-.my-form input[type="password"] {
-  color: black;
-  display: inline-block;
-  width: 200px;
-  margin-bottom: 3px;
-}
-.form-control {
+  .my-form input[type="text"],
+  .my-form input[type="email"],
+  .my-form input[type="password"] {
+    color: black;
+    display: inline-block;
+    width: 200px;
+    margin-bottom: 3px;
+  }
+
+  .form-control {
     font-family: Arial, sans-serif;
     font-size: 13px;
     width: 300px;
     background-color: #FDEEDC;
     border: 1px solid black;
     padding: 8px;
-}
-.heading{
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-bottom: 0px;
-}
-.container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  margin-top: -70px;
-}
+  }
 
-.my-form {
-  border: 3px solid #FDEEDC;
-  padding: 20px;
-  border-radius: 8px;
-  width: 100%;
-  max-width: 500px;
-}
+  .heading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 0px;
+  }
 
-.my-form input {
-  width: 100%;
-  padding: 10px;
-  margin-bottom: 10px;
-  border-radius: 4px;
-  border: 1px solid #ccc;
-}
+  .container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin-top: -70px;
+  }
 
-button[type="submit"] {
-  background-color: #FDEEDC;
-  color: black;
-  padding: 10px 20px;
-  margin: 8px 0;
-  border-radius: 4px;
-  display: block;
-  margin: 0 auto;
-}
+  .my-form {
+    border: 3px solid #FDEEDC;
+    padding: 20px;
+    border-radius: 8px;
+    width: 100%;
+    max-width: 500px;
+  }
+
+  .my-form input {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+  }
+
+  button[type="submit"] {
+    background-color: #FDEEDC;
+    color: black;
+    padding: 10px 20px;
+    margin: 8px 0;
+    border-radius: 4px;
+    display: block;
+    margin: 0 auto;
+  }
 </style>
 
-<body onload=getLocation()>
-    <h1 class="heading">Sign up</h1>
-    <p class="heading">Please fill out the following information to sign up</p>
+<head>
+  <script>
+    function getLocation() {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(showPosition, showError);
+      } else {
+        alert("Geolocation is not supported by this browser.");
+      }
+    }
+
+    function showPosition(position) {
+      var latitude = position.coords.latitude;
+      var longitude = position.coords.longitude;
+      document.getElementById("latitude").value = latitude;
+      document.getElementById("longitude").value = longitude;
+    }
+
+    function showError(error) {
+      switch (error.code) {
+        case error.PERMISSION_DENIED:
+          alert("User denied the request for Geolocation.")
+          break;
+        case error.POSITION_UNAVAILABLE:
+          alert("Location information is unavailable.")
+          break;
+        case error.TIMEOUT:
+          alert("The request to get user location timed out.")
+          break;
+        case error.UNKNOWN_ERROR:
+          alert("An unknown error occurred.")
+          break;
+      }
+    }
+  </script>
+</head>
+
+<body onload="getLocation()">
+  <h1 class="heading">Sign up</h1>
+  <p class="heading">Please fill out the following information to sign up</p>
   <div class="container">
     <form method="post" class="my-form">
       {% csrf_token %}
       {{ form.as_p }}
+      <input type="hidden" id="latitude" name="latitude">
+      <input type="hidden" id="longitude" name="longitude">
       <button type="submit" class="btn btn-primary">Sign up</button>
     </form>
   </div>
 </body>
-<script>
- function getLocation() {
-  if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(showPosition, showError);
-  } else {
-    alert("Geolocation is not supported by this browser.");
-  }
-}
 
-function showPosition(position) {
-  var latitude = position.coords.latitude;
-  var longitude = position.coords.longitude;
-  document.getElementById("latitude").value = latitude;
-  document.getElementById("longitude").value = longitude;
-}</script>
 {% endblock %}
-
-
-

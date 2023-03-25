@@ -1,48 +1,111 @@
-<style> body {
-  background-color:#FDEEDC;
-  }</style>
+{% block content %} {% load static %}
+<!DOCTYPE html>
+<html>
 
-{% block content %}
-<header>
-  <a href="{% url 'ngo_home' %}" class="navbar-brand">Home</a>
-</header>
-<body><h1>List of Donations</h1>
-  <form method="get">
-    <label for="pincode">Filter by Pincode:</label>
-    <input type="text" name="pincode" id="pincode" value="{{ request.GET.pincode }}">
-    <br>
-    <label for="min_quantity">Minimum Quantity:</label>
-    <input type="number" name="min_quantity" id="min_quantity" value="{{ request.GET.min_quantity }}">
-    <label for="max_quantity">Maximum Quantity:</label>
-    <input type="number" name="max_quantity" id="max_quantity" value="{{ request.GET.max_quantity }}">
-    <br>
-    <button type="submit">Apply Filters</button>
-  </form>
-  <ul class="donation-list">
-    {% for donation in donations %}
-      <li>
-        <div class="donation-info">
-          <h2>{{ donation.desc|truncatechars:20 }}{% if donation.desc|length > 20 %}...{% endif %}</h2>
-          <p>Donation made by: {{ donation.donor_id.donor_name }}</p>
-          <p>For: {{ donation.quantity }} people</p>
-          <p>Used By: {{ donation.exp_date }}</p>
-        </div>
-        {% if donation.status2 %}
-        Donation in progress
-        <form method="post" action="{% url 'update_donation_status_ngo' %}">
-          {% csrf_token %}
-          <input type="hidden" name="donation_id2" value="{{ donation.id }}">
-          <input type="hidden" name="status2" value="true">
-          <button type="submit">Donation Taken</button>
-          <a href="{% url 'mail' %}" class="btn btn-primary">Connect with the Donor</a>
-        {% else %}
-        Donation Taken
-         </form>
-        {% endif %}        
-      </li>
-    {% empty %}
-      <li>No donations found.</li>
-    {% endfor %}
-  </ul></body>
+<head>
+  <meta charset="utf-8">
+  <title>Hands for Hunger</title>
+  <link rel="icon" href="/static/favicon.ico">
+
+  <!-- GOOGLE FONTS -->
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100;300;400;500;900&family=Ubuntu:wght@300;400;700&display=swap" rel="stylesheet">
+
+  <!-- CSS STYLESHEETS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N" crossorigin="anonymous">
+  <link rel="stylesheet" href="{% static 'css/styles4.css' %}">
   
+  <!-- FONT AWESOME -->
+  <script src="https://kit.fontawesome.com/2fd7d971bc.js" crossorigin="anonymous"></script>
+
+  <!-- BOOTSTRAP SCRIPTS -->
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-Fy6S3B9q64WdZWQUiU+q4/2Lc9npb8tCaSX9FK7E8HnRr0Jz8D6OP9dO5Vg3Q9ct" crossorigin="anonymous"></script>
+  
+
+
+</head>
+
+<body>
+
+    <section id="title-img">
+        <div class="title row row-2">
+            <div class="parent col-lg-12">
+                <div class="inside container-fluid">
+                    <!-- Nav Bar -->
+                    <nav class="navbar navbar-expand-lg navbar-dark">
+                        <img class="logo" src="/static/images/cr2.png" alt="rice">
+                        <!-- <a class="navbar-brand" href="">Hands for Hunger</a> -->
+                        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                            <span class="navbar-toggler-icon"></span>
+                        </button>
+                        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                            <ul class="navbar-nav ml-auto">
+                                <li class="nav-item">
+                                    <div class="dropdown">
+                                        <button class="nav-link dropbtn"><i class='fas fa-user-alt'></i>{{user.username}}</button>
+                                        <div class="dropdown-content">
+                                            <a href="{% url 'ngo_home' %}" >Home</a>
+                                            <a href="{% url 'logout' %}" >Log Out</a>
+                                        </div>
+                                    </div> 
+                                </li>
+                            </ul>
+                        </div>
+                    </nav>
+                </div>
+                <h2 class="name">List of Donations</h2>
+                <h4 class="prof">Your DESCOINS: </h4>
+                <h4 class="addr">{{user.descoins}}</h4>
+                <img class="image1 title-image" height="250px" src="/static/images/mountain.jpeg" alt="mountain-mockup">
+            </div>
+        </div>
+    </section>
+
+    <section id="middle">
+      <br>
+      <form method="get">
+        <div style="margin: 0 auto 0 calc(20% - 100px); display: block">
+        <label for="pincode">Filter by Pincode:</label>
+        <input type="text" name="pincode" id="pincode" value="{{ request.GET.pincode }}">
+        <label for="min_quantity">Minimum Quantity:</label>
+        <input type="number" name="min_quantity" id="min_quantity" value="{{ request.GET.min_quantity }}">
+        <label for="max_quantity">Maximum Quantity:</label>
+        <input type="number" name="max_quantity" id="max_quantity" value="{{ request.GET.max_quantity }}">
+      </div>
+        <br>
+        <button type="submit"style="background-color: #E38B29;border: #E38B29;border-radius: 5px;color: white;margin: 0 auto 0 calc(50% - 50px); display: block;height: 35px;">Apply Filters</button>
+      </form>
+      <br>
+      <ul class="donation-list">
+        {% for donation in donations %}
+        <li>
+          <div class="donation-info">
+            <h2>{{ donation.desc|truncatechars:20 }}{% if donation.desc|length > 20 %}...{% endif %}</h2>
+            <p>Donation made by: {{ donation.donor_id.donor_name }}</p>
+            <p>For: {{ donation.quantity }} people</p>
+            <p>Best before: {{ donation.exp_date }}</p>
+            <p>Distance (km): {{ donation.distance }}</p>
+          </div>
+          {% if donation.ngo_status %}
+          Donation in progress
+          <form method="post" action="{% url 'update_donation_status_ngo' %}">
+            {% csrf_token %}
+            <input type="hidden" name="donation_id2" value="{{ donation.id }}">
+            <input type="hidden" name="ngo_status" value="true">
+            <button type="submit" style="background-color: #E38B29; border: #E38B29;border-radius: 5px;color: white;height: 37px;">Donation Taken</button>
+            <a href="{% url 'mail' donation.donor_id.email %}" class="btn btn-primary">Connect with the Donor</a>
+            {% else %}
+            Donation Taken
+          </form>
+          {% endif %}
+        </li>
+        {% empty %}
+        <li>No donations found.</li>
+        {% endfor %}
+      </ul>
+
+    </section>
+
+</body>
+
 {% endblock %}
