@@ -17,7 +17,30 @@ from dateutil.relativedelta import relativedelta
 from inventory.models import *
 from django.http import HttpResponse, HttpResponseBadRequest
 import matplotlib
+import matplotlib.dates as mdates
+from django.views.generic import TemplateView
 matplotlib.use('Agg')
+from inventory.models import *
+from dateutil.relativedelta import relativedelta
+import datetime
+from math import radians, sin, cos, sqrt, atan2
+import numpy as np
+from datetime import datetime as dt, timedelta
+from django.utils import timezone
+from django.shortcuts import redirect, render, get_object_or_404, redirect
+from django.contrib import messages
+from django.db.models.functions import TruncMonth
+from auth1.forms import *
+import networkx as nx
+from django.contrib.auth.decorators import login_required
+import matplotlib.pyplot as plt
+from django.db.models import Avg, Max,Sum, Q
+import calendar
+import io
+from django.template.loader import render_to_string
+from django.contrib import messages
+from django.core.mail import send_mail
+import base64
 
 
 @login_required
@@ -46,9 +69,7 @@ def redeem_points(request):
         if donor.descoins >= descoins_to_redeem:
             donor.descoins -= descoins_to_redeem
             donor.save()
-            transaction = Transaction.objects.create(
-                sender=donor.id, receiver=None, descoins_transferred=descoins_to_redeem, type=Transaction.D2U, timestamp=timezone.now())
-            messages.success(request, 'Points redeemed successfully.')
+            transaction = Transaction.objects.create(sender=donor,receiver=None, descoins_transferred=descoins_to_redeem, type=Transaction.D2U, timestamp=timezone.now())
         else:
             messages.error(request, 'You do not have enough points to redeem.')
     return render(request, 'inventory/redeem_points.html')
@@ -103,28 +124,13 @@ def donations_list(request):
     max_quantity = request.GET.get('max_quantity', 100)
     now = timezone.now()
     if codes is not None and min_quantity is not None and max_quantity is not None and min_quantity != '' and codes != '' and max_quantity != '':
-        donation = donations.objects.filter(Q(exp_date__gt=now) & Q(pincode__code=codes) & Q(quantity__range=(
-            min_quantity, max_quantity)) & (Q(donor_status=True) | Q(ngo_status=True))).order_by('-exp_date')
+        donation = donations.objects.filter(Q(exp_date__gt=now) & Q(pincode__code=codes) & Q(quantity__range=(min_quantity, max_quantity)) & (Q(status=True) | Q(status2=True)))
     elif codes is not None and min_quantity != '' and codes == '' and max_quantity != '':
-        donation = donations.objects.filter(Q(exp_date__gt=now) & Q(pincode__code=request.user.pincode.code) & Q(
-            quantity__range=(min_quantity, max_quantity)) & (Q(donor_status=True) | Q(ngo_status=True))).order_by('-exp_date')
+        donation = donations.objects.filter(Q(exp_date__gt=now) & Q(pincode__code=request.user.pincode.code) & Q(quantity__range=(min_quantity, max_quantity)) & (Q(status=True) | Q(status2=True)))
     elif codes is not None and min_quantity == '' and codes != '' and max_quantity == '':
-        donation = donations.objects.filter(Q(exp_date__gt=now) & Q(pincode__code=codes) & Q(
-            quantity__range=(0, 500)) & (Q(donor_status=True) | Q(ngo_status=True))).order_by('-exp_date')
+        donation = donations.objects.filter(Q(exp_date__gt=now) & Q(pincode__code=codes) & Q(quantity__range=(0, 500)) & (Q(status=True) | Q(status2=True)))
     else:
-        donation = donations.objects.filter(Q(exp_date__gt=now) & (
-            Q(donor_status=True) | Q(ngo_status=True))).order_by('-exp_date')
-        
-    user_latitude = request.user.latitude
-    user_longitude = request.user.longitude
-
-    for d in donation:
-        donor_latitude = d.donor_id.latitude
-        donor_longitude = d.donor_id.longitude
-        distance = haversine(user_latitude, user_longitude,
-                            donor_latitude, donor_longitude)
-        d.distance = round(distance, 2)
-
+        donation = donations.objects.filter(Q(exp_date__gt=now) & (Q(status=True) | Q(status2=True)))
     return render(request, "inventory/donations_list.html", {'donations': donation})
 
 
@@ -204,7 +210,8 @@ def update_points(donor_id, quantity, ngo_id):
 @login_required
 def donor_history(request):
     donor_instance = donor.objects.get(id=request.user.id)
-    donations_made = donor_instance.donations_made().order_by('donation_date')
+    donations_made = donor_instance.donations_made()
+
     context = {
         'donor': donor_instance,
         'donations_made': donations_made,
@@ -505,8 +512,7 @@ def donations_stats(request):
     donation_array = np.transpose(donation_array)
 
     now = dt.now()
-    k = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
-         "Jul", "Aug", "Sep", "Oct", "Nov", "Dec", "Jan"]
+    k=0
     x_labels = []
     l = 0
     for i in range(0, 52):
@@ -627,43 +633,40 @@ def donations_stats(request):
     total_weight_state = sum([G_state.edges[edge]['weight']
                              for edge in G_state.edges])
     average_weight_state = total_weight / total_edges
-    min_weight_state = min([G_state.edges[edge]['weight']
-                           for edge in G_state.edges])
-    max_weight_state = max([G_state.edges[edge]['weight']
-                           for edge in G_state.edges])
+    min_weight_state = min([G_state.edges[edge]['weight'] for edge in G_state.edges])
+    max_weight_state = max([G_state.edges[edge]['weight'] for edge in G_state.edges])
 
-    return render(request, 'inventory/donations_stats.html', {'image': image, 'plot_data2': plot_data2, 'plot_data3': plot_data3, 'plot_data1': plot_data1, 'plot_data5': plot_data5, **context})
-
+    
+        
+    return render(request, 'inventory/donations_stats.html', {'image': image,'plot_data2': plot_data2,'plot_data3': plot_data3,'plot_data1': plot_data1,'plot_data5': plot_data5, **context})
 
 @login_required
-def ngo_stats(request):
-
-    all_donations = donations.objects.all()
-
+def ngo_stats(request): 
+  
     ngo_count = ngo.objects.count()
     donor_count = donor.objects.filter(is_superuser=False).count()
     total_donations = donations.objects.count()
     avg_quantity = donations.objects.aggregate(Avg('quantity'))
     max_quantity = donations.objects.aggregate(Max('quantity'))
     total_quantity = donations.objects.aggregate(Sum('quantity'))
-    avg_quantity = int(avg_quantity['quantity__avg'])
+    avg_quantity =int(avg_quantity['quantity__avg'])
 
     context = {
-        'ngo_count': ngo_count,
-        'donor_count': donor_count,
+        'ngo_count':ngo_count,
+        'donor_count':donor_count,
         'total_donations': total_donations,
         'avg_quantity': avg_quantity,
         'max_quantity': max_quantity,
         'total_quantity': total_quantity,
     }
-
+    
 # --------------------------------------------------------------------------------------------------------------------
     '''
     Calculating Donors Retention rate
     '''
     retention_period = timedelta(days=365)
     start_date = (dt.now() - retention_period).replace(day=1)
-    total_donors = all_donations.count()
+    total_donors = donations.objects.count()
     end_date = dt.now().replace(day=1)
 
     # Create a list of all months within the retention period
@@ -699,11 +702,11 @@ def ngo_stats(request):
 
     buf = io.BytesIO()
     fig, ax = plt.subplots()
-    ax.bar(months, rates, color='orange')
+    ax.bar(months, rates,color='orange')
     ax.set_ylabel('Returning donors (%)')
     ax.set_xlabel('Month')
     ax.set_title('Donor retention over time')
-    plt.xticks(rotation=45, fontsize=7)
+    plt.xticks(rotation=45,fontsize=7)
 
     # Convert the PNG image to a base64 string for display on the web page
     plt.savefig(buf, format='png')
@@ -722,16 +725,16 @@ def ngo_stats(request):
     for i in range(12):
         month = (first_day_of_month - timedelta(days=30*i)).strftime('%b %Y')
         all_months.append(month)
-    city_donations = list(all_donations.filter(pincode__code=request.user.pincode.code)
-                          .annotate(month=TruncMonth('donation_date'))
-                          .values('month')
-                          .annotate(total_donations=Sum('quantity'))
-                          .order_by('month'))
-    tot_donations = list(all_donations
-                         .annotate(month=TruncMonth('donation_date'))
-                         .values('month')
-                         .annotate(total_donations=Sum('quantity'))
-                         .order_by('month'))
+    city_donations = list(donations.objects.filter(pincode__code=request.user.pincode.code)
+                        .annotate(month=TruncMonth('donation_date'))
+                        .values('month')
+                        .annotate(total_donations=Sum('quantity'))
+                        .order_by('month'))
+    tot_donations = list(donations.objects
+                        .annotate(month=TruncMonth('donation_date'))
+                        .values('month')
+                        .annotate(total_donations=Sum('quantity'))
+                        .order_by('month'))
 
     # Create a dictionary with all the months and their corresponding donation amounts
     city_donation_dict = {month: 0 for month in all_months}
@@ -753,15 +756,13 @@ def ngo_stats(request):
 
     # Plot the donations per month
     fig, ax = plt.subplots()
-    ax.plot(city_month, city_donation_amounts,
-            label='City Donations', color='black')
-    ax.plot(tot_month, tot_donation_amounts,
-            label='Total Donations', color='yellow')
+    ax.plot(city_month, city_donation_amounts, label='City Donations',color= 'black')
+    ax.plot(tot_month, tot_donation_amounts, label='Total Donations',color= 'yellow')
     ax.set_xlabel('Month')
     ax.set_ylabel('Donation Amount')
     ax.set_title('Donations per Month')
     ax.legend()
-    plt.xticks(rotation=45, fontsize=7)
+    plt.xticks(rotation=45,fontsize=7)
 
     # Save the plot to a PNG image
     buf = io.BytesIO()
@@ -770,7 +771,7 @@ def ngo_stats(request):
 
     # Convert the PNG image to a base64 string for display on the web page
     plot_data2 = base64.b64encode(buf.getvalue()).decode('ascii')
-
+        
 # -------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-    return render(request, 'inventory/ngo_stats.html', {'plot_data2': plot_data2, 'plot_data1': plot_data1, **context})
+   
+    return render(request, 'inventory/ngo_stats.html', {'plot_data2': plot_data2,'plot_data1': plot_data1, **context})

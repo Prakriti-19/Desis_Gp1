@@ -87,7 +87,6 @@ class donorUserCreationForm(UserCreationForm):
         attrs = {
             'class': 'form-control',
         }
-
     def clean(self):
         cleaned_data = super().clean()
         email = cleaned_data.get('email')
@@ -96,7 +95,6 @@ class donorUserCreationForm(UserCreationForm):
             self.add_error('email', 'Email already exists.')
         if donor.objects.filter(phone_no=phone_no).exists():
             self.add_error('phone_no', 'Phone number already exists.')
-
     def save(self, commit=True):
         user = super().save(commit=False)
         user.is_ngo = False
