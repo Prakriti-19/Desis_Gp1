@@ -15,4 +15,4 @@ def pay(request):
     context={
         'amount':order_amount, 'api_key':RAZORPAY_API_KEY, 'order_id':payment_order_id
     }
-    return render(request,'pay.html',context)
+    return render(request,'inventory/pay.html',context)

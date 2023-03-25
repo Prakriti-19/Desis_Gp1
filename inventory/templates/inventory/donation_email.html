@@ -37,11 +37,9 @@
 </head>
 
 <body>
-
     <div class="container">
-        <form class="well form-horizontal"
-            action="mailto:cs21b056@smail.iitm.ac.in?subject=Food Donation Pickup Confirmation From Hands For Hunger"
-            method="post" id="contact_form">
+        <form class="well form-horizontal" action="mailto:cs21b056@{{ donor_email }}?subject=Food Donation Pickup Confirmation From Hands For Hunger&body=Dear Donor, %0D%0A%0D%0AWe would like to extend our heartfelt gratitude for your generous donation to our food donation drive through Hands for Hunger. %0D%0AYour donation will go a long way in helping to alleviate hunger in our community. %0D%0A%0D%0AWe are pleased to confirm the pickup of your food donation on ${date} at ${time}. %0D%0A%0D%0AWe are grateful for your efforts in helping us collect nutritious food for those who need it the most.%0D%0APlease ensure that the food items are packaged securely and labeled clearly to ensure safe transportation. %0D%0AOnce again, thank you for your kindness and generosity. Your donation will make a significant difference in the lives of those struggling with hunger. %0D%0A%0D%0ASincerely, %0D%0A{{user.ngo_name}}%0D%0A%0D%0A" method="post"  id="contact_form">
+      
             <fieldset>
 
                 <!-- Form Name -->
@@ -114,27 +112,12 @@
 
     <script>
         function sendEmail() {
-            var donorEmail = "{{ donor_email }}";
-            var date = document.getElementById("date").value;
-            var time = document.getElementById("time").value;
-
-            Email.send({
-                SecureToken: "your_secure_token",
-                To: donorEmail,
-                From: email,
-                Subject: "Food Donation Pickup Confirmation from Hands for Hunger",
-                Body: "Dear [Donor Name]," +
-                    "\nWe would like to extend our heartfelt gratitude for your generous donation to our food donation drive through Hands for Hunger."
-                    + "\nYour donation will go a long way in helping to alleviate hunger in our community."
-                    + "\nWe are pleased to confirm the pickup of your food donation on " + date + " at " + time + " from your address at [Donor Address]. We are grateful for your efforts in helping us collect nutritious food for those who need it the most."
-                    + "\nPlease ensure that the food items are packaged securely and labeled clearly to ensure safe transportation."
-                    + "\nOnce again, thank you for your kindness and generosity. Your donation will make a significant difference in the lives of those struggling with hunger."
-                    + "\nSincerely,"
-                    + "NGO NAME"
-            }).then(
-                message => alert("Email sent successfully!")
-            );
-        }
+  var donorEmail = "{{ donor_email }}";
+  var date = document.getElementById("date").value;
+  var time = document.getElementById("time").value;
+  var emailBody = "Dear Donor, %0D%0A%0D%0AWe would like to extend our heartfelt gratitude for your generous donation to our food donation drive through Hands for Hunger. %0D%0AYour donation will go a long way in helping to alleviate hunger in our community. %0D%0A%0D%0AWe are pleased to confirm the pickup of your food donation on " + date + " at " + time + ". %0D%0A%0D%0AWe are grateful for your efforts in helping us collect nutritious food for those who need it the most.%0D%0APlease ensure that the food items are packaged securely and labeled clearly to ensure safe transportation. %0D%0AOnce again, thank you for your kindness and generosity. Your donation will make a significant difference in the lives of those struggling with hunger. %0D%0A%0D%0ASincerely, %0D%0A{{user.ngo_name}}%0D%0A%0D%0A";
+  document.getElementById("contact_form").setAttribute("action", "mailto:" + donorEmail + "?subject=Food Donation Pickup Confirmation From Hands For Hunger&body=" + emailBody);
+}
     </script>
 
 </body>

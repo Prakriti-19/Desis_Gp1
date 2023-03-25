@@ -53,6 +53,38 @@
     cursor: pointer;
     align-items: center;
   }
+  .alert {
+    margin-top: 30px; 
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid transparent;
+    border-radius: 4px;
+  }
+
+  .alert-success {
+    color: #155724;
+    background-color: #d4edda;
+    border-color: #c3e6cb;
+  }
+
+  .alert-info {
+    color: #0c5460;
+    background-color: #d1ecf1;
+    border-color: #bee5eb;
+  }
+
+  .alert-warning {
+    color: white;
+    padding: top 100px;
+    background-color: #E38B29;
+    border-color: #ffeeba;
+  }
+
+  .alert-danger {
+    color: black;
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+  }
 
   .btn {
     flex-direction: column;
@@ -73,6 +105,19 @@
 </header>
 
 <body>
+  {% if messages %}
+  {% for message in messages %}
+    <div class="alert alert-{{ message.tags }}">
+      {{ message }}
+    </div>
+    <script>
+      setTimeout(function () {
+        document.querySelector('.alert').remove();
+      }, 2000);
+    </script>
+  {% endfor %}
+  <meta http-equiv="refresh" content="3;URL='{{ request.path }}'">
+{% endif %}
   <div class="form">
     <h2 class="heading2">Donate DESCOINS</h2>
     <form method="post">

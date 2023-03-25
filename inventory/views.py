@@ -17,8 +17,6 @@ from dateutil.relativedelta import relativedelta
 from inventory.models import *
 from django.http import HttpResponse, HttpResponseBadRequest
 import matplotlib
-import matplotlib.dates as mdates
-from django.views.generic import TemplateView
 matplotlib.use('Agg')
 from inventory.models import *
 from dateutil.relativedelta import relativedelta
@@ -61,15 +59,13 @@ def donate(request):
 @login_required
 def redeem_points(request):
     print(request.POST)
-    if request.method == 'POST':
-        
+    if request.method == 'POST':        
         descoins_to_redeem = int(request.POST.get('descoins'))
-        print(descoins_to_redeem)
         donor = request.user
         if donor.descoins >= descoins_to_redeem:
             donor.descoins -= descoins_to_redeem
             donor.save()
-            transaction = Transaction.objects.create(sender=donor,receiver=None, descoins_transferred=descoins_to_redeem, type=Transaction.D2U, timestamp=timezone.now())
+            Transaction.objects.create(sender=donor,receiver=None, descoins_transferred=descoins_to_redeem, type=Transaction.D2U, timestamp=timezone.now())
         else:
             messages.error(request, 'You do not have enough points to redeem.')
     return render(request, 'inventory/redeem_points.html')
@@ -95,11 +91,10 @@ def donate_points(request, ngo_id):
             donor.save()
             ng.descoins += descoins_to_donate
             ng.save()
-            transaction = Transaction.objects.create(
+            Transaction.objects.create(
                 sender=donor.id, receiver=ngo_id, descoins_transferred=descoins_to_donate, type=Transaction.D2N, timestamp=timezone.now())
         else:
             messages.warning(request, "Insufficient points to donate.")
-        return redirect('ngo_list')
     ng = ngo.objects.get(id=ngo_id)
     context = {'ngo': ng}
     return render(request, 'inventory/donatep.html', context)
@@ -109,7 +104,7 @@ def donate_points(request, ngo_id):
 def process_payment(request):
     if request.method == 'POST':
         amount = request.POST.get('amount')
-        if amount is None or not amount.isdigit():
+        if (amount is None) or (not amount.isdigit()):
             return HttpResponseBadRequest('Invalid amount')
         context = {'amount': amount}
         return render(request, 'payment_success.html', context)
@@ -124,13 +119,21 @@ def donations_list(request):
     max_quantity = request.GET.get('max_quantity', 100)
     now = timezone.now()
     if codes is not None and min_quantity is not None and max_quantity is not None and min_quantity != '' and codes != '' and max_quantity != '':
-        donation = donations.objects.filter(Q(exp_date__gt=now) & Q(pincode__code=codes) & Q(quantity__range=(min_quantity, max_quantity)) & (Q(status=True) | Q(status2=True)))
+        donation = donations.objects.filter(Q(exp_date__gt=now) & Q(pincode__code=codes) & Q(quantity__range=(min_quantity, max_quantity)) & (Q(ngo_status=True) | Q(donor_status=True)))
     elif codes is not None and min_quantity != '' and codes == '' and max_quantity != '':
-        donation = donations.objects.filter(Q(exp_date__gt=now) & Q(pincode__code=request.user.pincode.code) & Q(quantity__range=(min_quantity, max_quantity)) & (Q(status=True) | Q(status2=True)))
+        donation = donations.objects.filter(Q(exp_date__gt=now) & Q(pincode__code=request.user.pincode.code) & Q(quantity__range=(min_quantity, max_quantity)) & (Q(ngo_status=True) | Q(donor_status=True)))
     elif codes is not None and min_quantity == '' and codes != '' and max_quantity == '':
-        donation = donations.objects.filter(Q(exp_date__gt=now) & Q(pincode__code=codes) & Q(quantity__range=(0, 500)) & (Q(status=True) | Q(status2=True)))
+        donation = donations.objects.filter(Q(exp_date__gt=now) & Q(pincode__code=codes) & Q(quantity__range=(0, 500)) & (Q(ngo_status=True) | Q(donor_status=True)))
     else:
-        donation = donations.objects.filter(Q(exp_date__gt=now) & (Q(status=True) | Q(status2=True)))
+        donation = donations.objects.filter(Q(exp_date__gt=now) & (Q(ngo_status=True) | Q(donor_status=True)))
+    user_latitude = request.user.latitude
+    user_longitude = request.user.longitude
+    for d in donation:
+        ngo_latitude = d.latitude
+        ngo_longitude = d.longitude
+        distance = haversine(user_latitude, user_longitude,
+                             ngo_latitude, ngo_longitude)
+        d.distance = round(distance, 2)
     return render(request, "inventory/donations_list.html", {'donations': donation})
 
 
@@ -203,7 +206,7 @@ def update_points(donor_id, quantity, ngo_id):
     ngos.descoins -= 5*quantity
     donors.save()
     ngos.save()
-    transaction = Transaction.objects.create(
+    Transaction.objects.create(
         sender=ngos.id, receiver=donors.id, descoins_transferred=5*quantity, type=Transaction.N2D, timestamp=timezone.now())
 
 
