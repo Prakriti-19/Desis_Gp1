@@ -59,7 +59,6 @@ def donate(request):
 
 @login_required
 def redeem_points(request):
-    print(request.POST)
     if request.method == "POST":
         descoins_to_redeem = int(request.POST.get("descoins"))
         donor = request.user
@@ -67,14 +66,15 @@ def redeem_points(request):
             donor.descoins -= descoins_to_redeem
             donor.save()
             Transaction.objects.create(
-                sender=donor,
+                sender=donor.id,
                 receiver=None,
                 descoins_transferred=descoins_to_redeem,
                 type=Transaction.D2U,
                 timestamp=timezone.now(),
             )
+            messages.success(request, "DESCOINS redeemed successfully.")
         else:
-            messages.error(request, "You do not have enough points to redeem.")
+            messages.error(request, "You do not have enough DESCOINS to redeem.")
     return render(request, "inventory/redeem_points.html")
 
 
@@ -90,23 +90,28 @@ def mail(request, email):
 @login_required
 def donate_points(request, ngo_id):
     if request.method == "POST":
-        ng = ngo.objects.get(id=ngo_id)
-        descoins_to_donate = int(request.POST.get("descoins"))
-        donor = request.user
-        if donor.descoins >= descoins_to_donate:
-            donor.descoins -= descoins_to_donate
-            donor.save()
-            ng.descoins += descoins_to_donate
-            ng.save()
-            Transaction.objects.create(
-                sender=donor.id,
-                receiver=ngo_id,
-                descoins_transferred=descoins_to_donate,
-                type=Transaction.D2N,
-                timestamp=timezone.now(),
-            )
+        descoins_to_donate = request.POST.get("descoins")
+        if descoins_to_donate is not None and descoins_to_donate.strip() != "":
+            descoins_to_donate = int(descoins_to_donate)
+            donor = request.user
+            ng = ngo.objects.get(id=ngo_id)
+            if donor.descoins >= descoins_to_donate:
+                donor.descoins -= descoins_to_donate
+                donor.save()
+                ng.descoins += descoins_to_donate
+                ng.save()
+                Transaction.objects.create(
+                    sender=donor.id,
+                    receiver=ngo_id,
+                    descoins_transferred=descoins_to_donate,
+                    type=Transaction.D2N,
+                    timestamp=timezone.now(),
+                )
+                messages.success(request, "Donation made successfully.")
+            else:
+                messages.warning(request, "Insufficient DESCOINS to donate.")
         else:
-            messages.warning(request, "Insufficient points to donate.")
+            messages.warning(request, "Please enter DESCOINS to be donated")
     ng = ngo.objects.get(id=ngo_id)
     context = {"ngo": ng}
     return render(request, "inventory/donatep.html", context)
@@ -613,7 +618,7 @@ def donations_stats(request):
     l = 0
     for i in range(0, 52):
         if i % 4 == 0:
-            x_labels.append(k[l])
+            x_labels.append(k)
             l += 1
         else:
             x_labels.append("")
