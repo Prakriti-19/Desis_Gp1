@@ -1,0 +1,20 @@
+EMAIL_ERROR_MSG = "Email is required"
+STAFF_FLAG = "is_staff"
+SUPERUSER_FLAG = "is_superuser"
+DONOR_GP = "donor_groups"
+DONOR_PERMISSION = "donor_permissions"
+MAX_LENGTH = 255
+SMALL_MAX_LENGTH = 17
+DECIMAL_MAX_LENGTH = 7
+NGO_DESCOINS = 500
+DONOR_DESCOINS = 0
+HOME_FOOD = "homefood"
+PARTY = "party"
+RESTAURANT = "restro"
+OTHER = "other"
+D2N = "donor_to_ngo"
+N2D = "ngo_to_donor"
+D2U = "donor_to_us"
+U2N = "us_to_ngo"
+NGO_DONATION ="ngo_donations"
+

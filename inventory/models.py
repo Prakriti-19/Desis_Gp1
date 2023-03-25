@@ -2,19 +2,32 @@ from django.utils import timezone
 from django.db import models
 from polymorphic.models import PolymorphicModel
 from django.contrib.auth.models import Permission, Group, AbstractUser, BaseUserManager
+from inventory.constants import *
 
 
 class NgoManager(BaseUserManager):
     """
-    NgoManager class inherits from Django's BaseUserManager class and is responsible for creating and
-    managing instances of the customaised user model: ngo.
-        -It has an additional feature of setting is_ngo True whenever a ngo registers
-        -It returns the instance of  an ngo user
+    NgoManager class inherits from Django's BaseUserManager class and is
+    responsible for creating and managing instances of the customaised user
+    model: ngo
     """
 
     def create_user(self, email, password=None, **kwargs):
+        """
+        Creates user of type ngo and sets is_ngo True
+
+        :param self:
+            reference to the instance of the class
+        :param email:
+            email address of the user being created.
+        :param password:
+            optional argument representing password for the user being created
+
+        :return:
+            instance of an ngo
+        """
         if not email:
-            raise ValueError("Email is required")
+            raise ValueError(EMAIL_ERROR_MSG)
 
         user = self.model(email=self.normalize_email(email), **kwargs)
         user.set_password(password)
@@ -25,16 +38,27 @@ class NgoManager(BaseUserManager):
 
 class DonorManager(BaseUserManager):
     """
-    DonorManager class inherits from Django's BaseUserManager class and is responsible for creating and
-    managing instances of the customaised user model: donor.
-        -It has an additional feature of setting is_ngo False whenever a donor registers
-        -It returns an instance of donor user
-        -It is also used to create superuser to manage the administration
+    DonorManager class inherits from Django's BaseUserManager class and is
+    responsible for creating and managing instances of the customaised user
+    model: donor.
     """
 
     def create_user(self, email, password=None, **kwargs):
+        """
+        Creates user of type donor and sets is_ngo False
+
+        :param self:
+            reference to the instance of the class
+        :param email:
+            email address of the user being created.
+        :param password:
+            optional argument representing password for the user being created
+
+        :return:
+            instance of an donor
+        """
         if not email:
-            raise ValueError("Email is required")
+            raise ValueError(EMAIL_ERROR_MSG)
 
         user = self.model(email=self.normalize_email(email), **kwargs)
         user.set_password(password)
@@ -43,19 +67,33 @@ class DonorManager(BaseUserManager):
         return user
 
     def create_superuser(self, email, password, **extra_fields):
-        extra_fields.setdefault("is_staff", True)
-        extra_fields.setdefault("is_superuser", True)
+        """
+        Creates a superuser of type donor
+
+        :param self:
+            reference to the instance of the class
+        :param email:
+            email address of the user being created.
+        :param password:
+            password for the user being created
+
+        :return:
+            instance of superuser
+        """
+        extra_fields.setdefault(STAFF_FLAG, True)
+        extra_fields.setdefault(SUPERUSER_FLAG, True)
         return self.create_user(email, password, **extra_fields)
 
 
 class pincode(models.Model):
     """
-    This model is used to store this information in normalized and efficient way.
+    This model is used to store the information in normalized and efficient way.
+    It inherits from models.Model
     """
 
     code = models.IntegerField()
-    city = models.CharField(max_length=250)
-    state = models.CharField(max_length=250)
+    city = models.CharField(max_length=MAX_LENGTH)
+    state = models.CharField(max_length=MAX_LENGTH)
 
     def __str__(self):
         return self.city
@@ -63,24 +101,28 @@ class pincode(models.Model):
 
 class ngo(AbstractUser):
     """
-    ngo Class is model used to represent an ngo in our application.
+    ngo Class represents an ngo
 
-    It is child class of AbstractUser inheritiong:
+    It is child class of AbstractUser Class, inheriting:
     - the fields username, password, email
     - methods for handling passwords, including password hashing and validation
     - built-in managers for creating, querying, and modifying user objects
 
-    Thus, by inheriting from AbstractUser, we are able to use the built-in authentication and permission features provided by Django,
-    while customizing the model with additional fields and functionality specific to NGOs.
+    :return:
+        instance of ngo user
     """
 
-    ngo_name = models.CharField(max_length=255)
-    email = models.EmailField(max_length=55)
-    phone_no = models.CharField(max_length=17)
+    ngo_name = models.CharField(max_length=MAX_LENGTH)
+    email = models.EmailField(max_length=MAX_LENGTH)
+    phone_no = models.CharField(max_length=SMALL_MAX_LENGTH)
     is_ngo = models.BooleanField(default=True)
-    descoins = models.PositiveBigIntegerField(default=500)
-    longitude = models.DecimalField(decimal_places=7, max_digits=15)
-    latitude = models.DecimalField(decimal_places=7, max_digits=15)
+    descoins = models.PositiveBigIntegerField(default=NGO_DESCOINS)
+    longitude = models.DecimalField(
+        decimal_places=DECIMAL_MAX_LENGTH, max_digits=SMALL_MAX_LENGTH
+    )
+    latitude = models.DecimalField(
+        decimal_places=DECIMAL_MAX_LENGTH, max_digits=SMALL_MAX_LENGTH
+    )
     pincode = models.ForeignKey(pincode, on_delete=models.CASCADE, null=True)
     objects = NgoManager()
 
@@ -90,22 +132,26 @@ class ngo(AbstractUser):
 
 class donor(AbstractUser):
     """
-    The same goes for donor Class which is used to represent a donor in our application
-    It has a function donations_made to return all donations made by that particular user
+    Represents a donor in our application and also inherits from AbstractUser Class
+
+    :return:
+        instance of donor user
     """
 
-    donor_name = models.CharField(max_length=255)
-    email = models.EmailField(max_length=55)
-    phone_no = models.CharField(max_length=17)
-    descoins = models.PositiveBigIntegerField(default=0)
+    donor_name = models.CharField(max_length=MAX_LENGTH)
+    email = models.EmailField(max_length=MAX_LENGTH)
+    phone_no = models.CharField(max_length=SMALL_MAX_LENGTH)
+    descoins = models.PositiveBigIntegerField(default=DONOR_DESCOINS)
     is_ngo = models.BooleanField(default=False)
-    longitude = models.DecimalField(decimal_places=7, max_digits=15, null=True)
-    latitude = models.DecimalField(decimal_places=7, max_digits=15, null=True)
-    pincode = models.ForeignKey(pincode, on_delete=models.CASCADE, null=True)
-    groups = models.ManyToManyField(Group, related_name="donor_groups")
-    user_permissions = models.ManyToManyField(
-        Permission, related_name="donor_permissions"
+    longitude = models.DecimalField(
+        decimal_places=DECIMAL_MAX_LENGTH, max_digits=SMALL_MAX_LENGTH, null=True
     )
+    latitude = models.DecimalField(
+        decimal_places=DECIMAL_MAX_LENGTH, max_digits=SMALL_MAX_LENGTH, null=True
+    )
+    pincode = models.ForeignKey(pincode, on_delete=models.CASCADE, null=True)
+    groups = models.ManyToManyField(Group, related_name=DONOR_GP)
+    user_permissions = models.ManyToManyField(Permission, related_name=DONOR_PERMISSION)
 
     objects = DonorManager()
 
@@ -113,23 +159,34 @@ class donor(AbstractUser):
         return self.donor_name
 
     def donations_made(self):
+        """
+        Returns all the donations made by that instance
+
+        :param self:
+            reference to the instance of the class i.e donor
+
+        :return:
+            QuerySet object of the donations
+        """
         return donations.objects.filter(donor_id=self.id)
 
 
 class donations(models.Model):
     """
-    This Class which is used to represent donation made by any donor.
+    Represents food donation made by a donor
 
-        - donor_id maps this donation to the donor who has made it
-        - ngo_id maps this donation to the ngo who will take it
-        - status is a bool flag representing if donor has donated the donation
-        - status2 is a bool flag representing if ngo has recieved the donation, depending on these two we transfer coins from ngo to donor
+    :param donor_id:
+        maps this donation to the donor who has made it
+    :param ngo_id:
+        maps this donation to the ngo who will take it
+    :param donor_status:
+        bool flag representing if donor has donated the donation
+    :param ngo_status:
+        bool flag representing if ngo has recieved the donation
+
+    :return:
+        instance of donation
     """
-
-    HOME_FOOD = "homefood"
-    PARTY = "party"
-    RESTAURANT = "restro"
-    OTHER = "other"
 
     TYPE_CHOICES = [
         (HOME_FOOD, "Home Food"),
@@ -142,14 +199,18 @@ class donations(models.Model):
     ngo_id = models.ForeignKey(
         ngo,
         on_delete=models.CASCADE,
-        related_name="ngo_donations",
+        related_name=NGO_DONATION,
         blank=True,
         null=True,
     )
     donation_date = models.DateField(null=True)
     exp_date = models.DateField()
-    longitude = models.DecimalField(decimal_places=10, max_digits=15)
-    latitude = models.DecimalField(decimal_places=10, max_digits=15)
+    longitude = models.DecimalField(
+        decimal_places=DECIMAL_MAX_LENGTH, max_digits=SMALL_MAX_LENGTH
+    )
+    latitude = models.DecimalField(
+        decimal_places=DECIMAL_MAX_LENGTH, max_digits=SMALL_MAX_LENGTH
+    )
     pincode = models.ForeignKey("pincode", on_delete=models.CASCADE, null=True)
     quantity = models.IntegerField()
     description = models.TextField()
@@ -162,18 +223,16 @@ class donations(models.Model):
 
 
 class Transaction(PolymorphicModel):
-    D2N = "donor_to_ngo"
-    N2D = "ngo_to_donor"
-    D2U = "donor_to_us"
-    U2N = "us_to_ngo"
-
+    """
+    Represents Transaction taking place between NGO, Donor and Our side
+    """
     TYPE_CHOICES = [
         (D2N, "donor_to_ngo"),
         (N2D, "ngo_to_donor"),
         (D2U, "donor_to_us"),
         (U2N, "us_to_ngo"),
     ]
-    type = models.CharField(max_length=15, choices=TYPE_CHOICES)
+    type = models.CharField(max_length=SMALL_MAX_LENGTH, choices=TYPE_CHOICES)
     sender = models.IntegerField(blank=True, null=True)
     receiver = models.IntegerField(blank=True, null=True)
     descoins_transferred = models.IntegerField()

@@ -6,8 +6,9 @@ from inventory.models import ngo, donor, pincode, donations
 
 class ngoUserCreationForm(UserCreationForm):
     """
-    The class ngoUserCreationForm is a subclass of the UserCreationForm provided by Django.
-    The Meta class is used to provide additional metadata for the ngo model and is an example of abstraction.
+    The class ngoUserCreationForm is a subclass of the UserCreationForm provided
+    by Django. The Meta class is used to provide additional metadata for the ngo
+    model and is an example of abstraction.
     """
 
     pincode = forms.ModelChoiceField(

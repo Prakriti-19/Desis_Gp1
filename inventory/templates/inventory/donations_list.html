@@ -79,14 +79,14 @@
       </form>
       <br>
       <ul class="donation-list">
-        {% for donation in donations %}
+        {% for donation, distance in distances %}
         <li>
           <div class="donation-info">
             <h2>{{ donation.desc|truncatechars:20 }}{% if donation.desc|length > 20 %}...{% endif %}</h2>
             <p>Donation made by: {{ donation.donor_id.donor_name }}</p>
             <p>For: {{ donation.quantity }} people</p>
             <p>Best before: {{ donation.exp_date }}</p>
-            <p>Distance (km): {{ donation.distance }}</p>
+            <p>Distance (km): {{ distance }}</p>
           </div>
           {% if donation.ngo_status %}
           Donation in progress
