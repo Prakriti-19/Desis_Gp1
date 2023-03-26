@@ -8,6 +8,10 @@
     <p>Meals Served: {{ total_quantity.quantity__sum}}</p>
     <p>Average Meals served per donation: {{ avg_quantity }}</p>
     <p>Maximum Meals served in single Donation: {{ max_quantity.quantity__max }}</p>
+    <p>Average Inter City Food Donations: {{ average_weight }}</p>
+    <p>Number of Inter City Connection: {{ total_edges}}</p>
+    <p>Average Inter State Food Donations: {{ average_weight_state }}</p>
+    <p>Number of Inter State Connection: {{ total_edges_state}}</p>
     {% if image %}
     <img src="data:image/png;base64,{{ image }}" alt="Donations by Donor">
     {% else %}
