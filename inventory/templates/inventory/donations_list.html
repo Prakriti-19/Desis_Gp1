@@ -83,10 +83,11 @@
         <li>
           <div class="donation-info">
             <h2>{{ donation.desc|truncatechars:20 }}{% if donation.desc|length > 20 %}...{% endif %}</h2>
-            <p>Donation made by: {{ donation.donor_id.donor_name }}</p>
+            <p style="font-weight: 500;">Donation made by: {{ donation.donor_id.donor_name }}</p>
             <p>For: {{ donation.quantity }} people</p>
             <p>Best before: {{ donation.exp_date }}</p>
-            <p>Distance (km): {{ distance }}</p>
+            <p>Donor's distance from you (in km): {{ distance }}</p>
+            <p>Status: </p>
           </div>
           {% if donation.ngo_status %}
           Donation in progress
@@ -97,7 +98,7 @@
             <button type="submit" style="background-color: #E38B29; border: #E38B29;border-radius: 5px;color: white;height: 37px;">Donation Taken</button>
             <a href="{% url 'mail' donation.donor_id.email %}" class="btn btn-primary">Connect with the Donor</a>
             {% else %}
-            Donation Taken
+            <class style="color: darkgreen;font-weight: 700;"> Donation in Progress</class>
           </form>
           {% endif %}
         </li>

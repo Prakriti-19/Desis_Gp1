@@ -18,7 +18,7 @@ def pay(request):
         the rendered payment page
     """
     order_amount = request.GET.get(AMOUNT)
-    order_amount = int(order_amount) * PAISE
+    order_amount = int(order_amount) * PERCENT
     order_currency = CURRENCY
     payment_order = client.order.create(
         dict(amount=order_amount, currency=order_currency, payment_capture=1)

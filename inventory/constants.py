@@ -40,3 +40,56 @@ NGOS = "ngos"
 DONOR = "donor"
 DONATIONS_MADE = "donations_made"
 CONST_1 = 1
+COLOR_1 = "yellow"
+COLOR_3 = "black"
+COLOR_4 = "white"
+PLOT2_LABEL = "Donations per Month"
+PLOT2_Y = "Donation Quantity"
+PLOT3_LABEL = "Sources of food wastage"
+PLOT3_X = "Sources"
+OVERALL = "Overall Donations"
+FORMAT = "png"
+CONST_0 = 0
+ASCII = "ascii"
+COLOR_2 = "orange"
+MY_LABEL = "Your"
+CITY_LABEL = "City Donations"
+OTHERS_LABEL = "Others"
+QUANT_SUM = "quantity__sum"
+DONATION_DATE = "donation_date"
+TOTAL_DONATION = "total_donations"
+MONTH = "month"
+MONTH_DAYS = 30
+YEAR_LEN = 12
+PLOT1_Y = "Returning donors (%)"
+PLOT1_LABEL = "Donor retention over time"
+IMAGE_LABEL = "Your Donation Percentage"
+IMAGE_AXIS = "equal"
+LEGEND = "Legend"
+WEIGHT = "weight"
+EXPLOD_PERCENT = 0.1
+IMAGE_CODE = "utf-8"
+PLOT5_LABEL = "Your Activity"
+k = [
+        "Jan",
+        "Feb",
+        "Mar",
+        "Apr",
+        "May",
+        "Jun",
+        "Jul",
+        "Aug",
+        "Sep",
+        "Oct",
+        "Nov",
+        "Dec",
+        "Jan",
+    ]
+y_labels = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+ROTATION = 45
+types = ["Homefood", "Party", "Restro", "Other"]
+QUANT_AVG = "quantity__avg"
+YEAR_DAYS = 365
+BAR_WIDTH = 0.35
+XAXIS_SPACE =  0.175
+FONT_SIZE = 7
