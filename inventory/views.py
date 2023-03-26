@@ -525,7 +525,7 @@ def donations_stats(request):
         total_donations_ = CONST_0
     if user_donations is None:
         user_donations = CONST_0
-    percentage = round(user_donations / total_donations_* PERCENT, CONST_2)
+    percentage = round(user_donations / total_donations_ * PERCENT, CONST_2)
 
     # Define the labels, sizes, colors and explosion for the pie chart
     labels = [MY_LABEL, OTHERS_LABEL]
@@ -634,28 +634,38 @@ def donations_stats(request):
 
     # -------------------------------------------------------------------------------------------------------------------------------------------------------------------
     """
-    Creates a 2D array with current users donation on each day to be displayed as a grid
+    Creates a 2D array with current users donation on each day to be displayed
+    as a grid
     """
     import datetime
 
-    today = datetime.date.today()
-    one_year_ago = datetime.date(today.year, 1, 1)
-    date_list = [
-        one_year_ago + datetime.timedelta(days=x)
-        for x in range((today - one_year_ago).days + 1)
-    ]
-    donation_dict = {date.strftime("%Y-%m-%d"): 0 for date in date_list}
-    for donation in user_donation:
-        donation_date = donation.donation_date
-        if one_year_ago <= donation_date <= today:
-            donation_dict[donation_date.strftime("%Y-%m-%d")] += donation.quantity
-    donation_array = [[0 for _ in range(7)] for _ in range(52)]
-    for i, date in enumerate(date_list):
-        week_num = date.isocalendar()[1] - CONST_1
-        day_num = date.weekday()
-        donation_array[week_num][day_num] = donation_dict[date.strftime("%Y-%m-%d")]
+    # Get the current year
+    now = datetime.datetime.now()
+    current_year = now.year
 
-    donation_array = np.transpose(donation_array)
+    # Create a dictionary to store donation totals for each date in the year
+    donations_by_date = {}
+
+    start_date = datetime.date(current_year, 1, 1)
+    end_date = datetime.date(current_year, 12, 31)
+    delta = datetime.timedelta(days=1)
+    for donation_date in (
+        start_date + datetime.timedelta(n)
+        for n in range((end_date - start_date).days + 1)
+    ):
+        donations_by_date[donation_date] = 0
+
+    # Loop through all donations in the current year and add them to the dictionary
+    for donation in user_donation:
+        if donation.donation_date.year == current_year:
+            donation_date = donation.donation_date
+            donations_by_date[donation_date] += donation.quantity
+    donation_array = [[0 for _ in range(53)] for _ in range(7)]
+    for i, donation_date in enumerate(donations_by_date):
+        donation_array[donation_date.weekday()][i // 7] = donations_by_date[
+            donation_date
+        ]
+
     x_labels = []
     l = 0
     for i in range(0, 52):
@@ -681,7 +691,8 @@ def donations_stats(request):
     ax.set_xticks(np.arange(len(x_labels)))
     ax.set_xticklabels(x_labels)
     plt.setp(
-        ax.get_xticklabels(), rotation=ROTATION, ha="right", rotation_mode="anchor" )
+        ax.get_xticklabels(), rotation=ROTATION, ha="right", rotation_mode="anchor"
+    )
     ax.set_yticks(np.arange(len(y_labels)))
     ax.set_yticklabels(y_labels)
     ax.set_title(PLOT5_LABEL)
@@ -717,20 +728,19 @@ def donations_stats(request):
 
     # Create a figure and axis object
     fig, ax = plt.subplots()
-    ax.plot(dates, amounts,color = COLOR_2)
-    ax.set_xlabel('Date')
-    ax.set_ylabel('Transaction Amount')
-    ax.set_title('Daily Transaction Amounts')
+    ax.plot(dates, amounts, color=COLOR_2)
+    ax.set_xlabel("Date")
+    ax.set_ylabel("Transaction Amount")
+    ax.set_title("Daily Transaction Amounts")
 
     # Set x-axis tick labels
-    date_labels = [date.strftime('%Y-%m-%d') for date in dates]  
-    ax.set_xticklabels(date_labels, rotation=90, fontsize=4, ha='right')
+    date_labels = [date.strftime("%Y-%m-%d") for date in dates]
+    ax.set_xticklabels(date_labels, rotation=90, fontsize=4, ha="right")
     ax.set_xticks(dates)  # set the number of ticks to match the number of dates
 
     # Set y-axis tick labels
-    amount_labels = ['{:.2f}'.format(amount) for amount in ax.get_yticks()]
+    amount_labels = ["{:.2f}".format(amount) for amount in ax.get_yticks()]
     ax.set_yticklabels(amount_labels)
-
 
     # Save the plot to a buffer and encode it as base64 for display in the HTML template
     buffer9 = io.BytesIO()
