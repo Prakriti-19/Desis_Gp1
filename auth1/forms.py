@@ -13,7 +13,7 @@ class ngoUserCreationForm(UserCreationForm):
 
     pincode = forms.ModelChoiceField(
         required=True,
-        queryset=pincode.objects.all(),
+        queryset=Pincode.objects.all(),
         widget=forms.Select(attrs={"class": CONTROL, "data-label": "City"}),
         label="City",
     )
@@ -68,7 +68,7 @@ class ngoUserCreationForm(UserCreationForm):
     )
 
     class Meta(UserCreationForm.Meta):
-        model = ngo
+        model = Ngo
         fields = (
             "username",
             "ngo_name",
@@ -99,9 +99,9 @@ class ngoUserCreationForm(UserCreationForm):
         cleaned_data = super().clean()
         email = cleaned_data.get(EMAIL)
         phone_no = cleaned_data.get(PHONE_NO)
-        if donor.objects.filter(email=email).exists():
+        if Donor.objects.filter(email=email).exists():
             self.add_error(EMAIL, VALIDATION_MSG)
-        if donor.objects.filter(phone_no=phone_no).exists():
+        if Donor.objects.filter(phone_no=phone_no).exists():
             self.add_error(PHONE_NO, VALIDATION_MSG)
 
     def save(self, commit=True):
@@ -119,7 +119,7 @@ class donorUserCreationForm(UserCreationForm):
     """
 
     pincode = forms.ModelChoiceField(
-        queryset=pincode.objects.all(),
+        queryset=Pincode.objects.all(),
         widget=forms.Select(attrs={"class": CONTROL, "data-label": "City"}),
         label="City",
     )
@@ -169,7 +169,7 @@ class donorUserCreationForm(UserCreationForm):
     )
 
     class Meta(UserCreationForm.Meta):
-        model = donor
+        model = Donor
         fields = (
             "username",
             "donor_name",
@@ -193,9 +193,9 @@ class donorUserCreationForm(UserCreationForm):
         cleaned_data = super().clean()
         email = cleaned_data.get(EMAIL)
         phone_no = cleaned_data.get(PHONE_NO)
-        if donor.objects.filter(email=email).exists():
+        if Donor.objects.filter(email=email).exists():
             self.add_error(EMAIL, VALIDATION_MSG)
-        if donor.objects.filter(phone_no=phone_no).exists():
+        if Donor.objects.filter(phone_no=phone_no).exists():
             self.add_error(PHONE_NO, VALIDATION_MSG)
 
     def save(self, commit=True):
@@ -224,12 +224,12 @@ class DonationForm(forms.ModelForm):
         coerce=str,
     )
     pincode = forms.ModelChoiceField(
-        queryset=pincode.objects.all(),
+        queryset=Pincode.objects.all(),
         widget=forms.Select(attrs={"class": CONTROL}),
     )
 
     class Meta:
-        model = donations
+        model = Donations
         fields = (
             "description",
             "quantity",

@@ -85,7 +85,7 @@ class DonorManager(BaseUserManager):
         return self.create_user(email, password, **extra_fields)
 
 
-class pincode(models.Model):
+class Pincode(models.Model):
     """
     This model is used to store the information in normalized and efficient way.
     It inherits from models.Model
@@ -99,7 +99,7 @@ class pincode(models.Model):
         return self.city
 
 
-class ngo(AbstractUser):
+class Ngo(AbstractUser):
     """
     ngo Class represents an ngo
 
@@ -123,14 +123,14 @@ class ngo(AbstractUser):
     latitude = models.DecimalField(
         decimal_places=DECIMAL_MAX_LENGTH, max_digits=SMALL_MAX_LENGTH
     )
-    pincode = models.ForeignKey(pincode, on_delete=models.CASCADE, null=True)
+    pincode = models.ForeignKey(Pincode, on_delete=models.CASCADE, null=True)
     objects = NgoManager()
 
     def __str__(self):
         return self.ngo_name
 
 
-class donor(AbstractUser):
+class Donor(AbstractUser):
     """
     Represents a donor in our application and also inherits from AbstractUser Class
 
@@ -149,7 +149,7 @@ class donor(AbstractUser):
     latitude = models.DecimalField(
         decimal_places=DECIMAL_MAX_LENGTH, max_digits=SMALL_MAX_LENGTH, null=True
     )
-    pincode = models.ForeignKey(pincode, on_delete=models.CASCADE, null=True)
+    pincode = models.ForeignKey(Pincode, on_delete=models.CASCADE, null=True)
     groups = models.ManyToManyField(Group, related_name=DONOR_GP)
     user_permissions = models.ManyToManyField(Permission, related_name=DONOR_PERMISSION)
 
@@ -168,10 +168,10 @@ class donor(AbstractUser):
         :return:
             QuerySet object of the donations
         """
-        return donations.objects.filter(donor_id=self.id)
+        return Donations.objects.filter(donor_id=self.id)
 
 
-class donations(models.Model):
+class Donations(models.Model):
     """
     Represents food donation made by a donor
 
@@ -195,9 +195,9 @@ class donations(models.Model):
         (OTHER, "Other"),
     ]
     id = models.AutoField(primary_key=True)
-    donor_id = models.ForeignKey(donor, on_delete=models.CASCADE)
+    donor_id = models.ForeignKey(Donor, on_delete=models.CASCADE)
     ngo_id = models.ForeignKey(
-        ngo,
+        Ngo,
         on_delete=models.CASCADE,
         related_name=NGO_DONATION,
         blank=True,
@@ -221,19 +221,24 @@ class donations(models.Model):
     def __str__(self):
         return self.description
 
-
-class Transaction(PolymorphicModel):
+class Transaction_code(models.Model):
+    """
+    This model is used to store the information in normalized and efficient way.
+    """
+    code = models.IntegerField()
+    sender =  models.CharField(max_length=MAX_LENGTH, default="donor")
+    receiver = models.CharField(max_length=MAX_LENGTH, default="receiver")
+    def __str__(self):
+        return self.sender
+    
+class Transaction(models.Model):
     """
     Represents Transaction taking place between NGO, Donor and Our side
     """
-    TYPE_CHOICES = [
-        (D2N, "donor_to_ngo"),
-        (N2D, "ngo_to_donor"),
-        (D2U, "donor_to_us"),
-        (U2N, "us_to_ngo"),
-    ]
-    type = models.CharField(max_length=SMALL_MAX_LENGTH, choices=TYPE_CHOICES)
+    code = models.ForeignKey(Transaction_code, on_delete=models.CASCADE, null=True)
     sender = models.IntegerField(blank=True, null=True)
     receiver = models.IntegerField(blank=True, null=True)
     descoins_transferred = models.IntegerField()
     timestamp = models.DateTimeField(default=timezone.now)
+
+

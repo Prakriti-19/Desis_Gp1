@@ -1,10 +1,10 @@
 from django.contrib import admin
-from .models import donor,ngo,donations,pincode, Transaction
+from .models import *
 
-
-admin.site.register(donations)
+admin.site.register(Donations)
 admin.site.register(Transaction)
-admin.site.register(ngo)
-admin.site.register(donor)
-admin.site.register(pincode)
+admin.site.register(Transaction_code)
+admin.site.register(Ngo)
+admin.site.register(Donor)
+admin.site.register(Pincode)
 admin.site.site_header = "Inventory"

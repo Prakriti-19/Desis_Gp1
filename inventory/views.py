@@ -71,7 +71,6 @@ def redeem_points(request):
                 sender=donor.id,
                 receiver=None,
                 descoins_transferred=descoins_to_redeem,
-                type=D2U,
                 timestamp=timezone.now(),
             )
             messages.success(request, SUCCESS_REDEEM)
@@ -102,7 +101,7 @@ def donate_points(request, ngo_id):
         if (descoins_to_donate is not None) and (descoins_to_donate.strip() != ""):
             descoins_to_donate = int(descoins_to_donate)
             donor = request.user
-            ng = ngo.objects.get(id=ngo_id)
+            ng = Ngo.objects.get(id=ngo_id)
             if donor.descoins >= descoins_to_donate:
                 # TODO: Solve read write inconsistency problem that might arise
                 donor.descoins -= descoins_to_donate
@@ -113,7 +112,6 @@ def donate_points(request, ngo_id):
                     sender=donor.id,
                     receiver=ngo_id,
                     descoins_transferred=descoins_to_donate,
-                    type=D2N,
                     timestamp=timezone.now(),
                 )
                 messages.success(request, SUCCESS_REDEEM)
@@ -121,7 +119,7 @@ def donate_points(request, ngo_id):
                 messages.warning(request, FAIL_REDEEM)
         else:
             messages.warning(request, NULL_FEILD_ERROR)
-    ng = ngo.objects.get(id=ngo_id)
+    ng = Ngo.objects.get(id=ngo_id)
     context = {"ngo": ng}
     return render(request, "inventory/donatep.html", context)
 
@@ -165,14 +163,14 @@ def donations_list(request):
         filter_distance = DEFAULT_MAX
 
     if (codes is None) or (codes == ""):
-        donation = donations.objects.filter(
+        donation = Donations.objects.filter(
             Q(exp_date__gt=now)
             & Q(quantity__range=(min_quantity, max_quantity))
             & (Q(ngo_status=True) | Q(donor_status=True))
         ).order_by(EXP_DATE)
 
     else:
-        donation = donations.objects.filter(
+        donation = Donations.objects.filter(
             Q(exp_date__gt=now)
             & Q(pincode__code=codes)
             & Q(quantity__range=(min_quantity, max_quantity))
@@ -204,7 +202,7 @@ def ngo_list(request):
     :return:
         rendered HTML page containing a list of the NGOs
     """
-    ngos = ngo.objects.all()
+    ngos = Ngo.objects.all()
     user_latitude = request.user.latitude
     user_longitude = request.user.longitude
     for ng in ngos:
@@ -259,14 +257,14 @@ def update_donation_status_donor(request):
     if request.method == "POST":
         donation_i = request.POST.get(ID1)
         try:
-            donation = donations.objects.get(id=donation_i)
+            donation = Donations.objects.get(id=donation_i)
             donation.donor_status = False
             donation.save()
             if donation.donor_status == False and donation.ngo_status == False:
                 update_points(
                     donation.donor_id.id, donation.quantity, donation.ngo_id.id
                 )
-        except donations.DoesNotExist:
+        except Donations.DoesNotExist:
             return HttpResponse("Donation not found.")
         else:
             return redirect("donor_history")
@@ -284,13 +282,14 @@ def update_donation_status_ngo(request):
     if request.method == "POST":
         donation_id = request.POST.get(ID2)
         try:
-            donation = donations.objects.get(id=donation_id)
+            donation = Donations.objects.get(id=donation_id)
             donation.ngo_id = request.user
-            donation.ngo_status = False
-            donation.save()
-            if donation.donor_status == False and donation.ngo_status == False:
-                update_points(donation.donor_id.id, donation.quantity, request.user.id)
-        except donations.DoesNotExist:
+            if(request.user.descoins>=donation.quantity*BASE_VAL):
+                donation.ngo_status = False
+                donation.save()
+                if donation.donor_status == False and donation.ngo_status == False:
+                    update_points(donation.donor_id.id, donation.quantity, request.user.id)
+        except Donations.DoesNotExist:
             return HttpResponse(DONATION_ERROR)
         else:
             return redirect("donations_list")
@@ -311,17 +310,18 @@ def update_points(donor_id, quantity, ngo_id):
     :returns:
         None
     """
-    ngos = ngo.objects.get(id=ngo_id)
-    donors = donor.objects.get(id=donor_id)
+    ngos = Ngo.objects.get(id=ngo_id)
+    donors = Donor.objects.get(id=donor_id)
     donors.descoins += BASE_VAL * quantity
     ngos.descoins -= BASE_VAL * quantity
+    if(ngos.descoins < CONST_0):
+        ngos.descoins = CONST_0
     donors.save()
     ngos.save()
     Transaction.objects.create(
         sender=ngos.id,
         receiver=donors.id,
         descoins_transferred=BASE_VAL * quantity,
-        type=N2D,
         timestamp=timezone.now(),
     )
 
@@ -335,7 +335,7 @@ def donor_history(request):
     :return:
         HTML page that lists all the donations made by the donor
     """
-    donor_instance = donor.objects.get(id=request.user.id)
+    donor_instance = Donor.objects.get(id=request.user.id)
     donations_made = donor_instance.donations_made().order_by("donation_date")
 
     context = {
@@ -352,14 +352,17 @@ def donations_stats(request):
     """
 
     # Retrieve all donations and donors
-    all_donations = donations.objects.all()
-    all_donors = donor.objects.all()
+    all_donations = Donations.objects.all()
+    all_donors = Donor.objects.all()
     user_donation = all_donations.filter(donor_id=request.user.id)
 
-    ngo_count = ngo.objects.count()
-    donor_count = donor.objects.filter(is_superuser=False).count()
+    ngo_count = Ngo.objects.count()
+    donor_count = Donor.objects.filter(is_superuser=False).count()
     total_donations = all_donations.count()
-    avg_quantity = all_donations.aggregate(Avg(QUANTITY))
+    if total_donations > 0:
+        avg_quantity = all_donations.aggregate(Avg(QUANTITY))
+    else:
+        avg_quantity=CONST_0
     max_quantity = all_donations.aggregate(Max(QUANTITY))
     total_quantity = all_donations.aggregate(Sum(QUANTITY))
     avg_quantity = int(avg_quantity[QUANT_AVG])
@@ -772,9 +775,15 @@ def donations_stats(request):
             G.add_edge(city1, city2, weight=amount)
 
     total_edges = G.number_of_edges()
-    total_weight = sum([G.edges[edge][WEIGHT] for edge in G.edges])
-    average_weight = total_weight / total_edges
-    max_weight = max([G.edges[edge][WEIGHT] for edge in G.edges])
+    if total_edges == CONST_0:
+        total_weight = CONST_0
+        average_weight = CONST_0
+        max_weight = CONST_0
+    else:
+        total_weight = sum([G.edges[edge][WEIGHT] for edge in G.edges])
+        average_weight = total_weight / total_edges        
+        max_weight = max([G.edges[edge][WEIGHT] for edge in G.edges])
+    
 
     graph_state = {}
     for donation in all_donations:
@@ -796,9 +805,15 @@ def donations_stats(request):
             G_state.add_edge(state1, state2, weight=amount)
 
     total_edges_state = G_state.number_of_edges()
-    total_weight_state = sum([G_state.edges[edge][WEIGHT] for edge in G_state.edges])
-    average_weight_state = total_weight / total_edges
-    max_weight_state = max([G_state.edges[edge][WEIGHT] for edge in G_state.edges])
+   
+    if total_edges_state == CONST_0:
+        average_weight_state = CONST_0
+        total_weight_state = CONST_0
+        max_weight_state = CONST_0
+    else:
+        total_weight_state = sum([G.edges[edge][WEIGHT] for edge in G.edges])
+        average_weight_state = total_weight_state / total_edges_state
+        max_weight_state = max([G.edges[edge][WEIGHT] for edge in G.edges])
 
     # Create context dictionary to pass variables to the HTML template
     context = {
@@ -830,14 +845,19 @@ def donations_stats(request):
 
 @login_required
 def ngo_stats(request):
+    all_donations = Donations.objects.all()
 
-    ngo_count = ngo.objects.count()
-    donor_count = donor.objects.filter(is_superuser=False).count()
-    total_donations = donations.objects.count()
-    avg_quantity = donations.objects.aggregate(Avg(QUANTITY))
-    max_quantity = donations.objects.aggregate(Max(QUANTITY))
-    total_quantity = donations.objects.aggregate(Sum(QUANTITY))
-    avg_quantity = int(avg_quantity[QUANT_AVG])
+    ngo_count = Ngo.objects.count()
+    donor_count = Donor.objects.filter(is_superuser=False).count()
+    total_donations = Donations.objects.count()
+    if total_donations > 0:
+        avg_quantity = all_donations.aggregate(Avg(QUANTITY))
+        avg_quantity = int(avg_quantity[QUANT_AVG])
+    else:
+        avg_quantity=CONST_0
+    max_quantity = Donations.objects.aggregate(Max(QUANTITY))
+    total_quantity = Donations.objects.aggregate(Sum(QUANTITY))
+    
 
     context = {
         "ngo_count": ngo_count,
@@ -852,9 +872,9 @@ def ngo_stats(request):
     """
     Calculating Donors Retention rate
     """
-    retention_period = timedelta(days=365)
+    retention_period = timedelta(days=YEAR_DAYS)
     start_date = (dt.now() - retention_period).replace(day=CONST_1)
-    total_donors = donations.objects.count()
+    total_donors = Donations.objects.count()
     end_date = dt.now().replace(day=CONST_1)
 
     # Create a list of all months within the retention period
@@ -864,17 +884,17 @@ def ngo_stats(request):
         start_date += relativedelta(months=CONST_1)
 
     returning_donors = {}
-    for donation in donations.objects.filter(
+    for donation in Donations.objects.filter(
         donation_date__gt=dt.now() - retention_period
     ):
         month = donation.donation_date.replace(day=1)
         donor_id = donation.donor_id.id
-        donors = donor.objects.filter(id=donor_id).first()
+        donors = Donor.objects.filter(id=donor_id).first()
         if donor_id in returning_donors.get(month - retention_period, set()):
             continue
         if (
             donors is not None
-            and donations.objects.filter(
+            and Donations.objects.filter(
                 donor_id=donor_id,
                 donation_date__lt=month,
                 donation_date__gt=month - retention_period,
@@ -916,7 +936,7 @@ def ngo_stats(request):
     """
     today = dt.now()
     first_day_of_month = today.replace(day=CONST_1)
-    all_donations = donations.all()
+    all_donations = Donations.objects.all()
 
     # Create a list of all the months in the current year
     all_months = []

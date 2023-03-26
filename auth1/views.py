@@ -13,7 +13,7 @@ def home_view(request):
 
 
 def donor_home(request):
-    user_donation = donations.objects.filter(donor_id=request.user)
+    user_donation = Donations.objects.filter(donor_id=request.user)
     lives = user_donation.filter(ngo_status=False, donor_status=False).aggregate(
         Sum(QUANTITY)
     )

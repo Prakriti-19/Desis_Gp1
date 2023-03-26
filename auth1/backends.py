@@ -1,5 +1,5 @@
 from django.contrib.auth.backends import BaseBackend
-from inventory.models import ngo, donor
+from inventory.models import *
 
 
 class MyUserBackend(BaseBackend):
@@ -19,15 +19,15 @@ class MyUserBackend(BaseBackend):
             the authenticated user object, or None if authentication fails
         """
         try:
-            user = ngo.objects.get(username=username, is_ngo=True)
+            user = Ngo.objects.get(username=username, is_ngo=True)
             if user.check_password(password):
                 return user
-        except ngo.DoesNotExist:
+        except Ngo.DoesNotExist:
             try:
-                user = donor.objects.get(username=username, is_ngo=False)
+                user = Donor.objects.get(username=username, is_ngo=False)
                 if user.check_password(password):
                     return user
-            except donor.DoesNotExist:
+            except Donor.DoesNotExist:
                 return None
 
     def get_user(self, user_id):
@@ -41,9 +41,9 @@ class MyUserBackend(BaseBackend):
             user instance if found, or None if not found
         """
         try:
-            return ngo.objects.get(pk=user_id)
-        except ngo.DoesNotExist:
+            return Ngo.objects.get(pk=user_id)
+        except Ngo.DoesNotExist:
             try:
-                return donor.objects.get(pk=user_id)
-            except donor.DoesNotExist:
+                return Donor.objects.get(pk=user_id)
+            except Donor.DoesNotExist:
                 return None
