@@ -1,71 +1,65 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
-from django.core.validators import EmailValidator, RegexValidator  
-from inventory.models import ngo, donor, pincode, donations
+from django.core.validators import RegexValidator
+from auth1.constants import *
+from inventory.constants import *
+from inventory.models import *
 
 
 class ngoUserCreationForm(UserCreationForm):
     """
-    The class ngoUserCreationForm is a subclass of the UserCreationForm provided
-    by Django. The Meta class is used to provide additional metadata for the ngo
-    model and is an example of abstraction.
+    Form for creating a new NGO account. It is subclass of the UserCreationForm
     """
 
     pincode = forms.ModelChoiceField(
         required=True,
         queryset=pincode.objects.all(),
-        widget=forms.Select(attrs={"class": "form-control", "data-label": "City"}),
+        widget=forms.Select(attrs={"class": CONTROL, "data-label": "City"}),
         label="City",
     )
     email = forms.EmailField(
         required=True,
-        max_length=350,
+        max_length=MAX_LENGTH,
         widget=forms.EmailInput(
             attrs={"class": "form-control", "placeholder": "Email"}
         ),
     )
     phone_regex = RegexValidator(
         regex=r"^\+?1?\d{9,15}$",
-        message="Phone number must be entered in the format: '+999999999'. Up to 15 digits allowed.",
+        message=PHONE_VAL,
     )
     ngo_name = forms.CharField(
         required=True,
-        max_length=255,
-        widget=forms.TextInput(
-            attrs={"class": "form-control", "placeholder": "NGO name"}
-        ),
+        max_length=MAX_LENGTH,
+        widget=forms.TextInput(attrs={"class": CONTROL, "placeholder": "NGO name"}),
     )
     phone_no = forms.CharField(
         validators=[phone_regex],
-        max_length=17,
-        widget=forms.TextInput(
-            attrs={"class": "form-control", "placeholder": "Phone number"}
-        ),
+        max_length=SMALL_MAX_LENGTH,
+        widget=forms.TextInput(attrs={"class": CONTROL, "placeholder": "Phone number"}),
     )
     username = forms.CharField(
-        max_length=255,
-        widget=forms.TextInput(
-            attrs={"class": "form-control", "placeholder": "Username"}
-        ),
+        max_length=MAX_LENGTH,
+        widget=forms.TextInput(attrs={"class": CONTROL, "placeholder": "Username"}),
     )
     password1 = forms.CharField(
         required=True,
-        max_length=150,
+        max_length=PASSWORD_LEN,
         widget=forms.PasswordInput(
             attrs={
-                "class": "form-control",
-                "data-label": "Password",
-                "placeholder": "Password",
+                "class": CONTROL,
+                "data-label": PASSWORD,
+                "placeholder": PASSWORD,
             }
         ),
-        label="Password",
+        label=PASSWORD,
     )
     password2 = forms.CharField(
         required=True,
-        max_length=150,
+        max_length=PASSWORD_LEN,
         widget=forms.PasswordInput(
             attrs={
-                "class": "form-control",
+                "class": CONTROL,
                 "data-label": "Confirm password",
                 "placeholder": "confirm password",
             }
@@ -95,13 +89,20 @@ class ngoUserCreationForm(UserCreationForm):
         }
 
     def clean(self):
+        """
+        Overrides clean() method to add custom validation for email and phone
+        number
+
+        :return:
+            error message in case of duplicacy in mail or phone number
+        """
         cleaned_data = super().clean()
-        email = cleaned_data.get("email")
-        phone_no = cleaned_data.get("phone_no")
+        email = cleaned_data.get(EMAIL)
+        phone_no = cleaned_data.get(PHONE_NO)
         if donor.objects.filter(email=email).exists():
-            self.add_error("email", "Email already exists.")
+            self.add_error(EMAIL, VALIDATION_MSG)
         if donor.objects.filter(phone_no=phone_no).exists():
-            self.add_error("phone_no", "Phone number already exists.")
+            self.add_error(PHONE_NO, VALIDATION_MSG)
 
     def save(self, commit=True):
         user = super().save(commit=False)
@@ -113,60 +114,53 @@ class ngoUserCreationForm(UserCreationForm):
 
 class donorUserCreationForm(UserCreationForm):
     """
-    Same goes for which is used to customize the form for donor registration
+    Form for creating a new Donor account. It is subclass of the
+    UserCreationForm
     """
 
     pincode = forms.ModelChoiceField(
         queryset=pincode.objects.all(),
-        widget=forms.Select(attrs={"class": "form-control", "data-label": "City"}),
+        widget=forms.Select(attrs={"class": CONTROL, "data-label": "City"}),
         label="City",
     )
     email = forms.EmailField(
-        max_length=350,
+        max_length=MAX_LENGTH,
         required=True,
-        widget=forms.EmailInput(
-            attrs={"class": "form-control", "placeholder": "Email"}
-        ),
+        widget=forms.EmailInput(attrs={"class": CONTROL, "placeholder": "Email"}),
     )
     donor_name = forms.CharField(
-        max_length=255,
-        widget=forms.TextInput(
-            attrs={"class": "form-control", "placeholder": "Donor name"}
-        ),
+        max_length=MAX_LENGTH,
+        widget=forms.TextInput(attrs={"class": CONTROL, "placeholder": "Donor name"}),
     )
     phone_regex = RegexValidator(
         regex=r"^\+?1?\d{9,15}$",
-        message="Phone number must be entered in the format: '+999999999'. Up to 15 digits allowed.",
+        message=PHONE_VAL,
     )
     phone_no = forms.CharField(
         validators=[phone_regex],
-        max_length=17,
-        widget=forms.TextInput(
-            attrs={"class": "form-control", "placeholder": "Phone number"}
-        ),
+        max_length=SMALL_MAX_LENGTH,
+        widget=forms.TextInput(attrs={"class": CONTROL, "placeholder": "Phone number"}),
     )
     username = forms.CharField(
-        max_length=255,
-        widget=forms.TextInput(
-            attrs={"class": "form-control", "placeholder": "Username"}
-        ),
+        max_length=MAX_LENGTH,
+        widget=forms.TextInput(attrs={"class": CONTROL, "placeholder": "Username"}),
     )
     password1 = forms.CharField(
-        max_length=150,
+        max_length=PASSWORD_LEN,
         widget=forms.PasswordInput(
             attrs={
-                "class": "form-control",
-                "data-label": "Password",
-                "placeholder": "Password",
+                "class": CONTROL,
+                "data-label": PASSWORD,
+                "placeholder": PASSWORD,
             }
         ),
-        label="Password",
+        label=PASSWORD,
     )
     password2 = forms.CharField(
-        max_length=150,
+        max_length=PASSWORD_LEN,
         widget=forms.PasswordInput(
             attrs={
-                "class": "form-control",
+                "class": CONTROL,
                 "data-label": "Confirm password",
                 "placeholder": "confirm password",
             }
@@ -192,17 +186,17 @@ class donorUserCreationForm(UserCreationForm):
             "longitude": forms.HiddenInput(),
         }
         attrs = {
-            "class": "form-control",
+            "class": CONTROL,
         }
 
     def clean(self):
         cleaned_data = super().clean()
-        email = cleaned_data.get("email")
-        phone_no = cleaned_data.get("phone_no")
+        email = cleaned_data.get(EMAIL)
+        phone_no = cleaned_data.get(PHONE_NO)
         if donor.objects.filter(email=email).exists():
-            self.add_error("email", "Email already exists.")
+            self.add_error(EMAIL, VALIDATION_MSG)
         if donor.objects.filter(phone_no=phone_no).exists():
-            self.add_error("phone_no", "Phone number already exists.")
+            self.add_error(PHONE_NO, VALIDATION_MSG)
 
     def save(self, commit=True):
         user = super().save(commit=False)
@@ -213,10 +207,9 @@ class donorUserCreationForm(UserCreationForm):
 
 
 class DonationForm(forms.ModelForm):
-    HOME_FOOD = "homefood"
-    PARTY = "party"
-    RESTAURANT = "restro"
-    OTHER = "other"
+    """
+    Form for creating a new Donation
+    """
 
     TYPE_CHOICES = [
         (HOME_FOOD, "Home Food"),
@@ -227,12 +220,12 @@ class DonationForm(forms.ModelForm):
 
     type = forms.TypedChoiceField(
         choices=TYPE_CHOICES,
-        widget=forms.Select(attrs={"class": "form-control"}),
+        widget=forms.Select(attrs={"class": CONTROL}),
         coerce=str,
     )
     pincode = forms.ModelChoiceField(
         queryset=pincode.objects.all(),
-        widget=forms.Select(attrs={"class": "form-control"}),
+        widget=forms.Select(attrs={"class": CONTROL}),
     )
 
     class Meta:
@@ -249,20 +242,16 @@ class DonationForm(forms.ModelForm):
         )
         widgets = {
             "description": forms.TextInput(
-                attrs={"class": "form-control", "placeholder": "Description"}
+                attrs={"class": CONTROL, "placeholder": "Description"}
             ),
             "quantity": forms.NumberInput(
                 attrs={
-                    "class": "form-control",
+                    "class": CONTROL,
                     "placeholder": "No. of people it can serve",
                 }
             ),
-            "donation_date": forms.DateInput(
-                attrs={"class": "form-control", "type": "date"}
-            ),
-            "exp_date": forms.DateInput(
-                attrs={"class": "form-control", "type": "date"}
-            ),
+            "donation_date": forms.DateInput(attrs={"class": CONTROL, "type": "date"}),
+            "exp_date": forms.DateInput(attrs={"class": CONTROL, "type": "date"}),
             "latitude": forms.HiddenInput(),
             "longitude": forms.HiddenInput(),
         }
@@ -272,9 +261,9 @@ class DonationForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
 
     def clean_quantity(self):
-        quantity = self.cleaned_data["quantity"]
+        quantity = self.cleaned_data[QUANTITY]
         if quantity <= 0:
-            raise forms.ValidationError("Quantity should be a positive integer")
+            raise forms.ValidationError(QUANTITY_ERROR_MSG)
         return quantity
 
     def save(self, commit=True):
