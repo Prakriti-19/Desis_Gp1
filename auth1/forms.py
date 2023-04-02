@@ -31,12 +31,14 @@ class ngoUserCreationForm(UserCreationForm):
     ngo_name = forms.CharField(
         required=True,
         max_length=MAX_LENGTH,
-        widget=forms.TextInput(attrs={"class": CONTROL, "placeholder": "NGO name"}),
+        widget=forms.TextInput(attrs={"class": CONTROL,"data-label": "NGO Name" ,"placeholder": "NGO Name"}),
+        label="NGO Name",
     )
     phone_no = forms.CharField(
         validators=[phone_regex],
         max_length=SMALL_MAX_LENGTH,
-        widget=forms.TextInput(attrs={"class": CONTROL, "placeholder": "Phone number"}),
+        widget=forms.TextInput(attrs={"class": CONTROL, "placeholder": "Phone Number"}),
+        label= "Phone Number",
     )
     username = forms.CharField(
         max_length=MAX_LENGTH,
@@ -49,10 +51,10 @@ class ngoUserCreationForm(UserCreationForm):
             attrs={
                 "class": CONTROL,
                 "data-label": PASSWORD,
-                "placeholder": PASSWORD,
+                "placeholder": "Password",
             }
         ),
-        label=PASSWORD,
+         label= "Password",
     )
     password2 = forms.CharField(
         required=True,
@@ -61,7 +63,7 @@ class ngoUserCreationForm(UserCreationForm):
             attrs={
                 "class": CONTROL,
                 "data-label": "Confirm password",
-                "placeholder": "confirm password",
+                "placeholder": "Confirm password",
             }
         ),
         label="Confirm password",
@@ -130,7 +132,7 @@ class donorUserCreationForm(UserCreationForm):
     )
     donor_name = forms.CharField(
         max_length=MAX_LENGTH,
-        widget=forms.TextInput(attrs={"class": CONTROL, "placeholder": "Donor name"}),
+        widget=forms.TextInput(attrs={"class": CONTROL, "placeholder": "Donor Name"}),
     )
     phone_regex = RegexValidator(
         regex=r"^\+?1?\d{9,15}$",
@@ -139,7 +141,8 @@ class donorUserCreationForm(UserCreationForm):
     phone_no = forms.CharField(
         validators=[phone_regex],
         max_length=SMALL_MAX_LENGTH,
-        widget=forms.TextInput(attrs={"class": CONTROL, "placeholder": "Phone number"}),
+        widget=forms.TextInput(attrs={"class": CONTROL, "placeholder": "Phone Number"}),
+        label="Phone Number"
     )
     username = forms.CharField(
         max_length=MAX_LENGTH,
@@ -151,21 +154,21 @@ class donorUserCreationForm(UserCreationForm):
             attrs={
                 "class": CONTROL,
                 "data-label": PASSWORD,
-                "placeholder": PASSWORD,
+                "placeholder": "Password",
             }
         ),
-        label=PASSWORD,
+        label="Password",
     )
     password2 = forms.CharField(
         max_length=PASSWORD_LEN,
         widget=forms.PasswordInput(
             attrs={
                 "class": CONTROL,
-                "data-label": "Confirm password",
-                "placeholder": "confirm password",
+                "data-label": "Confirm Password",
+                "placeholder": "Confirm Password",
             }
         ),
-        label="Confirm password",
+        label="Confirm Password",
     )
 
     class Meta(UserCreationForm.Meta):

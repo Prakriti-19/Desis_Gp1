@@ -3,9 +3,9 @@
     <a href="{% url 'donor_home' %}" class="navbar-brand">Home</a>
     <h1>Statistics</h1>
     <p>Total Number of Donations: {{ total_donations }}</p>
-    <p>NGOs Registered through our website: {{ ngo_count }}</p>
-    <p>Donors active on our website: {{ donor_count }}</p>
-    <p>Meals Served: {{ total_quantity.quantity__sum}}</p>
+    <p>Registered NGOs: {{ ngo_count }}</p>
+    <p>Registered Donors: {{ donor_count }}</p>
+    <p>Total Meals Served: {{ total_quantity.quantity__sum}}</p>
     <p>Average Meals served per donation: {{ avg_quantity }}</p>
     <p>Maximum Meals served in single Donation: {{ max_quantity.quantity__max }}</p>
     <p>Average Inter City Food Donations: {{ average_weight }}</p>

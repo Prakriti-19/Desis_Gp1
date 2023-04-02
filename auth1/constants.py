@@ -19,7 +19,7 @@ CONTROL = "form-control"
 EMAIL = "email"
 PHONE_NO = "phone_no"
 PASSWORD_LEN = 150
-VALIDATION_MSG = "Value already exists"
+VALIDATION_MSG = "Please provide a unique value"
 QUANTITY_ERROR_MSG = "Quantity should be a positive integer"
 PHONE_VAL = "Phone number must be entered in the format: '+999999999'. Up to 15 digits allowed."
 

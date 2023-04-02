@@ -110,7 +110,7 @@
               <th>Name</th>
               <th>Distance (km)</th>
               <th>Contact Information</th>
-              <th>Donate Points</th>
+              <th>Donate DESCOINS</th>
             </tr>
           </thead>
           <tbody>
@@ -119,7 +119,7 @@
               <td>{{ ngo.ngo_name }}</td>
               <td>{{ ngo.distance }}</td>
               <td>{{ ngo.phone_no }}</td>
-              <td><a href="{% url 'donate_points' ngo.id %}">Donate Points</a></td>
+              <td><a href="{% url 'donate_points' ngo.id %}">Donate DESCOINS</a></td>
             </tr>
             {% empty %}
             <tr>

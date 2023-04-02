@@ -17,7 +17,6 @@ from dateutil.relativedelta import relativedelta
 from inventory.models import *
 from django.http import HttpResponse, HttpResponseBadRequest
 import matplotlib
-
 from payment.constants import *
 
 matplotlib.use("Agg")
@@ -734,7 +733,7 @@ def donations_stats(request):
     ax.plot(dates, amounts, color=COLOR_2)
     ax.set_xlabel("Date")
     ax.set_ylabel("Transaction Amount")
-    ax.set_title("Daily Transaction Amounts")
+    ax.set_title("Transaction Trend")
 
     # Set x-axis tick labels
     date_labels = [date.strftime("%Y-%m-%d") for date in dates]
@@ -824,9 +823,9 @@ def donations_stats(request):
         "max_quantity": max_quantity,
         "total_quantity": total_quantity,
         "total_edges": total_edges,
-        "average_weight": average_weight,
+        "average_weight": round(average_weight,2),
         "total_edges_state": total_edges_state,
-        "average_weight_state": average_weight_state,
+        "average_weight_state": round(average_weight_state,2),
     }
     return render(
         request,
