@@ -30,7 +30,8 @@ To set-up the development environment on your local machine, follow the below st
 - To activate the virtual environment: `source env/bin/activate`.
 - Other steps are same as in Windows.
 
----
+#### Once django is installed successfully and working, it's time to install the packages so run: `pip install -r requirements.txt`
+
 ### Running Migrations 
 
 - Run the command:  `python manage.py makemigrations`.
@@ -46,7 +47,7 @@ To set-up the development environment on your local machine, follow the below st
   To access the admin site, run the server, open a browser, and go to: `https://localhost:8000/admin/` and enter your username and password there.
 
 
-#### Once django is installed successfully and working, it's time to install the packages so run: `pip install -r requirements.txt`
+
 
 
 
