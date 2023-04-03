@@ -112,7 +112,7 @@
   <h1 class="heading">Sign up</h1>
   <p class="heading">Please fill out the following information to sign up</p>
   <div class="container">
-    <form method="post" class="my-form">
+    <form method="post" class="my-form" autocomplete="off">
       {% csrf_token %}
       {{ form.as_p }}
       <input type="hidden" id="latitude" name="latitude">

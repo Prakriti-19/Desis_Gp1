@@ -123,7 +123,7 @@
   <h1 class="heading">Donate</h1>
   <div class="n">
 
-    <form id="donation-form" method="post">
+    <form id="donation-form" method="post" autocomplete="off">
       {% csrf_token %}
       {{ form.as_p }}
       <input type="hidden" name="latitude" id="latitude">
