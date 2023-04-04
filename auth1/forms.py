@@ -228,7 +228,7 @@ class DonationForm(forms.ModelForm):
     )
     pincode = forms.ModelChoiceField(
         queryset=Pincode.objects.all(),
-        widget=forms.Select(attrs={"class": CONTROL}),
+        widget=forms.Select(attrs={"class": CONTROL}), label="City",
     )
 
     class Meta:
