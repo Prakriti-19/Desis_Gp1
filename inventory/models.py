@@ -2,6 +2,7 @@ from django.utils import timezone
 from django.db import models
 from django.contrib.auth.models import Permission, Group, AbstractUser, BaseUserManager
 from inventory.constants import *
+from abc import ABC, abstractmethod
 
 
 class NgoManager(BaseUserManager):
@@ -219,6 +220,73 @@ class Donations(models.Model):
 
     def __str__(self):
         return self.description
+
+
+
+# class Donation(ABC):
+#     TYPE_CHOICES = [
+#         (HOME_FOOD, "Home Food"),
+#         (PARTY, "Party"),
+#         (RESTAURANT, "Restaurant"),
+#         (OTHER, "Other"),
+#     ]
+    
+#     @abstractmethod
+#     def get_donor(self):
+#         pass
+    
+#     @abstractmethod
+#     def get_ngo(self):
+#         pass
+    
+#     @abstractmethod
+#     def get_donation_date(self):
+#         pass
+    
+#     @abstractmethod
+#     def get_quantity(self):
+#         pass
+    
+#     # define other abstract methods as needed
+    
+# class Donations(Donation, models.Model):
+#     id = models.AutoField(primary_key=True)
+#     donor_id = models.ForeignKey(Donor, on_delete=models.CASCADE)
+#     ngo_id = models.ForeignKey(
+#         Ngo,
+#         on_delete=models.CASCADE,
+#         related_name=NGO_DONATION,
+#         blank=True,
+#         null=True,
+#     )
+#     donation_date = models.DateField(null=True)
+#     exp_date = models.DateField()
+#     longitude = models.DecimalField(
+#         decimal_places=DECIMAL_MAX_LENGTH, max_digits=SMALL_MAX_LENGTH
+#     )
+#     latitude = models.DecimalField(
+#         decimal_places=DECIMAL_MAX_LENGTH, max_digits=SMALL_MAX_LENGTH
+#     )
+#     pincode = models.ForeignKey("pincode", on_delete=models.CASCADE, null=True)
+#     quantity = models.IntegerField()
+#     description = models.TextField()
+#     ngo_status = models.BooleanField(default=True)
+#     donor_status = models.BooleanField(default=True)
+#     type = models.CharField(max_length=10, choices=TYPE_CHOICES, default=OTHER)
+
+#     def get_donor(self):
+#         return self.donor_id
+    
+#     def get_ngo(self):
+#         return self.ngo_id
+    
+#     def get_donation_date(self):
+#         return self.donation_date
+    
+#     def get_quantity(self):
+#         return self.quantity
+
+
 
 class Transaction_code(models.Model):
     """
