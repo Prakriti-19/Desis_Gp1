@@ -44,7 +44,6 @@ INSTALLED_APPS = [
     'rest_framework',
     'corsheaders',
     'django_filters',
-    'versatileimagefield',
     'payment',
 ]
 
@@ -84,14 +83,6 @@ AUTHENTICATION_BACKENDS = [
 ]
 WSGI_APPLICATION = 'test1.wsgi.application'
 
-VERSATILEIMAGEFIELD_RENDITION_KEY_SETS = {
-    'product_headshot': [
-        ('full_size', 'url'),
-        ('thumbnail', 'thumbnail__100x100'),
-        ('medium_square_crop', 'crop__400x400'),
-        ('small_square_crop', 'crop__50x50')
-    ]
-}
 
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases

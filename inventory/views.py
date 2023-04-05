@@ -480,13 +480,13 @@ def donations_stats(request):
 
     # Populate the dictionaries with the actual donation amounts
     for donation in user_donations:
-        month_str = donation[MONTH].strftime("%b %Y")
+        month_str = donation[MONTH].strftime("%b")
         user_donation_dict[month_str] = donation[TOTAL_DONATION]
     for donation in city_donations:
-        month_str = donation[MONTH].strftime("%b %Y")
+        month_str = donation[MONTH].strftime("%b")
         city_donation_dict[month_str] = donation[TOTAL_DONATION]
     for donation in tot_donations:
-        month_str = donation[MONTH].strftime("%b %Y")
+        month_str = donation[MONTH].strftime("%b")
         tot_donation_dict[month_str] = donation[TOTAL_DONATION]
 
     # Convert the dictionaries to lists for plotting
